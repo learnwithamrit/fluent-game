@@ -283,39 +283,66 @@ function shuffle(arr){
 // ═══════════════════════════════════════════════════
 //  LOAD PUZZLES FROM GOOGLE SHEET
 // ═══════════════════════════════════════════════════
+function useFallback(){
+  PUZZLES=shuffle(FALLBACK.map(p=>({...p,words:shuffle(p.words.map(w=>({...w})))})));
+}
+
 async function loadPuzzles(){
-  if(!SHEET_URL||SHEET_URL==='YOUR_SHEET_CSV_URL_HERE'){
-    PUZZLES=shuffle(FALLBACK.map(p=>({...p,words:shuffle([...p.words])))));
-    return;
-  }
+  // Always load fallback first — game is never stuck
+  useFallback();
+
+  if(!SHEET_URL) return;
+
   try{
-    const res=await fetch(SHEET_URL);
+    // 5-second timeout so a slow Sheet never hangs the game
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),5000);
+    const res=await fetch(SHEET_URL,{signal:controller.signal});
+    clearTimeout(timeout);
+
     const csv=await res.text();
-    const rows=csv.trim().split('\n').slice(1); // skip header
+    const rows=csv.trim().split('\n').slice(1); // skip header row
+    if(!rows.length||!rows[0].trim()) return; // Sheet empty — keep fallback
+
     const parsed=rows.map(row=>{
-      const cols=row.split(',').map(c=>c.replace(/^"|"$/g,'').trim());
-      // cols: topic, b_words(|sep), b_answer, b_hint, m_words, m_answer, m_hint, v_words, v_answer, v_hint
-      const parseWords=(str,req)=>str.split('|').map(t=>({t:t.trim(),r:req}));
-      const bW=parseWords(cols[1],1);
-      const mExtra=cols[4].split('|').map(t=>({t:t.trim(),r:0}));
-      const vExtra=cols[7].split('|').map(t=>({t:t.trim(),r:0}));
-      const allWords=[...bW,...mExtra,...vExtra];
-      const mNeeded=[...bW.map(w=>w.t),...mExtra.map(w=>w.t)];
-      const vNeeded=allWords.map(w=>w.t);
+      // Split carefully — commas inside quotes are part of a cell
+      const cols=[];
+      let cur='', inQ=false;
+      for(let i=0;i<row.length;i++){
+        if(row[i]==='"'){inQ=!inQ;}
+        else if(row[i]===','&&!inQ){cols.push(cur.trim());cur='';}
+        else cur+=row[i];
+      }
+      cols.push(cur.trim());
+
+      if(!cols[0]||!cols[1]||!cols[2]) return null; // skip incomplete rows
+
+      const parseWords=(str,req)=>(str||'').split('|').map(t=>({t:t.trim(),r:req})).filter(w=>w.t);
+      const bW     = parseWords(cols[1],1);
+      const mExtra = parseWords(cols[4],0);
+      const vExtra = parseWords(cols[7],0);
+      if(!bW.length) return null;
+
+      const allWords = [...bW,...mExtra,...vExtra];
+      const mNeeded  = [...bW.map(w=>w.t),...mExtra.map(w=>w.t)];
+      const vNeeded  = allWords.map(w=>w.t);
+
       return {
-        topic:cols[0],
-        words:shuffle(allWords),
+        topic: cols[0],
+        words: shuffle(allWords),
         lv:{
-          b:{n:bW.map(w=>w.t),h:cols[3]||"",a:cols[2]},
-          m:{n:mNeeded,h:cols[6]||"",a:cols[5]},
-          v:{n:vNeeded,h:cols[9]||"",a:cols[8]},
+          b:{n:bW.map(w=>w.t), h:cols[3]||'', a:cols[2]},
+          m:{n:mNeeded,         h:cols[6]||'', a:cols[5]||cols[2]},
+          v:{n:vNeeded,         h:cols[9]||'', a:cols[8]||cols[2]},
         }
       };
-    }).filter(p=>p.topic);
-    PUZZLES=shuffle(parsed);
+    }).filter(Boolean);
+
+    if(parsed.length>0) PUZZLES=shuffle(parsed); // only replace if we got real data
+
   }catch(e){
-    console.warn('Sheet load failed, using fallback',e);
-    PUZZLES=shuffle(FALLBACK.map(p=>({...p,words:shuffle([...p.words])})));
+    console.warn('Sheet load failed — using built-in puzzles.',e.message);
+    // fallback already loaded above, nothing to do
   }
 }
 
@@ -608,7 +635,7 @@ function finishSession(){
   `;
 
   // Silent log to Google Sheets
-  if(LOGGER_URL && LOGGER_URL!=='YOUR_APPS_SCRIPT_URL_HERE'){
+  if(LOGGER_URL){
     fetch(LOGGER_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -638,12 +665,25 @@ function resetAll(){
 }
 
 // ═══════════════════════════════════════════════════
-//  BOOT
+//  BOOT — bulletproof, never hangs
 // ═══════════════════════════════════════════════════
-window.addEventListener('load',async()=>{
-  await loadPuzzles();
-  document.getElementById('loadingScreen').style.display='none';
-  document.getElementById('nameScreen').style.display='flex';
+window.addEventListener('load', async () => {
+  // Safety net: always show name screen within 6 seconds no matter what
+  const safetyNet = setTimeout(() => {
+    useFallback();
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('nameScreen').style.display    = 'flex';
+  }, 6000);
+
+  try {
+    await loadPuzzles();
+  } catch(e) {
+    useFallback();
+  }
+
+  clearTimeout(safetyNet);
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('nameScreen').style.display    = 'flex';
 });
 </script>
 </body>
