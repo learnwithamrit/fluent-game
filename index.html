@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fluent — by Amrit</title>
+<style>
+:root {
+  --bg:#0d0d1a; --sur:#161628; --sur2:#1e1e38; --brd:#2e2e52;
+  --txt:#e8e8f0; --mut:#7070a0; --acc:#ff8906; --ac2:#f9c74f;
+  --grn:#06d6a0; --red:#ef4565; --blu:#3da9fc;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden;}
+
+/* ── NAME SCREEN ── */
+#nameScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;text-align:center;gap:0;}
+.ns-logo{font-size:2.8rem;margin-bottom:8px;}
+.ns-title{font-size:1.6rem;font-weight:900;color:var(--acc);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.ns-by{font-size:0.72rem;color:var(--mut);letter-spacing:1px;margin-bottom:36px;}
+.ns-label{font-size:0.8rem;color:var(--mut);font-weight:700;margin-bottom:10px;letter-spacing:.5px;}
+.ns-input{background:var(--sur);border:2px solid var(--brd);border-radius:14px;padding:14px 20px;font-size:1rem;color:var(--txt);width:100%;max-width:320px;outline:none;text-align:center;transition:border .2s;}
+.ns-input:focus{border-color:var(--acc);}
+.ns-input::placeholder{color:var(--mut);}
+.ns-btn{margin-top:20px;background:var(--acc);color:#0d0d1a;border:none;border-radius:14px;padding:14px 40px;font-size:1rem;font-weight:900;cursor:pointer;letter-spacing:.5px;transition:all .2s;max-width:320px;width:100%;}
+.ns-btn:hover{background:#ffaa30;transform:translateY(-2px);}
+.ns-note{font-size:0.65rem;color:var(--mut);margin-top:16px;line-height:1.6;max-width:300px;}
+
+/* ── GAME SCREEN ── */
+#gameScreen{display:none;flex-direction:column;align-items:center;padding:14px 8px 48px;width:100%;max-width:420px;}
+
+/* header */
+.g-title{font-size:1.1rem;font-weight:900;letter-spacing:2px;color:var(--acc);text-transform:uppercase;text-align:center;margin-bottom:1px;}
+.g-sub{font-size:0.6rem;color:var(--mut);text-align:center;margin-bottom:10px;}
+
+/* score bar */
+.scorebar{display:flex;gap:12px;background:var(--sur);border:1px solid var(--brd);border-radius:30px;padding:6px 16px;margin-bottom:10px;font-size:0.6rem;color:var(--mut);}
+.scorebar .sv{font-weight:900;color:var(--acc);font-size:0.85rem;display:block;text-align:center;}
+
+/* attempts */
+.att-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:0.6rem;color:var(--mut);}
+.pip{width:10px;height:10px;border-radius:50%;background:var(--brd);transition:background .2s;}
+.pip.used{background:var(--red);}
+
+/* tabs */
+.tabs{display:flex;gap:4px;margin-bottom:7px;}
+.tab{padding:5px 10px;border-radius:18px;border:2px solid;font-size:0.65rem;font-weight:800;cursor:pointer;transition:all .2s;background:var(--sur);user-select:none;}
+.tab.beg{border-color:var(--blu);color:var(--blu);}
+.tab.int{border-color:var(--ac2);color:var(--ac2);}
+.tab.adv{border-color:var(--red);color:var(--red);}
+.tab.beg.active{background:var(--blu);color:#0d0d1a;}
+.tab.int.active{background:var(--ac2);color:#0d0d1a;}
+.tab.adv.active{background:var(--red);color:#fff;}
+
+.lvldesc{font-size:0.6rem;color:var(--mut);text-align:center;margin-bottom:7px;line-height:1.4;min-height:14px;}
+.topic{font-size:0.58rem;color:var(--ac2);font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#f9c74f18;border:1px solid #f9c74f44;border-radius:9px;padding:2px 10px;margin-bottom:8px;text-align:center;}
+
+/* circle */
+.gw{position:relative;width:340px;height:340px;margin-bottom:10px;flex-shrink:0;}
+canvas{position:absolute;top:0;left:0;pointer-events:none;}
+.hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:0.46rem;font-weight:900;color:#0d0d1a;text-align:center;line-height:1.3;letter-spacing:.4px;text-transform:uppercase;box-shadow:0 0 22px #ff890640;transition:all .3s;z-index:5;user-select:none;}
+.hub.win{background:var(--grn);transform:translate(-50%,-50%) scale(1.15);}
+.hub.fail{background:var(--red);transform:translate(-50%,-50%) scale(1.1);}
+.node{position:absolute;transform:translate(-50%,-50%);padding:3px 8px;border-radius:16px;border:2px solid var(--brd);background:var(--sur);font-size:0.64rem;font-weight:700;cursor:pointer;user-select:none;transition:all .15s;white-space:nowrap;z-index:10;color:var(--mut);}
+.node.req{border-color:var(--acc);color:var(--acc);}
+.node.lck{opacity:.15;cursor:not-allowed;pointer-events:none;}
+.node.sel-req{background:var(--acc);color:#0d0d1a;border-color:var(--acc);box-shadow:0 0 10px var(--acc);}
+.node.sel-opt{background:var(--sur2);color:var(--txt);border-color:var(--mut);box-shadow:0 0 8px var(--mut);}
+
+/* sentence box */
+.sentbox{width:340px;background:var(--sur);border:2px solid var(--brd);border-radius:12px;padding:9px 12px;margin-bottom:7px;min-height:50px;}
+.slabel{font-size:0.5rem;color:var(--mut);font-weight:800;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:4px;}
+.sbuilt{font-size:0.82rem;line-height:1.6;min-height:22px;display:flex;flex-wrap:wrap;align-items:center;gap:3px;}
+.chip{display:inline-flex;align-items:center;gap:2px;background:var(--acc);color:#0d0d1a;border-radius:10px;padding:1px 7px;font-size:0.7rem;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.chip:hover{opacity:.75;}
+.chip.opt{background:var(--sur2);color:var(--txt);border:1px solid var(--brd);}
+.sph{color:var(--brd);font-size:0.7rem;font-style:italic;}
+.sper{font-size:0.9rem;font-weight:900;color:var(--mut);}
+
+/* answer reveal */
+.ansbox{width:340px;background:#ef456512;border:2px solid var(--red);border-radius:11px;padding:8px 12px;margin-bottom:7px;display:none;}
+.ansbox.show{display:block;}
+.anslbl{font-size:0.5rem;color:var(--red);font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+.anstxt{font-size:0.82rem;color:var(--txt);font-weight:600;line-height:1.5;}
+
+/* banner */
+.banner{width:340px;border-radius:11px;padding:8px 12px;font-size:0.72rem;font-weight:700;text-align:center;margin-bottom:7px;line-height:1.5;display:none;}
+.banner.show{display:block;animation:popIn .25s ease;}
+@keyframes popIn{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+.banner.suc{background:#06d6a018;border:2px solid var(--grn);color:var(--grn);}
+.banner.err{background:#ef456518;border:2px solid var(--red);color:var(--red);}
+.banner.par{background:#f9c74f18;border:2px solid var(--ac2);color:var(--ac2);}
+
+/* hint */
+.hint{width:340px;font-size:0.6rem;color:var(--mut);text-align:center;font-style:italic;line-height:1.4;min-height:18px;margin-bottom:6px;}
+
+/* buttons */
+.btnrow{display:flex;gap:6px;width:340px;margin-bottom:8px;}
+.btn{flex:1;padding:9px;border-radius:9px;border:none;font-size:0.7rem;font-weight:800;cursor:pointer;transition:all .18s;user-select:none;}
+.btn-c{background:var(--sur2);color:var(--mut);border:2px solid var(--brd);}
+.btn-k{background:var(--acc);color:#0d0d1a;}
+.btn-n{background:var(--blu);color:#0d0d1a;}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+
+/* dots */
+.dots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:340px;margin-bottom:12px;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--brd);cursor:pointer;transition:background .2s;}
+.dot.cur{background:var(--acc);}
+.dot.ok{background:var(--grn);}
+.dot.rev{background:var(--red);}
+
+/* finish screen */
+#finishScreen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;text-align:center;gap:12px;}
+.fin-emoji{font-size:3rem;}
+.fin-title{font-size:1.4rem;font-weight:900;color:var(--acc);}
+.fin-name{font-size:1rem;color:var(--txt);font-weight:700;}
+.fin-stats{background:var(--sur);border:1px solid var(--brd);border-radius:14px;padding:16px 24px;width:100%;max-width:320px;text-align:left;display:flex;flex-direction:column;gap:8px;}
+.fin-stat{display:flex;justify-content:space-between;font-size:0.8rem;color:var(--mut);}
+.fin-stat span{color:var(--txt);font-weight:800;}
+.fin-btn{background:var(--acc);color:#0d0d1a;border:none;border-radius:12px;padding:13px 32px;font-size:0.9rem;font-weight:900;cursor:pointer;transition:all .2s;}
+.fin-btn:hover{background:#ffaa30;}
+.fin-note{font-size:0.6rem;color:var(--mut);max-width:280px;line-height:1.6;}
+
+/* loading */
+#loadingScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;}
+.spin{width:40px;height:40px;border:3px solid var(--brd);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.load-txt{font-size:0.75rem;color:var(--mut);}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loadingScreen">
+  <div class="spin"></div>
+  <div class="load-txt">Loading Fluent…</div>
+</div>
+
+<!-- NAME ENTRY -->
+<div id="nameScreen">
+  <div class="ns-logo">🔵</div>
+  <div class="ns-title">Fluent</div>
+  <div class="ns-by">by Amrit</div>
+  <div class="ns-label">What is your name?</div>
+  <input class="ns-input" id="nameInput" type="text" placeholder="Type your name here…" maxlength="40" autocomplete="off">
+  <button class="ns-btn" id="startBtn" onclick="startGame()">Let's Play →</button>
+  <div class="ns-note">Build English sentences step by step.<br>Tap the words, connect the dots, grow your fluency!</div>
+</div>
+
+<!-- GAME -->
+<div id="gameScreen">
+  <div class="g-title">Fluent</div>
+  <div class="g-sub">by Amrit &nbsp;·&nbsp; <span id="playerLabel"></span></div>
+
+  <div class="scorebar">
+    <div><span class="sv" id="sc">0</span>Score</div>
+    <div><span class="sv" id="str">0🔥</span>Streak</div>
+    <div><span class="sv" id="pno">1/20</span>Puzzle</div>
+    <div><span class="sv" id="timer">0:00</span>Time</div>
+  </div>
+
+  <div class="att-row">
+    <span>Attempts:</span>
+    <div class="pip" id="p1"></div>
+    <div class="pip" id="p2"></div>
+    <div class="pip" id="p3"></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab beg active" onclick="setLv('b')">🌱 Beginner</div>
+    <div class="tab int"        onclick="setLv('m')">🔥 Intermediate</div>
+    <div class="tab adv"        onclick="setLv('v')">⚡ Advanced</div>
+  </div>
+
+  <div class="lvldesc" id="ldesc"></div>
+  <div class="topic"   id="tpc"></div>
+
+  <div class="gw" id="gw">
+    <canvas id="cv" width="340" height="340"></canvas>
+    <div class="hub" id="hub">TAP<br>WORDS</div>
+  </div>
+
+  <div class="sentbox">
+    <div class="slabel">Your Sentence</div>
+    <div class="sbuilt" id="sb"></div>
+  </div>
+
+  <div class="ansbox" id="ansbox">
+    <div class="anslbl">💡 One Correct Answer</div>
+    <div class="anstxt" id="anstxt"></div>
+  </div>
+
+  <div class="banner" id="ban"></div>
+  <div class="hint"   id="hnt"></div>
+
+  <div class="btnrow">
+    <button class="btn btn-c" id="clrBtn" onclick="clearAll()">✖ Clear</button>
+    <button class="btn btn-k" id="ckBtn"  onclick="doCheck()">✔ Check</button>
+    <button class="btn btn-n"             onclick="nextP()">Next ▶</button>
+  </div>
+
+  <div class="dots" id="dots"></div>
+
+  <button class="btn btn-c" style="width:340px;margin-top:4px;font-size:0.65rem;" onclick="finishSession()">Finish Session</button>
+</div>
+
+<!-- FINISH -->
+<div id="finishScreen">
+  <div class="fin-emoji">🎉</div>
+  <div class="fin-title">Well Done!</div>
+  <div class="fin-name" id="finName"></div>
+  <div class="fin-stats" id="finStats"></div>
+  <div class="fin-note">Your results have been saved. Great work today!</div>
+  <button class="fin-btn" onclick="resetAll()">Play Again</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  CONFIG — paste your values here after setup
+// ═══════════════════════════════════════════════════
+const SHEET_URL    = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-03zbbhbOpFNaWLdiRSBZhLqof8YacXhVYgjPvXG9wf5-N8lCuID4dF-ZGzmxHfNMhGwXZ-XSBy5V/pub?gid=0&single=true&output=csv';
+const LOGGER_URL   = 'https://script.google.com/macros/s/AKfycbxZRRa7RER6VmCzPGZqAcQUnIKyDjjmgJFiCAjcMpeHL3DMl1Yo3jpzfTiyuDMXDv0/exec';
+
+// ═══════════════════════════════════════════════════
+//  FALLBACK PUZZLES (used if Sheet fails to load)
+// ═══════════════════════════════════════════════════
+const FALLBACK = [
+  {topic:"Morning Walk",       words:[{t:"She",r:1},{t:"walks",r:1},{t:"in",r:1},{t:"the",r:1},{t:"park",r:1},{t:"every",r:0},{t:"morning",r:0},{t:"early",r:0},{t:"quietly",r:0},{t:"alone",r:0},{t:"breathing",r:0},{t:"fresh",r:0},{t:"air",r:0}],   lv:{b:{n:["She","walks","in","the","park"],h:"",a:"She walks in the park."},m:{n:["She","walks","in","the","park","every","morning","quietly"],h:"When and how does she walk?",a:"She walks quietly in the park every morning."},v:{n:["She","walks","in","the","park","every","morning","early","quietly","alone","breathing","fresh","air"],h:"Early, alone, breathing fresh air — all 13 words.",a:"Every early morning she quietly walks alone in the park breathing fresh air."}}},
+  {topic:"A Kind Doctor",      words:[{t:"The",r:1},{t:"doctor",r:1},{t:"treats",r:1},{t:"patients",r:1},{t:"always",r:0},{t:"poor",r:0},{t:"kindly",r:0},{t:"free",r:0},{t:"of",r:0},{t:"charge",r:0},{t:"every",r:0},{t:"Sunday",r:0},{t:"in",r:0},{t:"the",r:0},{t:"village",r:0}],  lv:{b:{n:["The","doctor","treats","patients"],h:"",a:"The doctor treats patients."},m:{n:["The","doctor","treats","poor","patients","always","kindly"],h:"What kind of patients, and how?",a:"The doctor always kindly treats poor patients."},v:{n:["The","doctor","treats","patients","always","poor","kindly","free","of","charge","every","Sunday","in","the","village"],h:"Where, when, how — paint the full picture.",a:"Every Sunday the doctor always kindly treats poor patients free of charge in the village."}}},
+  {topic:"Cooking at Home",    words:[{t:"My",r:1},{t:"mother",r:1},{t:"cooks",r:1},{t:"food",r:1},{t:"delicious",r:0},{t:"every",r:0},{t:"day",r:0},{t:"fresh",r:0},{t:"using",r:0},{t:"vegetables",r:0},{t:"lovingly",r:0},{t:"for",r:0},{t:"the",r:0},{t:"whole",r:0},{t:"family",r:0}],  lv:{b:{n:["My","mother","cooks","food"],h:"",a:"My mother cooks food."},m:{n:["My","mother","cooks","delicious","food","every","day","lovingly"],h:"What kind, how often, with what feeling?",a:"My mother lovingly cooks delicious food every day."},v:{n:["My","mother","cooks","food","delicious","every","day","fresh","using","vegetables","lovingly","for","the","whole","family"],h:"Ingredients, feeling, who it is for — all 15 words.",a:"My mother lovingly cooks delicious food every day using fresh vegetables for the whole family."}}},
+  {topic:"Reading at Night",   words:[{t:"She",r:1},{t:"reads",r:1},{t:"books",r:1},{t:"every",r:1},{t:"night",r:1},{t:"interesting",r:0},{t:"always",r:0},{t:"quietly",r:0},{t:"in",r:0},{t:"her",r:0},{t:"room",r:0},{t:"before",r:0},{t:"sleeping",r:0},{t:"new",r:0}],  lv:{b:{n:["She","reads","books","every","night"],h:"",a:"She reads books every night."},m:{n:["She","reads","books","every","night","quietly","in","her","room"],h:"Where and how?",a:"She reads books quietly in her room every night."},v:{n:["She","reads","books","every","night","interesting","always","quietly","in","her","room","before","sleeping","new"],h:"What kind, where, when, what after — all 14 words.",a:"She always quietly reads interesting new books in her room every night before sleeping."}}},
+  {topic:"A Hardworking Farmer",words:[{t:"The",r:1},{t:"farmer",r:1},{t:"works",r:1},{t:"in",r:1},{t:"his",r:1},{t:"fields",r:0},{t:"tirelessly",r:0},{t:"every",r:0},{t:"day",r:0},{t:"from",r:0},{t:"early",r:0},{t:"morning",r:0},{t:"under",r:0},{t:"the",r:0},{t:"hot",r:0},{t:"sun",r:0}],  lv:{b:{n:["The","farmer","works","in","his"],h:"",a:"The farmer works in his fields."},m:{n:["The","farmer","works","in","his","fields","tirelessly","every","day"],h:"Where and how hard?",a:"The farmer works tirelessly in his fields every day."},v:{n:["The","farmer","works","in","his","fields","tirelessly","every","day","from","early","morning","under","the","hot","sun"],h:"From dawn under the blazing heat — all 16 words.",a:"The farmer works tirelessly in his fields every day from early morning under the hot sun."}}},
+  {topic:"School Assembly",    words:[{t:"The",r:1},{t:"students",r:1},{t:"stand",r:1},{t:"quietly",r:1},{t:"every",r:0},{t:"morning",r:0},{t:"in",r:0},{t:"the",r:0},{t:"assembly",r:0},{t:"respectfully",r:0},{t:"singing",r:0},{t:"national",r:0},{t:"anthem",r:0},{t:"together",r:0}],  lv:{b:{n:["The","students","stand","quietly"],h:"",a:"The students stand quietly."},m:{n:["The","students","stand","quietly","every","morning","in","the","assembly"],h:"Where and when?",a:"The students stand quietly every morning in the assembly."},v:{n:["The","students","stand","quietly","every","morning","in","the","assembly","respectfully","singing","national","anthem","together"],h:"Full scene — when, where, how, what they are doing.",a:"Every morning the students stand quietly respectfully together in the assembly singing the national anthem."}}},
+  {topic:"Evening Cricket",    words:[{t:"The",r:1},{t:"boys",r:1},{t:"play",r:1},{t:"cricket",r:1},{t:"enthusiastically",r:0},{t:"every",r:0},{t:"evening",r:0},{t:"on",r:0},{t:"the",r:0},{t:"local",r:0},{t:"ground",r:0},{t:"together",r:0},{t:"happily",r:0},{t:"shouting",r:0}],  lv:{b:{n:["The","boys","play","cricket"],h:"",a:"The boys play cricket."},m:{n:["The","boys","play","cricket","enthusiastically","every","evening","on","the","ground"],h:"How, when, and where?",a:"The boys enthusiastically play cricket every evening on the ground."},v:{n:["The","boys","play","cricket","enthusiastically","every","evening","on","the","local","ground","together","happily","shouting"],h:"Energy, place, togetherness — every word.",a:"Every evening the boys enthusiastically play cricket together on the local ground happily shouting."}}},
+  {topic:"A Helpful Neighbour",words:[{t:"Our",r:1},{t:"neighbour",r:1},{t:"helps",r:1},{t:"everyone",r:1},{t:"always",r:0},{t:"kindly",r:0},{t:"in",r:0},{t:"difficult",r:0},{t:"times",r:0},{t:"without",r:0},{t:"asking",r:0},{t:"for",r:0},{t:"anything",r:0},{t:"in",r:0},{t:"return",r:0}],  lv:{b:{n:["Our","neighbour","helps","everyone"],h:"",a:"Our neighbour helps everyone."},m:{n:["Our","neighbour","helps","everyone","always","kindly","in","difficult","times"],h:"How and when?",a:"Our neighbour always kindly helps everyone in difficult times."},v:{n:["Our","neighbour","helps","everyone","always","kindly","in","difficult","times","without","asking","for","anything","in","return"],h:"His selfless spirit — all 15 words.",a:"Our neighbour always kindly helps everyone in difficult times without asking for anything in return."}}},
+  {topic:"Baby's First Steps", words:[{t:"The",r:1},{t:"baby",r:1},{t:"walks",r:1},{t:"slowly",r:1},{t:"for",r:0},{t:"the",r:0},{t:"first",r:0},{t:"time",r:0},{t:"carefully",r:0},{t:"taking",r:0},{t:"small",r:0},{t:"steps",r:0},{t:"holding",r:0},{t:"her",r:0},{t:"mother",r:0}],  lv:{b:{n:["The","baby","walks","slowly"],h:"",a:"The baby walks slowly."},m:{n:["The","baby","walks","slowly","for","the","first","time","carefully"],h:"When is this, and how carefully?",a:"The baby walks slowly and carefully for the first time."},v:{n:["The","baby","walks","slowly","for","the","first","time","carefully","taking","small","steps","holding","her","mother"],h:"Every tender detail of that first moment.",a:"For the first time the baby slowly carefully walks taking small steps holding her mother."}}},
+  {topic:"Rain and Children",  words:[{t:"The",r:1},{t:"children",r:1},{t:"dance",r:1},{t:"happily",r:1},{t:"in",r:0},{t:"the",r:0},{t:"rain",r:0},{t:"every",r:0},{t:"time",r:0},{t:"it",r:0},{t:"pours",r:0},{t:"heavily",r:0},{t:"laughing",r:0},{t:"loudly",r:0},{t:"on",r:0},{t:"the",r:0},{t:"street",r:0}],  lv:{b:{n:["The","children","dance","happily"],h:"",a:"The children dance happily."},m:{n:["The","children","dance","happily","in","the","rain","every","time","it","pours"],h:"When and where?",a:"The children dance happily in the rain every time it pours."},v:{n:["The","children","dance","happily","in","the","rain","every","time","it","pours","heavily","laughing","loudly","on","the","street"],h:"Joy, street, heavy rain — every word.",a:"Every time it pours heavily the children dance happily on the street laughing loudly in the rain."}}},
+  {topic:"A Bright Student",   words:[{t:"The",r:1},{t:"student",r:1},{t:"answers",r:1},{t:"every",r:1},{t:"question",r:1},{t:"correctly",r:0},{t:"always",r:0},{t:"confidently",r:0},{t:"in",r:0},{t:"the",r:0},{t:"class",r:0},{t:"impressing",r:0},{t:"the",r:0},{t:"teacher",r:0}],  lv:{b:{n:["The","student","answers","every","question"],h:"",a:"The student answers every question."},m:{n:["The","student","answers","every","question","correctly","always","confidently"],h:"How well and how often?",a:"The student always confidently answers every question correctly."},v:{n:["The","student","answers","every","question","correctly","always","confidently","in","the","class","impressing","the","teacher"],h:"Confidence, setting, impact — all 14 words.",a:"The student always confidently answers every question correctly in the class impressing the teacher."}}},
+  {topic:"Temple Visit",       words:[{t:"The",r:1},{t:"old",r:1},{t:"woman",r:1},{t:"visits",r:1},{t:"the",r:1},{t:"temple",r:0},{t:"every",r:0},{t:"morning",r:0},{t:"carrying",r:0},{t:"fresh",r:0},{t:"flowers",r:0},{t:"devotedly",r:0},{t:"and",r:0},{t:"praying",r:0},{t:"softly",r:0}],  lv:{b:{n:["The","old","woman","visits","the"],h:"",a:"The old woman visits the temple."},m:{n:["The","old","woman","visits","the","temple","every","morning","carrying","fresh","flowers"],h:"Where, when, what does she bring?",a:"The old woman visits the temple every morning carrying fresh flowers."},v:{n:["The","old","woman","visits","the","temple","every","morning","carrying","fresh","flowers","devotedly","and","praying","softly"],h:"Her devotion and prayer — all 15 words.",a:"Every morning the old woman devotedly visits the temple carrying fresh flowers and praying softly."}}},
+  {topic:"A Street Vendor",    words:[{t:"The",r:1},{t:"vendor",r:1},{t:"sells",r:1},{t:"fruits",r:1},{t:"fresh",r:0},{t:"on",r:0},{t:"the",r:0},{t:"street",r:0},{t:"every",r:0},{t:"morning",r:0},{t:"loudly",r:0},{t:"calling",r:0},{t:"out",r:0},{t:"and",r:0},{t:"cheerfully",r:0},{t:"attracting",r:0},{t:"customers",r:0}],  lv:{b:{n:["The","vendor","sells","fruits"],h:"",a:"The vendor sells fruits."},m:{n:["The","vendor","sells","fresh","fruits","on","the","street","every","morning"],h:"What kind, where, when?",a:"The vendor sells fresh fruits on the street every morning."},v:{n:["The","vendor","sells","fresh","fruits","on","the","street","every","morning","loudly","calling","out","and","cheerfully","attracting","customers"],h:"The energy of the street — all 17 words.",a:"Every morning the vendor sells fresh fruits on the street loudly calling out and cheerfully attracting customers."}}},
+  {topic:"Evening Study",      words:[{t:"My",r:1},{t:"sister",r:1},{t:"studies",r:1},{t:"hard",r:1},{t:"every",r:0},{t:"evening",r:0},{t:"under",r:0},{t:"the",r:0},{t:"lamp",r:0},{t:"quietly",r:0},{t:"preparing",r:0},{t:"new",r:0},{t:"lessons",r:0},{t:"for",r:0},{t:"her",r:0},{t:"exams",r:0}],  lv:{b:{n:["My","sister","studies","hard"],h:"",a:"My sister studies hard."},m:{n:["My","sister","studies","hard","every","evening","under","the","lamp","quietly"],h:"When, where, and how?",a:"My sister quietly studies hard every evening under the lamp."},v:{n:["My","sister","studies","hard","every","evening","under","the","lamp","quietly","preparing","new","lessons","for","her","exams"],h:"Full dedication — all 16 words.",a:"Every evening my sister quietly studies hard under the lamp preparing new lessons for her exams."}}},
+  {topic:"A Loving Grandfather",words:[{t:"My",r:1},{t:"grandfather",r:1},{t:"tells",r:1},{t:"us",r:1},{t:"stories",r:1},{t:"old",r:0},{t:"every",r:0},{t:"night",r:0},{t:"lovingly",r:0},{t:"sitting",r:0},{t:"together",r:0},{t:"near",r:0},{t:"the",r:0},{t:"fireplace",r:0},{t:"warmly",r:0}],  lv:{b:{n:["My","grandfather","tells","us","stories"],h:"",a:"My grandfather tells us stories."},m:{n:["My","grandfather","tells","us","old","stories","every","night","lovingly"],h:"What kind, when, with what feeling?",a:"My grandfather lovingly tells us old stories every night."},v:{n:["My","grandfather","tells","us","old","stories","every","night","lovingly","sitting","together","near","the","fireplace","warmly"],h:"Warmth, setting, love — all 15 words.",a:"Every night my grandfather lovingly tells us old stories sitting warmly together near the fireplace."}}},
+  {topic:"Festival Celebration",words:[{t:"The",r:1},{t:"children",r:1},{t:"celebrate",r:1},{t:"the",r:1},{t:"festival",r:1},{t:"every",r:0},{t:"year",r:0},{t:"joyfully",r:0},{t:"wearing",r:0},{t:"new",r:0},{t:"clothes",r:0},{t:"and",r:0},{t:"distributing",r:0},{t:"sweets",r:0},{t:"to",r:0},{t:"the",r:0},{t:"neighbours",r:0}],  lv:{b:{n:["The","children","celebrate","the","festival"],h:"",a:"The children celebrate the festival."},m:{n:["The","children","celebrate","the","festival","every","year","joyfully","wearing","new","clothes"],h:"When, how, what are they wearing?",a:"The children joyfully celebrate the festival every year wearing new clothes."},v:{n:["The","children","celebrate","the","festival","every","year","joyfully","wearing","new","clothes","and","distributing","sweets","to","the","neighbours"],h:"Joy shared with the neighbourhood — all 17 words.",a:"Every year the children joyfully celebrate the festival wearing new clothes and distributing sweets to the neighbours."}}},
+  {topic:"A Busy Market",      words:[{t:"The",r:1},{t:"women",r:1},{t:"buy",r:1},{t:"vegetables",r:1},{t:"fresh",r:0},{t:"from",r:0},{t:"the",r:0},{t:"market",r:0},{t:"every",r:0},{t:"morning",r:0},{t:"early",r:0},{t:"bargaining",r:0},{t:"loudly",r:0},{t:"for",r:0},{t:"the",r:0},{t:"best",r:0},{t:"price",r:0}],  lv:{b:{n:["The","women","buy","vegetables"],h:"",a:"The women buy vegetables."},m:{n:["The","women","buy","fresh","vegetables","from","the","market","every","morning"],h:"What kind, from where, when?",a:"The women buy fresh vegetables from the market every morning."},v:{n:["The","women","buy","fresh","vegetables","from","the","market","every","morning","early","bargaining","loudly","for","the","best","price"],h:"Full market scene — all 17 words.",a:"Every early morning the women buy fresh vegetables from the market bargaining loudly for the best price."}}},
+  {topic:"A Devoted Teacher",  words:[{t:"The",r:1},{t:"teacher",r:1},{t:"explains",r:1},{t:"lessons",r:1},{t:"difficult",r:0},{t:"always",r:0},{t:"patiently",r:0},{t:"to",r:0},{t:"the",r:0},{t:"students",r:0},{t:"every",r:0},{t:"day",r:0},{t:"giving",r:0},{t:"real",r:0},{t:"life",r:0},{t:"examples",r:0}],  lv:{b:{n:["The","teacher","explains","lessons"],h:"",a:"The teacher explains lessons."},m:{n:["The","teacher","explains","difficult","lessons","always","patiently","to","the","students"],h:"What kind, how, and to whom?",a:"The teacher always patiently explains difficult lessons to the students."},v:{n:["The","teacher","explains","difficult","lessons","always","patiently","to","the","students","every","day","giving","real","life","examples"],h:"Dedication and method — all 16 words.",a:"Every day the teacher always patiently explains difficult lessons to the students giving real life examples."}}},
+  {topic:"Playing in the Rain",words:[{t:"The",r:1},{t:"kids",r:1},{t:"run",r:1},{t:"outside",r:1},{t:"happily",r:0},{t:"in",r:0},{t:"the",r:0},{t:"rain",r:0},{t:"every",r:0},{t:"time",r:0},{t:"it",r:0},{t:"pours",r:0},{t:"forgetting",r:0},{t:"all",r:0},{t:"their",r:0},{t:"worries",r:0},{t:"laughing",r:0}],  lv:{b:{n:["The","kids","run","outside"],h:"",a:"The kids run outside."},m:{n:["The","kids","run","outside","happily","in","the","rain","every","time","it","pours"],h:"When and how do they feel?",a:"The kids happily run outside in the rain every time it pours."},v:{n:["The","kids","run","outside","happily","in","the","rain","every","time","it","pours","forgetting","all","their","worries","laughing"],h:"Pure childhood joy — every word.",a:"Every time it pours the kids happily run outside in the rain laughing forgetting all their worries."}}},
+  {topic:"Grandmother's Kitchen",words:[{t:"My",r:1},{t:"grandmother",r:1},{t:"prepares",r:1},{t:"breakfast",r:1},{t:"fresh",r:0},{t:"every",r:0},{t:"morning",r:0},{t:"early",r:0},{t:"for",r:0},{t:"the",r:0},{t:"whole",r:0},{t:"family",r:0},{t:"lovingly",r:0},{t:"singing",r:0},{t:"old",r:0},{t:"songs",r:0}],  lv:{b:{n:["My","grandmother","prepares","breakfast"],h:"",a:"My grandmother prepares breakfast."},m:{n:["My","grandmother","prepares","fresh","breakfast","every","morning","lovingly","for","the","whole","family"],h:"What kind, when, how, for whom?",a:"My grandmother lovingly prepares fresh breakfast every morning for the whole family."},v:{n:["My","grandmother","prepares","breakfast","fresh","every","morning","early","for","the","whole","family","lovingly","singing","old","songs"],h:"Love, songs, her kitchen — all 16 words.",a:"Every morning my grandmother lovingly prepares fresh breakfast early for the whole family singing old songs."}}},
+];
+
+// ═══════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════
+const LDESC = {
+  b:"Connect only the 🟠 orange words — make a simple correct sentence.",
+  m:"Use the orange words + grey words to add more detail.",
+  v:"Connect EVERY word in the circle for the richest sentence!"
+};
+const LPT = {b:10,m:20,v:40};
+const CX=170,CY=170,R=152;
+
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let PUZZLES=[], playerName="", sessionStart=null;
+let lv="b", pi=0, sel=[], locked=false, att=0;
+let score=0, streak=0, done=new Set(), revd=new Set();
+let nodes=[], timerInterval=null, elapsed=0;
+let sessionLog=[];  // [{puzzle, level, attempts, wrong:[], revealed}]
+let currentLog=null;
+
+// ═══════════════════════════════════════════════════
+//  SHUFFLE
+// ═══════════════════════════════════════════════════
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+// ═══════════════════════════════════════════════════
+//  LOAD PUZZLES FROM GOOGLE SHEET
+// ═══════════════════════════════════════════════════
+async function loadPuzzles(){
+  if(!SHEET_URL||SHEET_URL==='YOUR_SHEET_CSV_URL_HERE'){
+    PUZZLES=shuffle(FALLBACK.map(p=>({...p,words:shuffle([...p.words])))));
+    return;
+  }
+  try{
+    const res=await fetch(SHEET_URL);
+    const csv=await res.text();
+    const rows=csv.trim().split('\n').slice(1); // skip header
+    const parsed=rows.map(row=>{
+      const cols=row.split(',').map(c=>c.replace(/^"|"$/g,'').trim());
+      // cols: topic, b_words(|sep), b_answer, b_hint, m_words, m_answer, m_hint, v_words, v_answer, v_hint
+      const parseWords=(str,req)=>str.split('|').map(t=>({t:t.trim(),r:req}));
+      const bW=parseWords(cols[1],1);
+      const mExtra=cols[4].split('|').map(t=>({t:t.trim(),r:0}));
+      const vExtra=cols[7].split('|').map(t=>({t:t.trim(),r:0}));
+      const allWords=[...bW,...mExtra,...vExtra];
+      const mNeeded=[...bW.map(w=>w.t),...mExtra.map(w=>w.t)];
+      const vNeeded=allWords.map(w=>w.t);
+      return {
+        topic:cols[0],
+        words:shuffle(allWords),
+        lv:{
+          b:{n:bW.map(w=>w.t),h:cols[3]||"",a:cols[2]},
+          m:{n:mNeeded,h:cols[6]||"",a:cols[5]},
+          v:{n:vNeeded,h:cols[9]||"",a:cols[8]},
+        }
+      };
+    }).filter(p=>p.topic);
+    PUZZLES=shuffle(parsed);
+  }catch(e){
+    console.warn('Sheet load failed, using fallback',e);
+    PUZZLES=shuffle(FALLBACK.map(p=>({...p,words:shuffle([...p.words])})));
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  NAME SCREEN → START
+// ═══════════════════════════════════════════════════
+document.getElementById('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter')startGame();});
+
+function startGame(){
+  const n=document.getElementById('nameInput').value.trim();
+  if(!n){document.getElementById('nameInput').focus();return;}
+  playerName=n;
+  sessionStart=Date.now();
+  document.getElementById('nameScreen').style.display='none';
+  document.getElementById('gameScreen').style.display='flex';
+  document.getElementById('playerLabel').textContent='Hi, '+playerName+'!';
+  startTimer();
+  pi=0; score=0; streak=0; done=new Set(); revd=new Set(); sessionLog=[];
+  initPuzzle();
+}
+
+// ═══════════════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════════════
+function startTimer(){
+  elapsed=0;
+  timerInterval=setInterval(()=>{
+    elapsed++;
+    const m=Math.floor(elapsed/60), s=elapsed%60;
+    document.getElementById('timer').textContent=m+':'+(s<10?'0':'')+s;
+  },1000);
+}
+
+// ═══════════════════════════════════════════════════
+//  PUZZLE INIT
+// ═══════════════════════════════════════════════════
+function initPuzzle(){
+  const pz=PUZZLES[pi], lvd=pz.lv[lv];
+  document.getElementById('ldesc').textContent=LDESC[lv];
+  document.getElementById('tpc').textContent='📌 '+pz.topic;
+  document.getElementById('pno').textContent=(pi+1)+'/'+PUZZLES.length;
+  document.getElementById('ban').className='banner';
+  document.getElementById('ansbox').className='ansbox';
+  setHub('idle');
+  document.getElementById('hnt').textContent=(lv!=='b'&&lvd.h)?'💡 '+lvd.h:'';
+  sel=[]; locked=false; att=0;
+  currentLog={puzzle:pz.topic,level:lv,attempts:0,wrong:[],revealed:false};
+  updatePips(); buildNodes(); renderSel(); drawArcs(); buildDots();
+  document.getElementById('ckBtn').disabled=false;
+  document.getElementById('clrBtn').disabled=false;
+}
+
+function setLv(l){
+  lv=l;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const map={b:'.beg',m:'.int',v:'.adv'};
+  document.querySelector(map[l]).classList.add('active');
+  initPuzzle();
+}
+
+function nextP(){
+  if(currentLog)sessionLog.push(currentLog);
+  pi=(pi+1)%PUZZLES.length;
+  if(pi===0){finishSession();return;}
+  initPuzzle();
+}
+
+// ═══════════════════════════════════════════════════
+//  PIPS
+// ═══════════════════════════════════════════════════
+function updatePips(){
+  [1,2,3].forEach(i=>{
+    document.getElementById('p'+i).className='pip'+(i<=att?' used':'');
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  NODES
+// ═══════════════════════════════════════════════════
+function buildNodes(){
+  const gw=document.getElementById('gw');
+  gw.querySelectorAll('.node').forEach(n=>n.remove());
+  nodes=[];
+  const ws=PUZZLES[pi].words, nd=PUZZLES[pi].lv[lv].n, n=ws.length;
+  ws.forEach((w,i)=>{
+    const ang=(i/n)*2*Math.PI-Math.PI/2;
+    const x=CX+R*Math.cos(ang), y=CY+R*Math.sin(ang);
+    const isN=nd.includes(w.t);
+    const div=document.createElement('div');
+    div.className='node'+(w.r?' req':'')+(isN?'':' lck');
+    div.textContent=w.t;
+    div.style.left=x+'px'; div.style.top=y+'px';
+    if(isN)div.onclick=()=>toggle(w.t,w.r,div);
+    gw.appendChild(div);
+    nodes.push({el:div,x,y,t:w.t,r:w.r,isN});
+  });
+}
+
+function toggle(word,isReq,el){
+  if(locked)return;
+  const i=sel.indexOf(word);
+  if(i!==-1){
+    sel.splice(i,1);
+    el.classList.remove('sel-req','sel-opt');
+    if(isReq)el.classList.add('req');
+  } else {
+    sel.push(word);
+    el.classList.remove('req');
+    el.classList.add(isReq?'sel-req':'sel-opt');
+  }
+  renderSel(); drawArcs();
+}
+
+// ═══════════════════════════════════════════════════
+//  SENTENCE RENDER
+// ═══════════════════════════════════════════════════
+function renderSel(){
+  const box=document.getElementById('sb');
+  if(!sel.length){box.innerHTML='<span class="sph">Tap words in the circle…</span>';return;}
+  box.innerHTML=sel.map(w=>{
+    const nd=nodes.find(n=>n.t===w);
+    const cls=nd&&nd.r?'chip':'chip opt';
+    return`<span class="${cls}" onclick="remChip('${w.replace(/'/g,"\\'")}')">` +
+      w+`<span style="font-size:.55rem;opacity:.6;margin-left:2px">✕</span></span>`;
+  }).join(' ')+'<span class="sper">.</span>';
+}
+
+function remChip(word){
+  if(locked)return;
+  sel=sel.filter(x=>x!==word);
+  const nd=nodes.find(n=>n.t===word);
+  if(nd){nd.el.classList.remove('sel-req','sel-opt');if(nd.r)nd.el.classList.add('req');}
+  renderSel(); drawArcs();
+}
+
+function clearAll(){
+  if(locked)return;
+  sel=[];
+  nodes.forEach(n=>{n.el.classList.remove('sel-req','sel-opt');if(n.r&&n.isN)n.el.classList.add('req');});
+  renderSel(); drawArcs();
+  document.getElementById('ban').className='banner';
+}
+
+// ═══════════════════════════════════════════════════
+//  CANVAS ARCS
+// ═══════════════════════════════════════════════════
+function drawArcs(){
+  const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,340,340);
+  ctx.beginPath();ctx.arc(CX,CY,R,0,2*Math.PI);
+  ctx.strokeStyle='#2e2e5255';ctx.lineWidth=1.5;ctx.setLineDash([5,8]);ctx.stroke();ctx.setLineDash([]);
+  if(sel.length<2)return;
+  const pts=sel.map(w=>nodes.find(n=>n.t===w)).filter(Boolean);
+  for(let i=1;i<pts.length;i++){
+    const f=pts[i-1],t=pts[i];
+    ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.quadraticCurveTo(CX,CY,t.x,t.y);
+    ctx.strokeStyle='#ff890625';ctx.lineWidth=9;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.quadraticCurveTo(CX,CY,t.x,t.y);
+    ctx.strokeStyle='#ff890690';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.beginPath();ctx.arc(t.x,t.y,5,0,2*Math.PI);ctx.fillStyle='#ff8906';ctx.fill();
+  }
+  ctx.beginPath();ctx.arc(pts[0].x,pts[0].y,5,0,2*Math.PI);ctx.fillStyle='#f9c74f';ctx.fill();
+}
+
+// ═══════════════════════════════════════════════════
+//  HUB
+// ═══════════════════════════════════════════════════
+function setHub(state){
+  const h=document.getElementById('hub');
+  h.className='hub'+(state==='win'?' win':state==='fail'?' fail':'');
+  h.innerHTML=state==='win'?'🎉':state==='fail'?'😔':'TAP<br>WORDS';
+  if(state!=='idle')setTimeout(()=>setHub('idle'),2200);
+}
+
+// ═══════════════════════════════════════════════════
+//  BANNER
+// ═══════════════════════════════════════════════════
+function showBan(type,msg){
+  const b=document.getElementById('ban');
+  b.innerHTML=msg; b.className='banner show '+type;
+}
+
+// ═══════════════════════════════════════════════════
+//  DOTS
+// ═══════════════════════════════════════════════════
+function buildDots(){
+  const row=document.getElementById('dots');row.innerHTML='';
+  PUZZLES.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i===pi?' cur':done.has(i)?' ok':revd.has(i+'-'+lv)?' rev':'');
+    d.onclick=()=>{if(currentLog)sessionLog.push(currentLog);pi=i;initPuzzle();};
+    row.appendChild(d);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  AI CHECK
+// ═══════════════════════════════════════════════════
+async function doCheck(){
+  if(locked){showBan('par','✅ Already solved! Hit Next ▶');return;}
+  if(!sel.length){showBan('err','🤔 Tap some words first!');return;}
+  const lvd=PUZZLES[pi].lv[lv];
+  const extra=sel.filter(w=>!lvd.n.includes(w));
+  const missing=lvd.n.filter(w=>!sel.includes(w));
+  if(extra.length){showBan('err',`❌ "${extra.join('", "')}" not needed here — remove it!`);return;}
+  if(missing.length){showBan('par','🟡 Still missing: '+missing.join(', '));return;}
+
+  showBan('par','🤔 Checking your sentence…');
+  document.getElementById('ckBtn').disabled=true;
+
+  const wl=sel.join(', ');
+  const prompt=`You are an English grammar judge for a language learning game.
+The student has ONLY these words: [${wl}]
+Their sentence: "${sel.join(' ')}."
+Rules: Use ONLY these words in grammatically valid order. Adjectives before nouns. Articles in valid positions.
+Feedback rules: Only mention words from [${wl}]. Never invent words not in the list.
+Reply ONLY with raw JSON: {"valid":true,"feedback":"short encouraging line"} or {"valid":false,"feedback":"one specific fix"}`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:200,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    const raw=data.content.map(b=>b.text||'').join('').trim().replace(/```json|```/g,'').trim();
+    const result=JSON.parse(raw);
+
+    if(result.valid){
+      locked=true;
+      score+=LPT[lv]; streak++;
+      document.getElementById('sc').textContent=score;
+      document.getElementById('str').textContent=streak+'🔥';
+      done.add(pi); setHub('win');
+      showBan('suc',(lv==='b'?'✅':lv==='m'?'🔥':'⚡')+' '+result.feedback+' +'+LPT[lv]+' pts');
+      if(currentLog){currentLog.attempts=att+1;}
+      buildDots();
+    } else {
+      att++; streak=0;
+      document.getElementById('str').textContent='0🔥';
+      if(currentLog){currentLog.attempts=att;currentLog.wrong.push(sel.join(' ')+'.');}
+      updatePips();
+      if(att>=3){
+        locked=true;
+        if(currentLog)currentLog.revealed=true;
+        revd.add(pi+'-'+lv);
+        document.getElementById('anstxt').textContent=lvd.a;
+        document.getElementById('ansbox').className='ansbox show';
+        setHub('fail');
+        showBan('err','❌ 3 wrong attempts — see the answer above. Hit Next ▶ to continue!');
+        buildDots();
+      } else {
+        showBan('err','❌ Attempt '+att+'/3 — '+result.feedback);
+      }
+    }
+  }catch(e){
+    showBan('err','⚠️ Check failed — please try again.');
+  }finally{
+    document.getElementById('ckBtn').disabled=false;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  FINISH SESSION
+// ═══════════════════════════════════════════════════
+function finishSession(){
+  clearInterval(timerInterval);
+  if(currentLog)sessionLog.push(currentLog);
+
+  const mins=Math.floor(elapsed/60), secs=elapsed%60;
+  const duration=mins+'m '+(secs<10?'0':'')+secs+'s';
+  const mistakes=sessionLog.filter(l=>l.wrong.length>0||l.revealed);
+  const mistakeDetail=sessionLog.map(l=>{
+    if(!l.wrong.length&&!l.revealed)return null;
+    return l.puzzle+' ('+['b','m','v'].indexOf(l.level)!==-1?{b:'Beginner',m:'Intermediate',v:'Advanced'}[l.level]:l.level+')'
+      +(l.wrong.length?' | Wrong attempts: '+l.wrong.join(' / '):'')
+      +(l.revealed?' | Answer revealed':'');
+  }).filter(Boolean).join('\n');
+
+  // Show finish screen
+  document.getElementById('gameScreen').style.display='none';
+  document.getElementById('finishScreen').style.display='flex';
+  document.getElementById('finName').textContent=playerName+"'s Session";
+  document.getElementById('finStats').innerHTML=`
+    <div class="fin-stat">Final Score <span>${score} pts</span></div>
+    <div class="fin-stat">Puzzles Attempted <span>${sessionLog.length}</span></div>
+    <div class="fin-stat">Puzzles Solved <span>${done.size}</span></div>
+    <div class="fin-stat">Answers Revealed <span>${sessionLog.filter(l=>l.revealed).length}</span></div>
+    <div class="fin-stat">Time Played <span>${duration}</span></div>
+    <div class="fin-stat">Best Streak <span>${streak}🔥</span></div>
+  `;
+
+  // Silent log to Google Sheets
+  if(LOGGER_URL && LOGGER_URL!=='YOUR_APPS_SCRIPT_URL_HERE'){
+    fetch(LOGGER_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        name:playerName,
+        date:new Date().toLocaleString('en-IN'),
+        score,
+        duration,
+        puzzlesSolved:done.size,
+        puzzlesAttempted:sessionLog.length,
+        answersRevealed:sessionLog.filter(l=>l.revealed).length,
+        mistakes:mistakeDetail||'None',
+        detail:JSON.stringify(sessionLog)
+      })
+    }).catch(()=>{});
+  }
+}
+
+function resetAll(){
+  document.getElementById('finishScreen').style.display='none';
+  document.getElementById('nameScreen').style.display='flex';
+  document.getElementById('nameInput').value='';
+  lv='b'; pi=0; score=0; streak=0; att=0;
+  sel=[]; done=new Set(); revd=new Set(); sessionLog=[]; currentLog=null;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.tab.beg').classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════
+window.addEventListener('load',async()=>{
+  await loadPuzzles();
+  document.getElementById('loadingScreen').style.display='none';
+  document.getElementById('nameScreen').style.display='flex';
+});
+</script>
+</body>
+</html>
