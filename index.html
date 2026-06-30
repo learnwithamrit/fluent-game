@@ -399,7 +399,7 @@ function setLv(l){
 function nextP(){
   if(currentLog)sessionLog.push({...currentLog});
   pi=(pi+1)%PUZZLES.length;
-  if(done.size===PUZZLES.length||(pi===0&&sessionLog.length>=PUZZLES.length)){finishSession();return;}
+  if(pi===0 && sessionLog.length>0){finishSession();return;}
   initPuzzle();
 }
 
