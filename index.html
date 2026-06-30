@@ -345,7 +345,14 @@ async function loadPuzzles(){
         }
       };
     }).filter(Boolean);
-    if(parsed.length>0) PUZZLES=shuffle(parsed);
+    if(parsed.length>0){
+    const STAGE_SIZE_LOCAL=10;
+    const stages=[];
+    for(let i=0;i<parsed.length;i+=STAGE_SIZE_LOCAL){
+    stages.push(shuffle(parsed.slice(i,i+STAGE_SIZE_LOCAL)));
+    }
+    PUZZLES=stages.flat();
+    }
   }catch(e){
     console.warn('Sheet load failed — using fallback',e.message);
   }
