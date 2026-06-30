@@ -206,7 +206,7 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 //  CONFIG
 // ═══════════════════════════════════════════
 const SHEET_URL  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-03zbbhbOpFNaWLdiRSBZhLqof8YacXhVYgjPvXG9wf5-N8lCuID4dF-ZGzmxHfNMhGwXZ-XSBy5V/pub?gid=0&single=true&output=csv';
-const LOGGER_URL = 'https://script.google.com/macros/s/AKfycbxdDmbVrMJTyj2GxzkaH6SnViyDKf0D8vAwZnwRvInkOl-aWKaRE72QNpB1JbvLqCE/exec';
+const LOGGER_URL = 'https://script.google.com/macros/s/AKfycbwoBqKG1i-JQsL84A6V0P8NeUEA3U7XljXELZA4RD9A7fja-nFcqhsTALOGtkEZOT8/exec';
 
 // ═══════════════════════════════════════════
 //  CONSTANTS
@@ -227,6 +227,18 @@ let lv='b', pi=0, sel=[], locked=false, att=0;
 let score=0, streak=0, done=new Set(), revd=new Set();
 let nodes=[], timerInterval=null, elapsed=0;
 let sessionLog=[], currentLog=null;
+let currentStage=1;
+const STAGE_SIZE=10;
+function stagePuzzles(){
+  const start=(currentStage-1)*STAGE_SIZE;
+  const end=start+STAGE_SIZE;
+  return PUZZLES.slice(start,end);
+}
+
+function stageComplete(){
+  const sp=stagePuzzles();
+  return sp.every((_,i)=>done.has((currentStage-1)*STAGE_SIZE+i));
+}
 
 // ═══════════════════════════════════════════
 //  SHUFFLE
@@ -353,7 +365,7 @@ function startGame(){
   document.getElementById('gameScreen').style.display='flex';
   document.getElementById('playerLabel').textContent='Hi, '+playerName+'!';
   startTimer();
-  pi=0;score=0;streak=0;done=new Set();revd=new Set();sessionLog=[];
+  pi=0;score=0;streak=0;done=new Set();revd=new Set();sessionLog=[];currentStage=1;
   initPuzzle();
 }
 
@@ -373,10 +385,11 @@ function startTimer(){
 //  PUZZLE INIT
 // ═══════════════════════════════════════════
 function initPuzzle(){
-  const pz=PUZZLES[pi],lvd=pz.lv[lv];
+  const sp=stagePuzzles();
+  const pz=sp[pi],lvd=pz.lv[lv];
   document.getElementById('ldesc').textContent=LDESC[lv];
   document.getElementById('tpc').textContent='📌 '+pz.topic;
-  document.getElementById('pno').textContent=(pi+1)+'/'+PUZZLES.length;
+  document.getElementById('pno').textContent=(pi+1)+'/'+sp.length+' (Stage '+currentStage+')';
   document.getElementById('ban').className='banner';
   document.getElementById('ansbox').className='ansbox';
   setHub('idle');
@@ -398,8 +411,37 @@ function setLv(l){
 
 function nextP(){
   if(currentLog)sessionLog.push({...currentLog});
-  pi=(pi+1)%PUZZLES.length;
-  if(pi===0 && sessionLog.length>0){finishSession();return;}
+  const sp=stagePuzzles();
+  pi=(pi+1)%sp.length;
+
+  if(stageComplete()){
+    if(currentStage*STAGE_SIZE>=PUZZLES.length){
+      finishSession();return;
+    } else {
+      showStageComplete();return;
+    }
+  }
+  initPuzzle();
+}
+
+function showStageComplete(){
+  document.getElementById('gameScreen').style.display='none';
+  const el=document.createElement('div');
+  el.id='stageCompleteScreen';
+  el.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px;text-align:center;gap:14px;';
+  el.innerHTML=
+    '<div style="font-size:3rem;">🏆</div>'+
+    '<div style="font-size:1.4rem;font-weight:900;color:#ff8906;">Stage '+currentStage+' Complete!</div>'+
+    '<div style="font-size:0.9rem;color:#7070a0;max-width:280px;">You solved all '+STAGE_SIZE+' puzzles. Stage '+(currentStage+1)+' is now unlocked with harder sentences!</div>'+
+    '<button style="background:#ff8906;color:#0d0d1a;border:none;border-radius:14px;padding:14px 36px;font-size:1rem;font-weight:900;cursor:pointer;" onclick="advanceStage()">Continue to Stage '+(currentStage+1)+' →</button>';
+  document.body.appendChild(el);
+}
+
+function advanceStage(){
+  document.getElementById('stageCompleteScreen').remove();
+  currentStage++;
+  pi=0;
+  document.getElementById('gameScreen').style.display='flex';
   initPuzzle();
 }
 
@@ -417,7 +459,8 @@ function buildNodes(){
   const gw=document.getElementById('gw');
   gw.querySelectorAll('.node').forEach(n=>n.remove());
   nodes=[];
-  const ws=PUZZLES[pi].words,nd=PUZZLES[pi].lv[lv].n,n=ws.length;
+  const sp=stagePuzzles();
+const ws=sp[pi].words,nd=sp[pi].lv[lv].n,n=ws.length;
   ws.forEach((w,i)=>{
     const ang=(i/n)*2*Math.PI-Math.PI/2;
     const x=CX+R*Math.cos(ang),y=CY+R*Math.sin(ang);
@@ -524,10 +567,12 @@ function showBan(type,msg){
 // ═══════════════════════════════════════════
 function buildDots(){
   const row=document.getElementById('dots');row.innerHTML='';
-  PUZZLES.forEach((_,i)=>{
+  const sp=stagePuzzles();
+  sp.forEach((p,i)=>{
+    const globalIdx=(currentStage-1)*STAGE_SIZE+i;
     const d=document.createElement('div');
-    d.className='dot'+(i===pi?' cur':done.has(i)?' ok':revd.has(i+'-'+lv)?' rev':'');
-    d.title=PUZZLES[i].topic;
+    d.className='dot'+(i===pi?' cur':done.has(globalIdx)?' ok':revd.has(globalIdx+'-'+lv)?' rev':'');
+    d.title=p.topic;
     d.onclick=()=>{if(currentLog)sessionLog.push({...currentLog});pi=i;initPuzzle();};
     row.appendChild(d);
   });
@@ -540,7 +585,8 @@ function doCheck(){
   if(locked){showBan('par','✅ Already solved! Hit Next ▶');return;}
   if(!sel.length){showBan('err','🤔 Tap some words first!');return;}
 
-  const lvd=PUZZLES[pi].lv[lv];
+  const sp=stagePuzzles();
+  const lvd=sp[pi].lv[lv];
   const extra  =sel.filter(w=>!lvd.n.includes(w));
   const missing=lvd.n.filter(w=>!sel.includes(w));
   if(extra.length)  {showBan('err','❌ "'+extra.join('", "')+'" not needed here — remove it!');return;}
@@ -554,7 +600,7 @@ function doCheck(){
     score+=LPT[lv];streak++;
     document.getElementById('sc').textContent=score;
     document.getElementById('str').textContent=streak+'🔥';
-    done.add(pi);setHub('win');
+    done.add((currentStage-1)*STAGE_SIZE+pi);setHub('win');
     if(currentLog)currentLog.attempts=att+1;
     const pre={b:'✅',m:'🔥',v:'⚡'}[lv];
     const msgs={b:'Perfect! Clean and simple!',m:'Excellent! Great detail!',v:'Outstanding! You used every word!'};
@@ -568,7 +614,7 @@ function doCheck(){
     if(att>=3){
       locked=true;
       if(currentLog)currentLog.revealed=true;
-      revd.add(pi+'-'+lv);
+      revd.add((currentStage-1)*STAGE_SIZE+pi+'-'+lv);
       // Show first accepted answer
       document.getElementById('anstxt').textContent=lvd.ans[0]||'Try rearranging the words!';
       document.getElementById('ansbox').className='ansbox show';
@@ -610,20 +656,38 @@ function finishSession(){
     '<div class="fin-stat">Best Streak <span>'+streak+'🔥</span></div>';
 
   if(LOGGER_URL){
-    fetch(LOGGER_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        name:playerName,
-        date:new Date().toLocaleString('en-IN'),
-        score,duration,
-        puzzlesSolved:done.size,
-        puzzlesAttempted:sessionLog.length,
-        answersRevealed:sessionLog.filter(l=>l.revealed).length,
-        mistakes:mistakeDetail,
-        detail:JSON.stringify(sessionLog)
-      })
-    }).catch(()=>{});
+  const payload={
+    name:playerName,
+    date:new Date().toLocaleString('en-IN'),
+    score,duration,
+    puzzlesSolved:done.size,
+    puzzlesAttempted:sessionLog.length,
+    answersRevealed:sessionLog.filter(l=>l.revealed).length,
+    mistakes:mistakeDetail,
+    detail:JSON.stringify(sessionLog)
+  };
+  const form=document.createElement('form');
+  form.method='POST';
+  form.action=LOGGER_URL;
+  form.target='hiddenLogFrame';
+  form.style.display='none';
+  Object.keys(payload).forEach(key=>{
+    const input=document.createElement('input');
+    input.name=key;
+    input.value=typeof payload[key]==='object'?JSON.stringify(payload[key]):String(payload[key]);
+    form.appendChild(input);
+  });
+  let iframe=document.getElementById('hiddenLogFrame');
+  if(!iframe){
+    iframe=document.createElement('iframe');
+    iframe.name='hiddenLogFrame';
+    iframe.id='hiddenLogFrame';
+    iframe.style.display='none';
+    document.body.appendChild(iframe);
+  }
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(()=>form.remove(),1000);
   }
 }
 
@@ -631,7 +695,7 @@ function resetAll(){
   document.getElementById('finishScreen').style.display='none';
   document.getElementById('nameScreen').style.display='flex';
   document.getElementById('nameInput').value='';
-  lv='b';pi=0;score=0;streak=0;att=0;
+  lv='b';pi=0;score=0;streak=0;att=0;currentStage=1;
   sel=[];done=new Set();revd=new Set();sessionLog=[];currentLog=null;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelector('.tab.beg').classList.add('active');
