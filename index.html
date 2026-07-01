@@ -550,7 +550,7 @@ function clearAll(){
 // ═══════════════════════════════════════════
 function drawArcs(){
   const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
-  ctx.clearRect(0,0,340,340);
+  ctx.clearRect(0,0,cv.width,cv.height);
   ctx.beginPath();ctx.arc(CX,CY,R,0,2*Math.PI);
   ctx.strokeStyle='#2e2e5255';ctx.lineWidth=1.5;ctx.setLineDash([5,8]);ctx.stroke();ctx.setLineDash([]);
   if(sel.length<2)return;
