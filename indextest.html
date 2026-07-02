@@ -75,6 +75,10 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 .chip{display:inline-flex;align-items:center;gap:2px;background:var(--acc);color:#0d0d1a;border-radius:10px;padding:2px 8px;font-size:0.76rem;font-weight:700;cursor:pointer;transition:opacity .15s;}
 .chip:hover{opacity:.75;}
 .chip.opt{background:var(--sur2);color:var(--txt);border:1px solid var(--brd);}
+.chip{
+  /* existing properties stay... */
+  cursor:grab;
+}
 .sph{color:var(--brd);font-size:0.76rem;font-style:italic;}
 .sper{font-size:0.92rem;font-weight:900;color:var(--mut);}
 
@@ -529,7 +533,8 @@ function buildNodes(){
       div.className='node'+(w.r?' req':'')+(isN?'':' lck')+(w.outer?' outer':'');
       div.textContent=w.t;
       div.style.left=x+'px';div.style.top=y+'px';
-      if(isN)div.onclick=()=>toggle(w.t,w.r,div);
+      const nodeIdx=nodes.length;
+      if(isN)div.onclick=()=>toggle(w.t,w.r,div,nodeIdx);
       gw.appendChild(div);
       nodes.push({el:div,x,y,t:w.t,r:w.r,isN});
     });
@@ -539,15 +544,15 @@ function buildNodes(){
   if(outerWords.length) placeRing(outerWords,R2);
 }
   
-function toggle(word,isReq,el){
+function toggle(word,isReq,el,nodeIdx){
   if(locked)return;
-  const i=sel.indexOf(word);
+  const i=sel.findIndex(s=>s.idx===nodeIdx);
   if(i!==-1){
     sel.splice(i,1);
     el.classList.remove('sel-req','sel-opt');
     if(isReq)el.classList.add('req');
   } else {
-    sel.push(word);
+    sel.push({t:word,idx:nodeIdx,r:isReq});
     el.classList.remove('req');
     el.classList.add(isReq?'sel-req':'sel-opt');
   }
@@ -559,27 +564,55 @@ function toggle(word,isReq,el){
 // ═══════════════════════════════════════════
 function renderSel(){
   const box=document.getElementById('sb');
-  if(!sel.length){box.innerHTML='<span class="sph">Tap words in the circle…</span>';return;}
-  const chips=sel.map((w,idx)=>{
-    const nd=nodes.find(n=>n.t===w);
+  if(!sel.length){
+    box.innerHTML='<span class="sph">Tap words in the circle…</span>';
+    return;
+  }
+  const chips=sel.map((entry,idx)=>{
+    const nd=nodes[entry.idx];
     const cls=nd&&nd.r?'chip':'chip opt';
-    return '<span class="'+cls+'" data-idx="'+idx+'">'
-      +w+'<span style="font-size:.55rem;opacity:.6;margin-left:2px">✕</span></span>';
+    return '<span class="'+cls+'" draggable="true" data-idx="'+idx+'">'
+      +entry.t+'<span style="font-size:.55rem;opacity:.6;margin-left:2px">✕</span></span>';
   });
   box.innerHTML=chips.join(' ')+'<span class="sper">.</span>';
-  box.querySelectorAll('.chip').forEach(chip=>{
-    chip.onclick=()=>removeAtIndex(parseInt(chip.dataset.idx,10));
-  });
-}
 
-function removeAtIndex(idx){
-  if(locked)return;
-  const word=sel[idx];
-  if(word===undefined)return;
-  sel.splice(idx,1);
-  const nd=nodes.find(n=>n.t===word);
-  if(nd){nd.el.classList.remove('sel-req','sel-opt');if(nd.r&&nd.isN)nd.el.classList.add('req');}
-  renderSel();drawArcs();
+  // Attach remove clicks
+  box.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click',()=>removeAtIndex(parseInt(chip.dataset.idx,10)));
+  });
+
+  // Attach drag-to-reorder
+  let dragSrcIdx=null;
+  box.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('dragstart',e=>{
+      dragSrcIdx=parseInt(chip.dataset.idx,10);
+      chip.style.opacity='0.4';
+      e.dataTransfer.effectAllowed='move';
+    });
+    chip.addEventListener('dragend',e=>{
+      chip.style.opacity='1';
+    });
+    chip.addEventListener('dragover',e=>{
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      chip.style.borderColor='#ff8906';
+    });
+    chip.addEventListener('dragleave',e=>{
+      chip.style.borderColor='';
+    });
+    chip.addEventListener('drop',e=>{
+      e.preventDefault();
+      chip.style.borderColor='';
+      const dropIdx=parseInt(chip.dataset.idx,10);
+      if(dragSrcIdx===null||dragSrcIdx===dropIdx)return;
+      // Reorder sel array
+      const moved=sel.splice(dragSrcIdx,1)[0];
+      sel.splice(dropIdx,0,moved);
+      dragSrcIdx=null;
+      renderSel();
+      drawArcs();
+    });
+  });
 }
 
 function clearAll(){
@@ -599,7 +632,7 @@ function drawArcs(){
   ctx.beginPath();ctx.arc(CX,CY,R,0,2*Math.PI);
   ctx.strokeStyle='#2e2e5255';ctx.lineWidth=1.5;ctx.setLineDash([5,8]);ctx.stroke();ctx.setLineDash([]);
   if(sel.length<2)return;
-  const pts=sel.map(w=>nodes.find(n=>n.t===w)).filter(Boolean);
+  const pts=sel.map(entry=>nodes[entry.idx]).filter(Boolean);
   for(let i=1;i<pts.length;i++){
     const f=pts[i-1],t=pts[i];
     ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.quadraticCurveTo(CX,CY,t.x,t.y);
@@ -651,12 +684,13 @@ function doCheck(){
 
   const sp=stagePuzzles();
   const lvd=sp[pi].lv[lv];
-  const extra  =sel.filter(w=>!lvd.n.includes(w));
-  const missing=lvd.n.filter(w=>!sel.includes(w));
+  const selWords=sel.map(s=>s.t);
+  const extra  =selWords.filter(w=>!lvd.n.includes(w));
+  const missing=lvd.n.filter(w=>!selWords.includes(w));
   if(extra.length)  {showBan('err','❌ "'+extra.join('", "')+'" not needed here — remove it!');return;}
   if(missing.length){showBan('par','🟡 Still missing: '+missing.join(', '));return;}
 
-  const built=sel.join(' ')+'.';
+  const built=sel.map(s=>s.t).join(' ')+'.';
   const correct=checkAnswer(built,lvd.ans);
 
   if(correct){
