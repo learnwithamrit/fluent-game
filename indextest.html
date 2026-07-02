@@ -326,8 +326,8 @@ async function loadPuzzles(){
       const vExtra=parseW(c[7],0);
 
       // rowIndex 0 = puzzle 1 (row 2 in sheet), so puzzle 21+ means rowIndex >= 20
-      const isStage3Plus = rowIndex >= 20;
-      vExtra.forEach(w=>{ if(isStage3Plus) w.outer=true; });
+      const ringCount = parseInt(c[10])||1;
+      vExtra.forEach(w=>{ if(ringCount===2) w.outer=true; });
 
       if(!bW.length) return null;
       const allW  =[...bW,...mExtra,...vExtra];
@@ -467,7 +467,8 @@ function buildNodes(){
   const gw=document.getElementById('gw');
   gw.querySelectorAll('.node').forEach(n=>n.remove());
   nodes=[];
-  const pz=PUZZLES[pi];
+  const sp=stagePuzzles();
+  const pz=sp[pi];
   const nd=pz.lv[lv].n;
 
   // Split words into inner ring (required+intermediate) and outer ring (advanced extras)
@@ -604,6 +605,7 @@ function doCheck(){
   if(locked){showBan('par','✅ Already solved! Hit Next ▶');return;}
   if(!sel.length){showBan('err','🤔 Tap some words first!');return;}
 
+  const sp=stagePuzzles();
   const sp=stagePuzzles();
   const lvd=sp[pi].lv[lv];
   const extra  =sel.filter(w=>!lvd.n.includes(w));
