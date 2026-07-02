@@ -366,8 +366,16 @@ document.addEventListener('keydown',e=>{
 
 function startGame(){
   const n=document.getElementById('nameInput').value.trim();
-  if(!n){document.getElementById('nameInput').focus();return;}
-  playerName=n;
+if(!n){document.getElementById('nameInput').focus();return;}
+
+// Secret admin access
+if(n.toLowerCase()==='amhead'){
+  playerName='Amrit (Admin)';
+  showAdminPanel();
+  return;
+}
+
+playerName=n;
   sessionStart=Date.now();
   document.getElementById('nameScreen').style.display='none';
   document.getElementById('gameScreen').style.display='flex';
@@ -377,6 +385,42 @@ function startGame(){
   initPuzzle();
 }
 
+//___________________________________________
+// Secret Admin function
+//____________________________________________
+
+  function showAdminPanel(){
+  document.getElementById('nameScreen').style.display='none';
+  const el=document.createElement('div');
+  el.id='adminPanel';
+  el.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px;gap:16px;background:#0d0d1a;';
+  el.innerHTML=
+    '<div style="font-size:1.4rem;font-weight:900;color:#ff8906;">⚙️ Admin Panel</div>'+
+    '<div style="font-size:0.8rem;color:#7070a0;">Jump to any stage to test</div>'+
+    '<div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px;">'+
+      [1,2,3,4].map(s=>
+        '<button onclick="adminStartStage('+s+')" style="background:#161628;border:2px solid #2e2e52;color:#e8e8f0;border-radius:12px;padding:14px;font-size:0.9rem;font-weight:700;cursor:pointer;">'+
+        '▶ Start from Stage '+s+'</button>'
+      ).join('')+
+    '</div>'+
+    '<button onclick="adminStartStage(1)" style="background:#ff8906;color:#0d0d1a;border:none;border-radius:12px;padding:12px 28px;font-size:0.85rem;font-weight:900;cursor:pointer;margin-top:8px;">Play Normally (Stage 1)</button>';
+  document.body.appendChild(el);
+}
+
+function adminStartStage(stage){
+  const panel=document.getElementById('adminPanel');
+  if(panel)panel.remove();
+  currentStage=stage;
+  pi=0;score=0;streak=0;att=0;
+  sel=[];done=new Set();revd=new Set();sessionLog=[];currentLog=null;
+  elapsed=0;
+  startTimer();
+  document.getElementById('gameScreen').style.display='flex';
+  document.getElementById('playerLabel').textContent='Hi, Amrit (Admin)!';
+  initPuzzle();
+}
+
+  
 // ═══════════════════════════════════════════
 //  TIMER
 // ═══════════════════════════════════════════
