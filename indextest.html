@@ -606,7 +606,6 @@ function doCheck(){
   if(!sel.length){showBan('err','🤔 Tap some words first!');return;}
 
   const sp=stagePuzzles();
-  const sp=stagePuzzles();
   const lvd=sp[pi].lv[lv];
   const extra  =sel.filter(w=>!lvd.n.includes(w));
   const missing=lvd.n.filter(w=>!sel.includes(w));
