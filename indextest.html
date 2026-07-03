@@ -840,43 +840,48 @@ box.querySelectorAll('.chip').forEach(chip=>{
 });
 
 // ── DESKTOP MOUSE DRAG (drop target) ──
-box.querySelectorAll('.chip').forEach(chip=>{
-  chip.addEventListener('mouseenter',e=>{
-    if(dragSrcIdx===null||locked)return;
-    chip.style.borderColor='#ff8906';
+box.addEventListener('mousemove',e=>{
+  if(dragSrcIdx===null||locked)return;
+  box.querySelectorAll('.chip').forEach(c=>c.style.borderColor='');
+  const target=document.elementFromPoint(e.clientX,e.clientY);
+  const targetChip=target?target.closest('.chip'):null;
+  if(targetChip&&parseInt(targetChip.dataset.idx,10)!==dragSrcIdx){
+    targetChip.style.borderColor='#ff8906';
+  }
+});
+
+box.addEventListener('mouseup',e=>{
+  if(dragSrcIdx===null||locked)return;
+  const target=document.elementFromPoint(e.clientX,e.clientY);
+  const targetChip=target?target.closest('.chip'):null;
+  box.querySelectorAll('.chip').forEach(c=>{
+    c.style.opacity='1';
+    c.style.borderColor='';
   });
-  chip.addEventListener('mouseleave',e=>{
-    chip.style.borderColor='';
-  });
-  chip.addEventListener('mouseup',e=>{
-    if(dragSrcIdx===null||locked)return;
-    const dropIdx=parseInt(chip.dataset.idx,10);
-    box.querySelectorAll('.chip').forEach(c=>{
-      c.style.opacity='1';
-      c.style.borderColor='';
-    });
+  if(targetChip){
+    const dropIdx=parseInt(targetChip.dataset.idx,10);
     if(!isNaN(dropIdx)&&dropIdx!==dragSrcIdx){
       const moved=sel.splice(dragSrcIdx,1)[0];
       sel.splice(dropIdx,0,moved);
-    renderSel();
-    const sp=stagePuzzles();
-    if(sp[pi]&&sp[pi].mode!==4) drawArcs();
-      
+      renderSel();
+      const sp=stagePuzzles();
+      if(sp[pi]&&sp[pi].mode!==4) drawArcs();
     }
-    dragSrcIdx=null;
-  });
+  }
+  dragSrcIdx=null;
 });
 
 // Safety cleanup if mouse released outside chips
 document.addEventListener('mouseup',()=>{
   if(dragSrcIdx!==null){
+    if(dragClone){dragClone.remove();dragClone=null;}
     box.querySelectorAll('.chip').forEach(c=>{
       c.style.opacity='1';
       c.style.borderColor='';
     });
     dragSrcIdx=null;
   }
-},{once:true});
+});
   }
 function clearAll(){
   if(locked)return;
