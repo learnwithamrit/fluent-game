@@ -764,147 +764,120 @@ function renderSel(){
     chip.addEventListener('click',()=>removeAtIndex(parseInt(chip.dataset.idx,10)));
   });
 
- // Works on both mobile (touch) and desktop (mouse)
+// ── UNIFIED DRAG (pointer events — works on mobile + desktop) ──
 let dragSrcIdx=null;
 let dragClone=null;
+let pointerDown=false;
 
 box.querySelectorAll('.chip').forEach(chip=>{
-  // ── DESKTOP MOUSE DRAG ──
-  chip.addEventListener('mousedown',e=>{
-    if(locked)return;
-    dragSrcIdx=parseInt(chip.dataset.idx,10);
-    chip.style.opacity='0.4';
-  });
+  chip.style.touchAction='none';
 
-  // ── MOBILE TOUCH DRAG ──
-  chip.addEventListener('touchstart',e=>{
+  chip.addEventListener('pointerdown',e=>{
     if(locked)return;
     e.preventDefault();
+    pointerDown=true;
     dragSrcIdx=parseInt(chip.dataset.idx,10);
+    chip.setPointerCapture(e.pointerId);
 
-    // Create floating clone that follows the finger
+    // Create floating clone
+    const rect=chip.getBoundingClientRect();
     dragClone=chip.cloneNode(true);
     dragClone.style.cssText=`
       position:fixed;
+      left:${rect.left}px;
+      top:${rect.top}px;
+      width:${rect.width}px;
       pointer-events:none;
       z-index:9999;
-      opacity:0.85;
-      transform:scale(1.1);
+      opacity:0.9;
+      transform:scale(1.12);
       background:var(--acc);
       color:#0d0d1a;
       border-radius:12px;
       padding:8px 14px;
       font-size:0.78rem;
       font-weight:700;
-      box-shadow:0 4px 16px rgba(0,0,0,0.4);
+      box-shadow:0 6px 20px rgba(0,0,0,0.5);
+      transition:none;
     `;
-    const touch=e.touches[0];
-    dragClone.style.left=(touch.clientX-40)+'px';
-    dragClone.style.top=(touch.clientY-20)+'px';
     document.body.appendChild(dragClone);
     chip.style.opacity='0.3';
-  },{passive:false});
-
-  chip.addEventListener('touchmove',e=>{
-  e.preventDefault();
-  if(!dragClone)return;
-  const touch=e.touches[0];
-  dragClone.style.left=(touch.clientX-40)+'px';
-  dragClone.style.top=(touch.clientY-20)+'px';
-
-  // Highlight the word underneath the finger
-  box.querySelectorAll('.chip').forEach(c=>{
-    c.style.borderColor='';
-    c.style.transform='';
-    c.style.transition='transform .15s';
   });
-  // Temporarily hide clone so elementFromPoint works through it
-  dragClone.style.display='none';
-  const el=document.elementFromPoint(touch.clientX,touch.clientY);
-  dragClone.style.display='';
-  const targetChip=el?el.closest('.chip'):null;
-  if(targetChip&&parseInt(targetChip.dataset.idx,10)!==dragSrcIdx){
-    targetChip.style.borderColor='#ff8906';
-    targetChip.style.transform='scale(1.08)';
-  }
-},{passive:false});
 
-  chip.addEventListener('touchend',e=>{
+  chip.addEventListener('pointermove',e=>{
+    if(!pointerDown||dragSrcIdx===null||!dragClone)return;
     e.preventDefault();
+
+    // Move clone with pointer
+    const rect=dragClone.getBoundingClientRect();
+    dragClone.style.left=(e.clientX-rect.width/2)+'px';
+    dragClone.style.top=(e.clientY-rect.height/2)+'px';
+
+    // Find chip underneath
+    dragClone.style.display='none';
+    const el=document.elementFromPoint(e.clientX,e.clientY);
+    dragClone.style.display='';
+
+    // Reset all highlights
+    box.querySelectorAll('.chip').forEach(c=>{
+      c.style.borderColor='';
+      c.style.transform='';
+    });
+
+    const targetChip=el?el.closest('.chip'):null;
+    if(targetChip){
+      const targetIdx=parseInt(targetChip.dataset.idx,10);
+      if(!isNaN(targetIdx)&&targetIdx!==dragSrcIdx){
+        targetChip.style.borderColor='#ff8906';
+        targetChip.style.transform='scale(1.1)';
+        targetChip.style.transition='transform .12s';
+      }
+    }
+  });
+
+  chip.addEventListener('pointerup',e=>{
+    if(!pointerDown||dragSrcIdx===null)return;
+    pointerDown=false;
+
+    // Cleanup clone
     if(dragClone){dragClone.remove();dragClone=null;}
-    chip.style.opacity='1';
 
-box.querySelectorAll('.chip').forEach(c=>{
-  c.style.borderColor='';
-  c.style.transform='';
-});
-    
-    if(dragSrcIdx===null)return;
+    // Reset all chips
+    box.querySelectorAll('.chip').forEach(c=>{
+      c.style.opacity='1';
+      c.style.borderColor='';
+      c.style.transform='';
+    });
 
-    // Find which chip the finger landed on
-    const touch=e.changedTouches[0];
-    const el=document.elementFromPoint(touch.clientX,touch.clientY);
-    const target=el?el.closest('.chip'):null;
+    // Find drop target
+    const el=document.elementFromPoint(e.clientX,e.clientY);
+    const targetChip=el?el.closest('.chip'):null;
 
-    if(target&&target!==chip){
-      const dropIdx=parseInt(target.dataset.idx,10);
+    if(targetChip){
+      const dropIdx=parseInt(targetChip.dataset.idx,10);
       if(!isNaN(dropIdx)&&dropIdx!==dragSrcIdx){
         const moved=sel.splice(dragSrcIdx,1)[0];
         sel.splice(dropIdx,0,moved);
         renderSel();
         const sp=stagePuzzles();
         if(sp[pi]&&sp[pi].mode!==4) drawArcs();
-        
       }
     }
     dragSrcIdx=null;
-  },{passive:false});
-});
-
-// ── DESKTOP MOUSE DRAG (drop target) ──
-box.addEventListener('mousemove',e=>{
-  if(dragSrcIdx===null||locked)return;
-  box.querySelectorAll('.chip').forEach(c=>c.style.borderColor='');
-  const target=document.elementFromPoint(e.clientX,e.clientY);
-  const targetChip=target?target.closest('.chip'):null;
-  if(targetChip&&parseInt(targetChip.dataset.idx,10)!==dragSrcIdx){
-    targetChip.style.borderColor='#ff8906';
-  }
-});
-
-box.addEventListener('mouseup',e=>{
-  if(dragSrcIdx===null||locked)return;
-  const target=document.elementFromPoint(e.clientX,e.clientY);
-  const targetChip=target?target.closest('.chip'):null;
-  box.querySelectorAll('.chip').forEach(c=>{
-    c.style.opacity='1';
-    c.style.borderColor='';
   });
-  if(targetChip){
-    const dropIdx=parseInt(targetChip.dataset.idx,10);
-    if(!isNaN(dropIdx)&&dropIdx!==dragSrcIdx){
-      const moved=sel.splice(dragSrcIdx,1)[0];
-      sel.splice(dropIdx,0,moved);
-      renderSel();
-      const sp=stagePuzzles();
-      if(sp[pi]&&sp[pi].mode!==4) drawArcs();
-    }
-  }
-  dragSrcIdx=null;
-});
 
-// Safety cleanup if mouse released outside chips
-document.addEventListener('mouseup',()=>{
-  if(dragSrcIdx!==null){
+  chip.addEventListener('pointercancel',e=>{
+    pointerDown=false;
+    dragSrcIdx=null;
     if(dragClone){dragClone.remove();dragClone=null;}
     box.querySelectorAll('.chip').forEach(c=>{
       c.style.opacity='1';
       c.style.borderColor='';
+      c.style.transform='';
     });
-    dragSrcIdx=null;
-  }
+  });
 });
-  }
+}
 function clearAll(){
   if(locked)return;
   sel=[];
