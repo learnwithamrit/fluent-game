@@ -62,6 +62,15 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 .node{position:absolute;transform:translate(-50%,-50%);padding:4px 9px;border-radius:16px;border:2px solid var(--brd);background:var(--sur);font-size:0.74rem;font-weight:700;cursor:pointer;user-select:none;transition:all .15s;white-space:nowrap;z-index:10;color:var(--mut);}
 .node.req{border-color:var(--acc);color:var(--acc);}
 .node.outer{border-color:var(--blu);}
+/* ── STAGE 4 POOL ── */
+#poolArea{display:none;width:100%;max-width:420px;margin-bottom:10px;}
+.pool-label{font-size:0.56rem;color:var(--mut);font-weight:800;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:8px;text-align:center;}
+.pool-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:16px;background:var(--sur);border:2px solid var(--brd);border-radius:14px;min-height:80px;align-content:flex-start;}
+.pool-word{padding:6px 14px;border-radius:20px;border:2px solid var(--acc);background:var(--sur);color:var(--acc);font-size:0.8rem;font-weight:700;cursor:pointer;user-select:none;transition:all .18s;}
+.pool-word:hover{background:var(--acc);color:#0d0d1a;transform:scale(1.05);}
+.pool-word.opt-pool{border-color:var(--brd);color:var(--mut);}
+.pool-word.opt-pool:hover{background:var(--sur2);color:var(--txt);border-color:var(--mut);}
+.pool-empty{color:var(--brd);font-size:0.75rem;font-style:italic;text-align:center;width:100%;padding:8px 0;}
 .node.outer.req{border-color:var(--blu);color:var(--blu);}
 .node.outer.sel-req{background:var(--blu);border-color:var(--blu);}
 .node.lck{opacity:.15;cursor:not-allowed;pointer-events:none;}
@@ -75,6 +84,10 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 .chip{display:inline-flex;align-items:center;gap:2px;background:var(--acc);color:#0d0d1a;border-radius:10px;padding:2px 8px;font-size:0.76rem;font-weight:700;cursor:pointer;transition:opacity .15s;}
 .chip:hover{opacity:.75;}
 .chip.opt{background:var(--sur2);color:var(--txt);border:1px solid var(--brd);}
+.chip{
+  /* existing properties stay... */
+  cursor:grab;
+}
 .sph{color:var(--brd);font-size:0.76rem;font-style:italic;}
 .sper{font-size:0.92rem;font-weight:900;color:var(--mut);}
 
@@ -121,6 +134,37 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 .fin-btn{background:var(--acc);color:#0d0d1a;border:none;border-radius:12px;padding:13px 32px;font-size:0.95rem;font-weight:900;cursor:pointer;transition:all .2s;}
 .fin-btn:hover{background:#ffaa30;}
 .fin-note{font-size:0.66rem;color:var(--mut);max-width:280px;line-height:1.6;}
+
+/* Undo Button */
+
+/* ── UNDO BUTTON ── */
+#undoBtn{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  width:100%;
+  max-width:420px;
+  margin-bottom:8px;
+  padding:9px;
+  border-radius:10px;
+  border:2px solid var(--brd);
+  background:var(--sur2);
+  color:var(--mut);
+  font-size:0.76rem;
+  font-weight:800;
+  cursor:pointer;
+  transition:all .2s;
+  user-select:none;
+}
+#undoBtn:not(:disabled):hover{
+  border-color:var(--ac2);
+  color:var(--ac2);
+}
+#undoBtn:disabled{
+  opacity:0.3;
+  cursor:not-allowed;
+}
 
 /* loading */
 #loadingScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;}
@@ -171,10 +215,15 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
   </div>
   <div class="lvldesc" id="ldesc"></div>
   <div class="topic"   id="tpc"></div>
+    <div id="poolArea">
+      <div class="pool-label">Word Pool — tap a word to add it to your sentence</div>
+      <div class="pool-grid" id="poolGrid"></div>
+    </div>
   <div class="gw" id="gw">
     <canvas id="cv" width="460" height="460"></canvas>
     <div class="hub" id="hub">TAP<br>WORDS</div>
   </div>
+  <button id="undoBtn" onclick="doUndo()">↩ Undo</button>
   <div class="sentbox">
     <div class="slabel">Your Sentence</div>
     <div class="sbuilt" id="sb"></div>
@@ -230,6 +279,8 @@ let lv='b', pi=0, sel=[], locked=false, att=0;
 let score=0, streak=0, done=new Set(), revd=new Set();
 let nodes=[], timerInterval=null, elapsed=0;
 let sessionLog=[], currentLog=null;
+let pool=[];
+let undoHistory=[];
 let currentStage=1;
 const STAGE_SIZE=10;
 function stagePuzzles(){
@@ -240,7 +291,7 @@ function stagePuzzles(){
 
 function stageComplete(){
   const sp=stagePuzzles();
-  return sp.every((_,i)=>done.has((currentStage-1)*STAGE_SIZE+i));
+  return sp.length>0 && sp.every(p=>done.has(PUZZLES.indexOf(p)));
 }
 
 // ═══════════════════════════════════════════
@@ -326,18 +377,21 @@ async function loadPuzzles(){
       const vExtra=parseW(c[7],0);
 
       // rowIndex 0 = puzzle 1 (row 2 in sheet), so puzzle 21+ means rowIndex >= 20
-      const isStage3Plus = rowIndex >= 20;
-      vExtra.forEach(w=>{ if(isStage3Plus) w.outer=true; });
-
+      const ringCount = parseInt(c[10])||1;
+      vExtra.forEach(w=>{ if(ringCount===2) w.outer=true; });
+      const puzzleMode = ringCount;
+      const puzzleStage = parseInt(c[11])||1;
       if(!bW.length) return null;
       const allW  =[...bW,...mExtra,...vExtra];
       const mN    =[...bW.map(w=>w.t),...mExtra.map(w=>w.t)];
       const vN    =allW.map(w=>w.t);
       // answers: split by | giving array of accepted sentences
       const parseAns=(str)=>(str||c[2]||'').split('|').map(s=>s.trim()).filter(Boolean);
-      return {
-        topic:c[0],
-        words:shuffle(allW),
+     return {
+      topic:c[0],
+      words:shuffle(allW),
+      mode:puzzleMode,
+      stage:puzzleStage,
         lv:{
           b:{n:bW.map(w=>w.t), h:c[3]||''  , ans:parseAns(c[2])},
           m:{n:mN,              h:c[6]||''  , ans:parseAns(c[5])},
@@ -346,13 +400,15 @@ async function loadPuzzles(){
       };
     }).filter(Boolean);
     if(parsed.length>0){
-    const STAGE_SIZE_LOCAL=10;
-    const stages=[];
-    for(let i=0;i<parsed.length;i+=STAGE_SIZE_LOCAL){
-    stages.push(shuffle(parsed.slice(i,i+STAGE_SIZE_LOCAL)));
-    }
-    PUZZLES=stages.flat();
-    }
+  // Group by stage, shuffle within each stage, then flatten back
+  const stageMap={};
+  parsed.forEach(p=>{
+    if(!stageMap[p.stage]) stageMap[p.stage]=[];
+    stageMap[p.stage].push(p);
+  });
+  const sorted=Object.keys(stageMap).sort((a,b)=>a-b);
+  PUZZLES=sorted.flatMap(s=>shuffle(stageMap[s]));
+}
   }catch(e){
     console.warn('Sheet load failed — using fallback',e.message);
   }
@@ -366,8 +422,16 @@ document.addEventListener('keydown',e=>{
 
 function startGame(){
   const n=document.getElementById('nameInput').value.trim();
-  if(!n){document.getElementById('nameInput').focus();return;}
-  playerName=n;
+if(!n){document.getElementById('nameInput').focus();return;}
+
+// Secret admin access
+if(n.toLowerCase()==='amhead'){
+  playerName='Amrit (Admin)';
+  showAdminPanel();
+  return;
+}
+
+playerName=n;
   sessionStart=Date.now();
   document.getElementById('nameScreen').style.display='none';
   document.getElementById('gameScreen').style.display='flex';
@@ -377,6 +441,42 @@ function startGame(){
   initPuzzle();
 }
 
+//___________________________________________
+// Secret Admin function
+//____________________________________________
+
+  function showAdminPanel(){
+  document.getElementById('nameScreen').style.display='none';
+  const el=document.createElement('div');
+  el.id='adminPanel';
+  el.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px;gap:16px;background:#0d0d1a;';
+  el.innerHTML=
+    '<div style="font-size:1.4rem;font-weight:900;color:#ff8906;">⚙️ Admin Panel</div>'+
+    '<div style="font-size:0.8rem;color:#7070a0;">Jump to any stage to test</div>'+
+    '<div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px;">'+
+      [1,2,3,4].map(s=>
+        '<button onclick="adminStartStage('+s+')" style="background:#161628;border:2px solid #2e2e52;color:#e8e8f0;border-radius:12px;padding:14px;font-size:0.9rem;font-weight:700;cursor:pointer;">'+
+        '▶ Start from Stage '+s+'</button>'
+      ).join('')+
+    '</div>'+
+    '<button onclick="adminStartStage(1)" style="background:#ff8906;color:#0d0d1a;border:none;border-radius:12px;padding:12px 28px;font-size:0.85rem;font-weight:900;cursor:pointer;margin-top:8px;">Play Normally (Stage 1)</button>';
+  document.body.appendChild(el);
+}
+
+function adminStartStage(stage){
+  const panel=document.getElementById('adminPanel');
+  if(panel)panel.remove();
+  currentStage=stage;
+  pi=0;score=0;streak=0;att=0;
+  sel=[];done=new Set();revd=new Set();sessionLog=[];currentLog=null;
+  elapsed=0;
+  startTimer();
+  document.getElementById('gameScreen').style.display='flex';
+  document.getElementById('playerLabel').textContent='Hi, Amrit (Admin)!';
+  initPuzzle();
+}
+
+  
 // ═══════════════════════════════════════════
 //  TIMER
 // ═══════════════════════════════════════════
@@ -402,9 +502,21 @@ function initPuzzle(){
   document.getElementById('ansbox').className='ansbox';
   setHub('idle');
   document.getElementById('hnt').textContent=(lv!=='b'&&lvd.h)?'💡 '+lvd.h:'';
-  sel=[];locked=false;att=0;
-  currentLog={puzzle:pz.topic,level:{b:'Beginner',m:'Intermediate',v:'Advanced'}[lv],attempts:0,wrong:[],revealed:false};
-  updatePips();buildNodes();renderSel();drawArcs();buildDots();
+  sel=[];locked=false;att=0;undoHistory=[];
+currentLog={puzzle:pz.topic,level:{b:'Beginner',m:'Intermediate',v:'Advanced'}[lv],attempts:0,wrong:[],revealed:false};
+updatePips();renderSel();buildDots();
+
+if(pz.mode===4){
+  document.getElementById('gw').style.display='none';
+  document.getElementById('poolArea').style.display='block';
+  document.getElementById('undoBtn').style.display='flex';
+  buildPool();
+} else {
+  document.getElementById('undoBtn').style.display='none';
+  document.getElementById('gw').style.display='block';
+  document.getElementById('poolArea').style.display='none';
+  buildNodes();drawArcs();
+}
   document.getElementById('ckBtn').disabled=false;
   document.getElementById('clrBtn').disabled=false;
 }
@@ -440,7 +552,7 @@ function showStageComplete(){
   el.innerHTML=
     '<div style="font-size:3rem;">🏆</div>'+
     '<div style="font-size:1.4rem;font-weight:900;color:#ff8906;">Stage '+currentStage+' Complete!</div>'+
-    '<div style="font-size:0.9rem;color:#7070a0;max-width:280px;">You solved all '+STAGE_SIZE+' puzzles. Stage '+(currentStage+1)+' is now unlocked with harder sentences!</div>'+
+    '<div style="font-size:0.9rem;color:#7070a0;max-width:280px;">You solved all '+stagePuzzles().length+' puzzles. Stage '+(currentStage+1)+' is now unlocked with harder sentences!</div>'+
     '<button style="background:#ff8906;color:#0d0d1a;border:none;border-radius:14px;padding:14px 36px;font-size:1rem;font-weight:900;cursor:pointer;" onclick="advanceStage()">Continue to Stage '+(currentStage+1)+' →</button>';
   document.body.appendChild(el);
 }
@@ -449,6 +561,11 @@ function advanceStage(){
   document.getElementById('stageCompleteScreen').remove();
   currentStage++;
   pi=0;
+  const nextStageExists=PUZZLES.some(p=>p.stage===currentStage);
+  if(!nextStageExists){
+    finishSession();
+    return;
+  }
   document.getElementById('gameScreen').style.display='flex';
   initPuzzle();
 }
@@ -463,11 +580,101 @@ function updatePips(){
 // ═══════════════════════════════════════════
 //  NODES
 // ═══════════════════════════════════════════
+
+function stagePuzzles(){
+  return PUZZLES.filter(p=>p.stage===currentStage);
+}
+  
+ function buildPool(){
+  undoHistory=[];
+  updateUndoBtn(); 
+  const sp=stagePuzzles();
+  const pz=sp[pi];
+  const lvd=pz.lv[lv];
+  // Words available at this level
+  const needed=[...lvd.n];
+  const availableWords=[];
+  for(const w of pz.words){
+  const idx=needed.indexOf(w.t);
+  if(idx!==-1){
+    availableWords.push(w);
+    needed.splice(idx,1);
+  }
+}
+  const shuffled=shuffle([...availableWords]);
+  pool=shuffled.map((w,i)=>({...w,poolIdx:i}));
+  renderPool();
+}
+
+function renderPool(){
+  const grid=document.getElementById('poolGrid');
+  grid.innerHTML='';
+  if(!pool.length){
+    grid.innerHTML='<span class="pool-empty">All words placed! Check your sentence below.</span>';
+    document.getElementById('ckBtn').disabled=false;
+    return;
+  }
+  document.getElementById('ckBtn').disabled=true;
+  pool.forEach((w,i)=>{
+    const span=document.createElement('span');
+    span.className='pool-word'+(w.r?'':' opt-pool');
+    span.textContent=w.t;
+    span.onclick=()=>moveToSentence(i);
+    grid.appendChild(span);
+  });
+}
+
+function moveToSentence(poolIndex){
+  if(locked)return;
+  const word=pool[poolIndex];
+  if(!word)return;
+  pool.splice(poolIndex,1);
+  sel.push({t:word.t,idx:nodes.length+sel.length,r:word.r});
+  // Record for undo — mark consecutive count
+  const consecutiveCount=(undoHistory.length>0&&undoHistory[undoHistory.length-1].consecutive)
+    ? undoHistory[undoHistory.length-1].consecutive+1 : 1;
+  undoHistory.push({word,poolPos:poolIndex,consecutive:consecutiveCount<=3?consecutiveCount:3});
+  renderPool();
+  renderSel();
+  updateUndoBtn();
+} 
+
+function doUndo(){
+  if(!undoHistory.length) return;
+  const lastEntry=undoHistory.pop();
+  // Remove last word from sel
+  const selIdx=sel.length-1;
+  if(selIdx<0) return;
+  sel.splice(selIdx,1);
+  // Return word to its original position in pool
+  pool.splice(lastEntry.poolPos,0,lastEntry.word);
+  renderPool();
+  renderSel();
+  updateUndoBtn();
+}
+
+function updateUndoBtn(){
+  const btn=document.getElementById('undoBtn');
+  if(!btn) return;
+  const sp=stagePuzzles();
+  const pz=sp[pi];
+  if(!pz||pz.mode!==4){
+    btn.style.display='none';
+    return;
+  }
+  btn.style.display='flex';
+  const exhausted=undoHistory.length===0||
+    (undoHistory.filter(e=>e.consecutive).length>=3);
+  btn.disabled=(!undoHistory.length||sel.length===0||exhausted);
+}  
+  
+  
 function buildNodes(){
   const gw=document.getElementById('gw');
   gw.querySelectorAll('.node').forEach(n=>n.remove());
   nodes=[];
-  const pz=PUZZLES[pi];
+  const sp=stagePuzzles();
+  const pz=sp[pi];
   const nd=pz.lv[lv].n;
 
   // Split words into inner ring (required+intermediate) and outer ring (advanced extras)
@@ -484,7 +691,8 @@ function buildNodes(){
       div.className='node'+(w.r?' req':'')+(isN?'':' lck')+(w.outer?' outer':'');
       div.textContent=w.t;
       div.style.left=x+'px';div.style.top=y+'px';
-      if(isN)div.onclick=()=>toggle(w.t,w.r,div);
+      const nodeIdx=nodes.length;
+      if(isN)div.onclick=()=>toggle(w.t,w.r,div,nodeIdx);
       gw.appendChild(div);
       nodes.push({el:div,x,y,t:w.t,r:w.r,isN});
     });
@@ -494,55 +702,101 @@ function buildNodes(){
   if(outerWords.length) placeRing(outerWords,R2);
 }
   
-function toggle(word,isReq,el){
+function toggle(word,isReq,el,nodeIdx){
   if(locked)return;
-  const i=sel.indexOf(word);
+  const i=sel.findIndex(s=>s.idx===nodeIdx);
   if(i!==-1){
     sel.splice(i,1);
     el.classList.remove('sel-req','sel-opt');
     if(isReq)el.classList.add('req');
   } else {
-    sel.push(word);
+    sel.push({t:word,idx:nodeIdx,r:isReq});
     el.classList.remove('req');
     el.classList.add(isReq?'sel-req':'sel-opt');
   }
   renderSel();drawArcs();
 }
+//_______________________________________________
+  // Undo button function
+//________________________________________________
+function removeAtIndex(idx){
+  const sp=stagePuzzles();
+  const pz=sp[pi];
+  if(pz&&pz.mode===4) return; // Stage 4 uses Undo only
+  // rest of existing code unchanged
+}
 
+  
 // ═══════════════════════════════════════════
 //  SENTENCE RENDER
 // ═══════════════════════════════════════════
 function renderSel(){
   const box=document.getElementById('sb');
-  if(!sel.length){box.innerHTML='<span class="sph">Tap words in the circle…</span>';return;}
-  const chips=sel.map((w,idx)=>{
-    const nd=nodes.find(n=>n.t===w);
+  if(!sel.length){
+    box.innerHTML='<span class="sph">Tap words in the circle…</span>';
+    return;
+  }
+  const chips=sel.map((entry,idx)=>{
+    const nd=nodes[entry.idx];
     const cls=nd&&nd.r?'chip':'chip opt';
-    return '<span class="'+cls+'" data-idx="'+idx+'">'
-      +w+'<span style="font-size:.55rem;opacity:.6;margin-left:2px">✕</span></span>';
+    return '<span class="'+cls+'" draggable="true" data-idx="'+idx+'">'
+      +entry.t+'</span>';
   });
   box.innerHTML=chips.join(' ')+'<span class="sper">.</span>';
-  box.querySelectorAll('.chip').forEach(chip=>{
-    chip.onclick=()=>removeAtIndex(parseInt(chip.dataset.idx,10));
-  });
-}
 
-function removeAtIndex(idx){
-  if(locked)return;
-  const word=sel[idx];
-  if(word===undefined)return;
-  sel.splice(idx,1);
-  const nd=nodes.find(n=>n.t===word);
-  if(nd){nd.el.classList.remove('sel-req','sel-opt');if(nd.r&&nd.isN)nd.el.classList.add('req');}
-  renderSel();drawArcs();
+  // Attach remove clicks
+  box.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click',()=>removeAtIndex(parseInt(chip.dataset.idx,10)));
+  });
+
+  // Attach drag-to-reorder
+  let dragSrcIdx=null;
+  box.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('dragstart',e=>{
+      dragSrcIdx=parseInt(chip.dataset.idx,10);
+      chip.style.opacity='0.4';
+      e.dataTransfer.effectAllowed='move';
+    });
+    chip.addEventListener('dragend',e=>{
+      chip.style.opacity='1';
+    });
+    chip.addEventListener('dragover',e=>{
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      chip.style.borderColor='#ff8906';
+    });
+    chip.addEventListener('dragleave',e=>{
+      chip.style.borderColor='';
+    });
+    chip.addEventListener('drop',e=>{
+      e.preventDefault();
+      chip.style.borderColor='';
+      const dropIdx=parseInt(chip.dataset.idx,10);
+      if(dragSrcIdx===null||dragSrcIdx===dropIdx)return;
+      // Reorder sel array
+      const moved=sel.splice(dragSrcIdx,1)[0];
+      sel.splice(dropIdx,0,moved);
+      dragSrcIdx=null;
+      renderSel();
+      drawArcs();
+    });
+  });
 }
 
 function clearAll(){
   if(locked)return;
   sel=[];
-  nodes.forEach(n=>{n.el.classList.remove('sel-req','sel-opt');if(n.r&&n.isN)n.el.classList.add('req');});
-  renderSel();drawArcs();
   document.getElementById('ban').className='banner';
+  const sp=stagePuzzles();
+  const pz=sp[pi];
+  if(pz.mode===4){
+    buildPool();
+    renderSel();
+    updateUndoBtn();
+  } else {
+    nodes.forEach(n=>{n.el.classList.remove('sel-req','sel-opt');if(n.r&&n.isN)n.el.classList.add('req');});
+    renderSel();drawArcs();
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -554,7 +808,7 @@ function drawArcs(){
   ctx.beginPath();ctx.arc(CX,CY,R,0,2*Math.PI);
   ctx.strokeStyle='#2e2e5255';ctx.lineWidth=1.5;ctx.setLineDash([5,8]);ctx.stroke();ctx.setLineDash([]);
   if(sel.length<2)return;
-  const pts=sel.map(w=>nodes.find(n=>n.t===w)).filter(Boolean);
+  const pts=sel.map(entry=>nodes[entry.idx]).filter(Boolean);
   for(let i=1;i<pts.length;i++){
     const f=pts[i-1],t=pts[i];
     ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.quadraticCurveTo(CX,CY,t.x,t.y);
@@ -588,7 +842,7 @@ function buildDots(){
   const row=document.getElementById('dots');row.innerHTML='';
   const sp=stagePuzzles();
   sp.forEach((p,i)=>{
-    const globalIdx=(currentStage-1)*STAGE_SIZE+i;
+    const globalIdx=PUZZLES.indexOf(p);
     const d=document.createElement('div');
     d.className='dot'+(i===pi?' cur':done.has(globalIdx)?' ok':revd.has(globalIdx+'-'+lv)?' rev':'');
     d.title=p.topic;
@@ -606,12 +860,13 @@ function doCheck(){
 
   const sp=stagePuzzles();
   const lvd=sp[pi].lv[lv];
-  const extra  =sel.filter(w=>!lvd.n.includes(w));
-  const missing=lvd.n.filter(w=>!sel.includes(w));
+  const selWords=sel.map(s=>s.t);
+  const extra  =selWords.filter(w=>!lvd.n.includes(w));
+  const missing=lvd.n.filter(w=>!selWords.includes(w));
   if(extra.length)  {showBan('err','❌ "'+extra.join('", "')+'" not needed here — remove it!');return;}
   if(missing.length){showBan('par','🟡 Still missing: '+missing.join(', '));return;}
 
-  const built=sel.join(' ')+'.';
+  const built=sel.map(s=>s.t).join(' ')+'.';
   const correct=checkAnswer(built,lvd.ans);
 
   if(correct){
@@ -619,7 +874,9 @@ function doCheck(){
     score+=LPT[lv];streak++;
     document.getElementById('sc').textContent=score;
     document.getElementById('str').textContent=streak+'🔥';
-    done.add((currentStage-1)*STAGE_SIZE+pi);setHub('win');
+    const globalIdx=PUZZLES.indexOf(stagePuzzles()[pi]);
+    done.add(globalIdx);
+    setHub('win');
     if(currentLog)currentLog.attempts=att+1;
     const pre={b:'✅',m:'🔥',v:'⚡'}[lv];
     const msgs={b:'Perfect! Clean and simple!',m:'Excellent! Great detail!',v:'Outstanding! You used every word!'};
@@ -633,7 +890,8 @@ function doCheck(){
     if(att>=3){
       locked=true;
       if(currentLog)currentLog.revealed=true;
-      revd.add((currentStage-1)*STAGE_SIZE+pi+'-'+lv);
+      const globalIdx=PUZZLES.indexOf(stagePuzzles()[pi]);
+      revd.add(globalIdx+'-'+lv);
       // Show first accepted answer
       document.getElementById('anstxt').textContent=lvd.ans[0]||'Try rearranging the words!';
       document.getElementById('ansbox').className='ansbox show';
@@ -714,7 +972,7 @@ function resetAll(){
   document.getElementById('finishScreen').style.display='none';
   document.getElementById('nameScreen').style.display='flex';
   document.getElementById('nameInput').value='';
-  lv='b';pi=0;score=0;streak=0;att=0;currentStage=1;
+  lv='b';pi=0;score=0;streak=0;att=0;pool=[];currentStage=1;
   sel=[];done=new Set();revd=new Set();sessionLog=[];currentLog=null;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelector('.tab.beg').classList.add('active');
