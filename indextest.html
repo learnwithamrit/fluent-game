@@ -549,7 +549,15 @@ function stagePuzzles(){
   const pz=sp[pi];
   const lvd=pz.lv[lv];
   // Words available at this level
-  const availableWords=pz.words.filter(w=>lvd.n.includes(w.t));
+  const needed=[...lvd.n];
+  const availableWords=[];
+  for(const w of pz.words){
+  const idx=needed.indexOf(w.t);
+  if(idx!==-1){
+    availableWords.push(w);
+    needed.splice(idx,1);
+  }
+}
   const shuffled=shuffle([...availableWords]);
   pool=shuffled.map((w,i)=>({...w,poolIdx:i}));
   renderPool();
