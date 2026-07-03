@@ -763,7 +763,7 @@ function renderSel(){
   box.querySelectorAll('.chip').forEach(chip=>{
     chip.addEventListener('click',()=>removeAtIndex(parseInt(chip.dataset.idx,10)));
   });
-
+}
  // Works on both mobile (touch) and desktop (mouse)
 let dragSrcIdx=null;
 let dragClone=null;
