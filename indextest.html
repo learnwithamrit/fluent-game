@@ -1215,33 +1215,7 @@ function buildPoolDirect(pz){
 }
    
 
-   
-// Track this puzzle as wrong for retry queue (only in normal mode)
-if(!isRetryMode){
-  const sp=stagePuzzles();
-  const pz=sp[pi];
-  if(pz&&!wrongPuzzles.find(p=>p.topic===pz.topic)){
-    wrongPuzzles.push(pz);
-  }
-}
-    if(att>=3){
-  locked=true;
-  if(currentLog)currentLog.revealed=true;
-  if(!isRetryMode){
-    const globalIdx=PUZZLES.indexOf(stagePuzzles()[pi]);
-    revd.add(globalIdx+'-'+lv);
-  }
-  document.getElementById('anstxt').textContent=lvd.ans[0]||'Try rearranging the words!';
-  document.getElementById('ansbox').className='ansbox show';
-  setHub('fail');
-  showBan('err','💡 Answer revealed above. Hit Next ▶ to continue!');
-  buildDots();
-}
-     else {
-      showBan('err', randomMotivation());
-    }
-
-}
+  
 // ═══════════════════════════════════════════
 //  FINISH SESSION
 // ═══════════════════════════════════════════
