@@ -81,7 +81,22 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 .sentbox{width:340px;background:var(--sur);border:2px solid var(--brd);border-radius:12px;padding:10px 13px;margin-bottom:7px;min-height:52px;}
 .slabel{font-size:0.58rem;color:var(--mut);font-weight:800;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:5px;}
 .sbuilt{font-size:0.88rem;line-height:1.6;min-height:22px;display:flex;flex-wrap:wrap;align-items:center;gap:3px;}
-.chip{display:inline-flex;align-items:center;gap:2px;background:var(--acc);color:#0d0d1a;border-radius:10px;padding:2px 8px;font-size:0.76rem;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+  background:var(--acc);
+  color:#0d0d1a;
+  border-radius:12px;
+  padding:8px 14px;
+  font-size:0.78rem;
+  font-weight:700;
+  cursor:grab;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+  -webkit-touch-callout:none;
+  transition:opacity .15s;}
 .chip:hover{opacity:.75;}
 .chip.opt{background:var(--sur2);color:var(--txt);border:1px solid var(--brd);}
 .chip{
@@ -749,40 +764,120 @@ function renderSel(){
     chip.addEventListener('click',()=>removeAtIndex(parseInt(chip.dataset.idx,10)));
   });
 
-  // Attach drag-to-reorder
-  let dragSrcIdx=null;
-  box.querySelectorAll('.chip').forEach(chip=>{
-    chip.addEventListener('dragstart',e=>{
-      dragSrcIdx=parseInt(chip.dataset.idx,10);
-      chip.style.opacity='0.4';
-      e.dataTransfer.effectAllowed='move';
+// ── UNIFIED DRAG (pointer events — works on mobile + desktop) ──
+let dragSrcIdx=null;
+let dragClone=null;
+let pointerDown=false;
+
+box.querySelectorAll('.chip').forEach(chip=>{
+  chip.style.touchAction='none';
+
+  chip.addEventListener('pointerdown',e=>{
+    if(locked)return;
+    e.preventDefault();
+    pointerDown=true;
+    dragSrcIdx=parseInt(chip.dataset.idx,10);
+    chip.setPointerCapture(e.pointerId);
+
+    // Create floating clone
+    const rect=chip.getBoundingClientRect();
+    dragClone=chip.cloneNode(true);
+    dragClone.style.cssText=`
+      position:fixed;
+      left:${rect.left}px;
+      top:${rect.top}px;
+      width:${rect.width}px;
+      pointer-events:none;
+      z-index:9999;
+      opacity:0.9;
+      transform:scale(1.12);
+      background:var(--acc);
+      color:#0d0d1a;
+      border-radius:12px;
+      padding:8px 14px;
+      font-size:0.78rem;
+      font-weight:700;
+      box-shadow:0 6px 20px rgba(0,0,0,0.5);
+      transition:none;
+    `;
+    document.body.appendChild(dragClone);
+    chip.style.opacity='0.3';
+  });
+
+  chip.addEventListener('pointermove',e=>{
+    if(!pointerDown||dragSrcIdx===null||!dragClone)return;
+    e.preventDefault();
+
+    // Move clone with pointer
+    const rect=dragClone.getBoundingClientRect();
+    dragClone.style.left=(e.clientX-rect.width/2)+'px';
+    dragClone.style.top=(e.clientY-rect.height/2)+'px';
+
+    // Find chip underneath
+    dragClone.style.display='none';
+    const el=document.elementFromPoint(e.clientX,e.clientY);
+    dragClone.style.display='';
+
+    // Reset all highlights
+    box.querySelectorAll('.chip').forEach(c=>{
+      c.style.borderColor='';
+      c.style.transform='';
     });
-    chip.addEventListener('dragend',e=>{
-      chip.style.opacity='1';
+
+    const targetChip=el?el.closest('.chip'):null;
+    if(targetChip){
+      const targetIdx=parseInt(targetChip.dataset.idx,10);
+      if(!isNaN(targetIdx)&&targetIdx!==dragSrcIdx){
+        targetChip.style.borderColor='#ff8906';
+        targetChip.style.transform='scale(1.1)';
+        targetChip.style.transition='transform .12s';
+      }
+    }
+  });
+
+  chip.addEventListener('pointerup',e=>{
+    if(!pointerDown||dragSrcIdx===null)return;
+    pointerDown=false;
+
+    // Cleanup clone
+    if(dragClone){dragClone.remove();dragClone=null;}
+
+    // Reset all chips
+    box.querySelectorAll('.chip').forEach(c=>{
+      c.style.opacity='1';
+      c.style.borderColor='';
+      c.style.transform='';
     });
-    chip.addEventListener('dragover',e=>{
-      e.preventDefault();
-      e.dataTransfer.dropEffect='move';
-      chip.style.borderColor='#ff8906';
-    });
-    chip.addEventListener('dragleave',e=>{
-      chip.style.borderColor='';
-    });
-    chip.addEventListener('drop',e=>{
-      e.preventDefault();
-      chip.style.borderColor='';
-      const dropIdx=parseInt(chip.dataset.idx,10);
-      if(dragSrcIdx===null||dragSrcIdx===dropIdx)return;
-      // Reorder sel array
-      const moved=sel.splice(dragSrcIdx,1)[0];
-      sel.splice(dropIdx,0,moved);
-      dragSrcIdx=null;
-      renderSel();
-      drawArcs();
+
+    // Find drop target
+    const el=document.elementFromPoint(e.clientX,e.clientY);
+    const targetChip=el?el.closest('.chip'):null;
+
+    if(targetChip){
+      const dropIdx=parseInt(targetChip.dataset.idx,10);
+      if(!isNaN(dropIdx)&&dropIdx!==dragSrcIdx){
+        const moved=sel.splice(dragSrcIdx,1)[0];
+        sel.splice(dropIdx,0,moved);
+        renderSel();
+        const sp=stagePuzzles();
+        if(sp[pi]&&sp[pi].mode!==4) drawArcs();
+      }
+    }
+    dragSrcIdx=null;
+  });
+
+  chip.addEventListener('pointercancel',e=>{
+    pointerDown=false;
+    dragSrcIdx=null;
+    if(dragClone){dragClone.remove();dragClone=null;}
+    box.querySelectorAll('.chip').forEach(c=>{
+      c.style.opacity='1';
+      c.style.borderColor='';
+      c.style.transform='';
     });
   });
+});
 }
-
 function clearAll(){
   if(locked)return;
   sel=[];
