@@ -286,6 +286,17 @@ const LDESC = {
 const LPT = {b:10, m:20, v:40};
 const CX=230, CY=230, R=130, R2=200;
 
+const MOTIVATIONAL=[
+  "Great try! Let's keep practicing! ✨",
+  "You're getting closer, let's try again! 💪",
+  "Mistakes help us learn. You've got this! 🌟",
+  "Every attempt makes you smarter. Keep going! 🚀",
+  "Awesome effort! Let's give it one more shot! 🎉"
+];
+function randomMotivation(){
+  return MOTIVATIONAL[Math.floor(Math.random()*MOTIVATIONAL.length)];
+}
+  
 // ═══════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════
@@ -296,6 +307,11 @@ let nodes=[], timerInterval=null, elapsed=0;
 let sessionLog=[], currentLog=null;
 let pool=[];
 let undoHistory=[];
+let wrongPuzzles=[];
+let retryQueue=[];
+let isRetryMode=false;
+let retryAttempts={};
+let scoreFrozen=false;
 let currentStage=1;
 const STAGE_SIZE=10;
 function stagePuzzles(){
@@ -452,7 +468,8 @@ playerName=n;
   document.getElementById('gameScreen').style.display='flex';
   document.getElementById('playerLabel').textContent='Hi, '+playerName+'!';
   startTimer();
-  pi=0;score=0;streak=0;done=new Set();revd=new Set();sessionLog=[];currentStage=1;
+  pi=0;score=0;streak=0;done=new Set();revd=new Set();sessionLog=[];
+wrongPuzzles=[];retryQueue=[];isRetryMode=false;retryAttempts={};scoreFrozen=false;currentStage=1;
   initPuzzle();
 }
 
@@ -546,18 +563,127 @@ function setLv(l){
 
 function nextP(){
   if(currentLog)sessionLog.push({...currentLog});
+
+  if(isRetryMode){
+    // Move through retry queue
+    retryQueue.shift();
+    if(retryQueue.length>0){
+      loadRetryPuzzle();
+    } else {
+      // Retry queue exhausted — advance stage
+      isRetryMode=false;
+      scoreFrozen=false;
+      wrongPuzzles=[];
+      retryAttempts={};
+      advanceOrFinish();
+    }
+    return;
+  }
+
+  // Normal mode
   const sp=stagePuzzles();
   pi=(pi+1)%sp.length;
 
   if(stageComplete()){
-    if(currentStage*STAGE_SIZE>=PUZZLES.length){
-      finishSession();return;
+    // Stage done — check if there are wrong puzzles to retry
+    if(wrongPuzzles.length>0){
+      startRetryMode();
     } else {
-      showStageComplete();return;
+      advanceOrFinish();
     }
+    return;
   }
   initPuzzle();
 }
+
+function advanceOrFinish(){
+  const nextStageExists=PUZZLES.some(p=>p.stage===currentStage+1);
+  if(!nextStageExists){
+    finishSession();
+  } else {
+    showStageComplete();
+  }
+}
+
+ function startRetryMode(){
+  isRetryMode=true;
+  scoreFrozen=true;
+  retryQueue=[...wrongPuzzles];
+  retryAttempts={};
+  wrongPuzzles=[];
+  showRetryIntro();
+}
+
+function showRetryIntro(){
+  document.getElementById('gameScreen').style.display='none';
+  const existing=document.getElementById('retryIntroScreen');
+  if(existing)existing.remove();
+  const el=document.createElement('div');
+  el.id='retryIntroScreen';
+  el.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px;text-align:center;gap:14px;background:#0d0d1a;';
+  el.innerHTML=
+    '<div style="font-size:3rem;">🔁</div>'+
+    '<div style="font-size:1.3rem;font-weight:900;color:#ff8906;">Quick Review!</div>'+
+    '<div style="font-size:0.85rem;color:#7070a0;max-width:280px;line-height:1.6;">You got <strong style="color:#e8e8f0;">'+retryQueue.length+'</strong> puzzle'+(retryQueue.length>1?'s':'')+' wrong. Let\'s try them again — you\'ve got this!</div>'+
+    '<div style="font-size:0.75rem;color:#7070a0;max-width:280px;">Score is locked. Focus on getting them right!</div>'+
+    '<button onclick="beginRetry()" style="background:#ff8906;color:#0d0d1a;border:none;border-radius:14px;padding:14px 36px;font-size:1rem;font-weight:900;cursor:pointer;">Let\'s Go! →</button>';
+  document.body.appendChild(el);
+}
+
+function beginRetry(){
+  const el=document.getElementById('retryIntroScreen');
+  if(el)el.remove();
+  document.getElementById('gameScreen').style.display='flex';
+  loadRetryPuzzle();
+}
+
+function loadRetryPuzzle(){
+  if(!retryQueue.length){
+    isRetryMode=false;
+    scoreFrozen=false;
+    retryAttempts={};
+    advanceOrFinish();
+    return;
+  }
+
+  const pz=retryQueue[0];
+  if(!retryAttempts[pz.topic]) retryAttempts[pz.topic]=0;
+
+  // Set up puzzle state directly
+  sel=[];locked=false;att=0;undoHistory=[];
+  currentLog={puzzle:pz.topic,level:{b:'Beginner',m:'Intermediate',v:'Advanced'}[lv],attempts:0,wrong:[],revealed:false,isRetry:true};
+
+  // Update UI labels
+  document.getElementById('ldesc').textContent=LDESC[lv];
+  document.getElementById('tpc').textContent='📌 '+pz.topic+' 🔁';
+  document.getElementById('pno').textContent='Review '+(Object.keys(retryAttempts).indexOf(pz.topic)+1)+'/'+Object.keys(retryAttempts).length;
+  document.getElementById('ban').className='banner';
+  document.getElementById('ansbox').className='ansbox';
+  setHub('idle');
+  document.getElementById('hnt').textContent=(lv!=='b'&&pz.lv[lv].h)?'💡 '+pz.lv[lv].h:'';
+  updatePips();
+
+  // Show retry attempt counter
+  const attempt=retryAttempts[pz.topic]+1;
+  showBan('par','🔁 Retry attempt '+attempt+' of 2 — '+randomMotivation().split('!')[0]+'!');
+
+  if(pz.mode===4){
+    document.getElementById('gw').style.display='none';
+    document.getElementById('poolArea').style.display='block';
+    document.getElementById('undoBtn').style.display='flex';
+    // Override PUZZLES temporarily for buildPool to work
+    buildPoolDirect(pz);
+  } else {
+    document.getElementById('gw').style.display='block';
+    document.getElementById('poolArea').style.display='none';
+    document.getElementById('undoBtn').style.display='none';
+    buildNodesDirect(pz);
+    drawArcs();
+  }
+  buildDots();
+  document.getElementById('ckBtn').disabled=false;
+  document.getElementById('clrBtn').disabled=false;
+} 
 
 function showStageComplete(){
   document.getElementById('gameScreen').style.display='none';
@@ -953,8 +1079,9 @@ function doCheck(){
   if(locked){showBan('par','✅ Already solved! Hit Next ▶');return;}
   if(!sel.length){showBan('err','🤔 Tap some words first!');return;}
 
-  const sp=stagePuzzles();
-  const lvd=sp[pi].lv[lv];
+  const currentPz=isRetryMode?retryQueue[0]:stagePuzzles()[pi];
+if(!currentPz)return;
+const lvd=currentPz.lv[lv];
   const selWords=sel.map(s=>s.t);
   const extra  =selWords.filter(w=>!lvd.n.includes(w));
   const missing=lvd.n.filter(w=>!selWords.includes(w));
@@ -964,13 +1091,21 @@ function doCheck(){
   const built=sel.map(s=>s.t).join(' ')+'.';
   const correct=checkAnswer(built,lvd.ans);
 
-  if(correct){
-    locked=true;
+ if(correct){
+  locked=true;
+  if(!scoreFrozen){
     score+=LPT[lv];streak++;
     document.getElementById('sc').textContent=score;
     document.getElementById('str').textContent=streak+'🔥';
+  }
     const globalIdx=PUZZLES.indexOf(stagePuzzles()[pi]);
     done.add(globalIdx);
+    // Remove from wrongPuzzles if they got it right
+if(!isRetryMode){
+  const sp=stagePuzzles();
+  const pz=sp[pi];
+  wrongPuzzles=wrongPuzzles.filter(p=>p.topic!==pz.topic);
+}
     setHub('win');
     if(currentLog)currentLog.attempts=att+1;
     const pre={b:'✅',m:'🔥',v:'⚡'}[lv];
@@ -979,22 +1114,95 @@ function doCheck(){
     buildDots();
   } else {
     att++;streak=0;
-    document.getElementById('str').textContent='0🔥';
-    if(currentLog){currentLog.attempts=att;currentLog.wrong.push(built);}
-    updatePips();
-    if(att>=3){
+document.getElementById('str').textContent='0🔥';
+if(currentLog){currentLog.attempts=att;currentLog.wrong.push(built);}
+updatePips();
+   // Retry mode: check if 2 attempts used up
+if(isRetryMode){
+  const pz=retryQueue[0];
+  if(pz){
+    retryAttempts[pz.topic]=(retryAttempts[pz.topic]||0)+1;
+    if(retryAttempts[pz.topic]>=2){
       locked=true;
       if(currentLog)currentLog.revealed=true;
-      const globalIdx=PUZZLES.indexOf(stagePuzzles()[pi]);
-      revd.add(globalIdx+'-'+lv);
-      // Show first accepted answer
-      document.getElementById('anstxt').textContent=lvd.ans[0]||'Try rearranging the words!';
+      const lvd2=pz.lv[lv];
+      document.getElementById('anstxt').textContent=lvd2.ans[0]||'Try rearranging the words!';
       document.getElementById('ansbox').className='ansbox show';
       setHub('fail');
-      showBan('err','❌ 3 wrong attempts — see the answer above. Hit Next ▶ to continue!');
-      buildDots();
-    } else {
-      showBan('err','❌ Attempt '+att+'/3 — Check your word order and try again!');
+      showBan('err','💡 Answer revealed. Hit Next ▶ to continue!');
+      return;
+    }
+  }
+}
+
+
+
+function buildNodesDirect(pz){
+  const gw=document.getElementById('gw');
+  gw.querySelectorAll('.node').forEach(n=>n.remove());
+  nodes=[];
+  const nd=pz.lv[lv].n;
+  const innerWords=pz.words.filter(w=>!w.outer);
+  const outerWords=pz.words.filter(w=>w.outer);
+  const placeRing=(list,radius)=>{
+    const n=list.length;
+    list.forEach((w,i)=>{
+      const ang=(i/n)*2*Math.PI-Math.PI/2;
+      const x=CX+radius*Math.cos(ang),y=CY+radius*Math.sin(ang);
+      const isN=nd.includes(w.t);
+      const div=document.createElement('div');
+      div.className='node'+(w.r?' req':'')+(isN?'':' lck')+(w.outer?' outer':'');
+      div.textContent=w.t;
+      div.style.left=x+'px';div.style.top=y+'px';
+      const nodeIdx=nodes.length;
+      if(isN)div.onclick=()=>toggle(w.t,w.r,div,nodeIdx);
+      gw.appendChild(div);
+      nodes.push({el:div,x,y,t:w.t,r:w.r,isN});
+    });
+  };
+  placeRing(innerWords,R);
+  if(outerWords.length)placeRing(outerWords,R2);
+}
+
+function buildPoolDirect(pz){
+  undoHistory=[];
+  updateUndoBtn();
+  const lvd=pz.lv[lv];
+  const needed=[...lvd.n];
+  const availableWords=[];
+  for(const w of pz.words){
+    const idx=needed.indexOf(w.t);
+    if(idx!==-1){availableWords.push(w);needed.splice(idx,1);}
+  }
+  pool=shuffle([...availableWords]).map((w,i)=>({...w,poolIdx:i}));
+  renderPool();
+}
+   
+
+   
+// Track this puzzle as wrong for retry queue (only in normal mode)
+if(!isRetryMode){
+  const sp=stagePuzzles();
+  const pz=sp[pi];
+  if(pz&&!wrongPuzzles.find(p=>p.topic===pz.topic)){
+    wrongPuzzles.push(pz);
+  }
+}
+    if(att>=3){
+  locked=true;
+  if(currentLog)currentLog.revealed=true;
+  if(!isRetryMode){
+    const globalIdx=PUZZLES.indexOf(stagePuzzles()[pi]);
+    revd.add(globalIdx+'-'+lv);
+  }
+  document.getElementById('anstxt').textContent=lvd.ans[0]||'Try rearranging the words!';
+  document.getElementById('ansbox').className='ansbox show';
+  setHub('fail');
+  showBan('err','💡 Answer revealed above. Hit Next ▶ to continue!');
+  buildDots();
+}
+     else {
+      showBan('err', randomMotivation());
     }
   }
 }
@@ -1068,7 +1276,8 @@ function resetAll(){
   document.getElementById('nameScreen').style.display='flex';
   document.getElementById('nameInput').value='';
   lv='b';pi=0;score=0;streak=0;att=0;pool=[];currentStage=1;
-  sel=[];done=new Set();revd=new Set();sessionLog=[];currentLog=null;
+sel=[];done=new Set();revd=new Set();sessionLog=[];currentLog=null;
+wrongPuzzles=[];retryQueue=[];isRetryMode=false;retryAttempts={};scoreFrozen=false;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelector('.tab.beg').classList.add('active');
 }
