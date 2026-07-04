@@ -132,11 +132,45 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 .btn:disabled{opacity:.35;cursor:not-allowed;}
 
 /* dots */
-.dots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:340px;margin-bottom:12px;}
-.dot{width:9px;height:9px;border-radius:50%;background:var(--brd);cursor:pointer;transition:background .2s;}
+.dots-wrapper{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  max-width:420px;
+  margin-bottom:12px;
+}
+.dots{
+  display:flex;
+  gap:4px;
+  flex-wrap:nowrap;
+  justify-content:center;
+}
+.dot{
+  width:9px;height:9px;
+  border-radius:50%;
+  background:var(--brd);
+  cursor:pointer;
+  transition:background .2s;
+  flex-shrink:0;
+}
 .dot.cur{background:var(--acc);}
 .dot.ok{background:var(--grn);}
 .dot.rev{background:var(--red);}
+.dot-arrow{
+  background:none;
+  border:none;
+  color:var(--mut);
+  font-size:1.1rem;
+  cursor:pointer;
+  padding:4px 6px;
+  border-radius:6px;
+  transition:color .2s;
+  user-select:none;
+  flex-shrink:0;
+}
+.dot-arrow:hover{color:var(--txt);}
+.dot-arrow:disabled{opacity:0.2;cursor:not-allowed;}
 
 /* finish screen */
 #finishScreen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;text-align:center;gap:12px;}
@@ -254,8 +288,10 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
     <button class="btn btn-k" id="ckBtn"  onclick="doCheck()">✔ Check</button>
     <button class="btn btn-n"             onclick="nextP()">Next ▶</button>
   </div>
+  <div class="dots-wrapper">
+  <button class="dot-arrow" id="dotsLeft" onclick="scrollDots(-1)">‹</button>
   <div class="dots" id="dots"></div>
-  <button class="btn btn-c" style="width:340px;margin-top:4px;font-size:0.7rem;" onclick="finishSession()">⏹ Finish Session</button>
+  <button class="dot-arrow" id="dotsRight" onclick="scrollDots(1)">›</button>
 </div>
 
 <!-- FINISH -->
@@ -307,6 +343,7 @@ let nodes=[], timerInterval=null, elapsed=0;
 let sessionLog=[], currentLog=null;
 let pool=[];
 let undoHistory=[];
+let dotWindowStart=0;
 let wrongPuzzles=[];
 let retryQueue=[];
 let isRetryMode=false;
@@ -469,7 +506,7 @@ playerName=n;
   document.getElementById('gameScreen').style.display='flex';
   document.getElementById('playerLabel').textContent='Hi, '+playerName+'!';
   startTimer();
-  pi=0;score=0;streak=0;done=new Set();revd=new Set();sessionLog=[];
+  pi=0;score=0;streak=0;done=new Set();revd=new Set();sessionLog=[];dotWindowStart=0;
 wrongPuzzles=[];retryQueue=[];isRetryMode=false;retryAttempts={};scoreFrozen=false;currentStage=1;
   initPuzzle();
 }
@@ -536,6 +573,7 @@ function initPuzzle(){
   setHub('idle');
   document.getElementById('hnt').textContent=(lv!=='b'&&lvd.h)?'💡 '+lvd.h:'';
   sel=[];locked=false;att=0;undoHistory=[];
+  dotWindowStart=0;
 currentLog={puzzle:pz.topic,level:{b:'Beginner',m:'Intermediate',v:'Advanced'}[lv],attempts:0,wrong:[],revealed:false};
 updatePips();renderSel();buildDots();
 
@@ -1073,17 +1111,56 @@ function showBan(type,msg){
 // ═══════════════════════════════════════════
 //  DOTS
 // ═══════════════════════════════════════════
+const DOTS_WINDOW=10;
+
 function buildDots(){
-  const row=document.getElementById('dots');row.innerHTML='';
+  const row=document.getElementById('dots');
+  row.innerHTML='';
   const sp=stagePuzzles();
-  sp.forEach((p,i)=>{
+  const total=sp.length;
+
+  // Clamp window start so current puzzle is always visible
+  const localPi=isRetryMode
+    ? sp.findIndex(p=>p.topic===(retryQueue[0]&&retryQueue[0].topic))
+    : pi;
+  const effectivePi=localPi===-1?pi:localPi;
+
+  if(effectivePi<dotWindowStart) dotWindowStart=effectivePi;
+  if(effectivePi>=dotWindowStart+DOTS_WINDOW) dotWindowStart=effectivePi-DOTS_WINDOW+1;
+  dotWindowStart=Math.max(0,Math.min(dotWindowStart,total-DOTS_WINDOW));
+
+  const windowEnd=Math.min(dotWindowStart+DOTS_WINDOW,total);
+
+  for(let i=dotWindowStart;i<windowEnd;i++){
+    const p=sp[i];
     const globalIdx=PUZZLES.indexOf(p);
     const d=document.createElement('div');
-    d.className='dot'+(i===pi?' cur':done.has(globalIdx)?' ok':revd.has(globalIdx+'-'+lv)?' rev':'');
+    d.className='dot'
+      +(i===effectivePi?' cur'
+      :done.has(globalIdx)?' ok'
+      :revd.has(globalIdx+'-'+lv)?' rev':'');
     d.title=p.topic;
-    d.onclick=()=>{if(currentLog)sessionLog.push({...currentLog});pi=i;initPuzzle();};
+    d.onclick=()=>{
+      if(currentLog)sessionLog.push({...currentLog});
+      pi=i;
+      isRetryMode=false;
+      initPuzzle();
+    };
     row.appendChild(d);
-  });
+  }
+
+  // Update arrow states
+  const leftBtn=document.getElementById('dotsLeft');
+  const rightBtn=document.getElementById('dotsRight');
+  if(leftBtn)  leftBtn.disabled=(dotWindowStart<=0);
+  if(rightBtn) rightBtn.disabled=(dotWindowStart+DOTS_WINDOW>=total);
+}
+
+function scrollDots(dir){
+  const sp=stagePuzzles();
+  const total=sp.length;
+  dotWindowStart=Math.max(0,Math.min(dotWindowStart+dir*DOTS_WINDOW,total-DOTS_WINDOW));
+  buildDots();
 }
 
 // ═══════════════════════════════════════════
@@ -1293,7 +1370,7 @@ function resetAll(){
   document.getElementById('finishScreen').style.display='none';
   document.getElementById('nameScreen').style.display='flex';
   document.getElementById('nameInput').value='';
-  lv='b';pi=0;score=0;streak=0;att=0;pool=[];currentStage=1;
+  lv='b';pi=0;score=0;streak=0;att=0;pool=[];currentStage=1;dotWindowStart=0;
 sel=[];done=new Set();revd=new Set();sessionLog=[];currentLog=null;
 wrongPuzzles=[];retryQueue=[];isRetryMode=false;retryAttempts={};scoreFrozen=false;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
