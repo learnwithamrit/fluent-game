@@ -1307,6 +1307,10 @@ function buildPoolDirect(pz){
 // ═══════════════════════════════════════════
 function finishSession(){
   clearInterval(timerInterval);
+  ['stageCompleteScreen','retryIntroScreen','adminPanel'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.remove();
+});
   if(currentLog&&!sessionLog.find(l=>l.puzzle===currentLog.puzzle&&l.level===currentLog.level)){
     sessionLog.push({...currentLog});
   }
@@ -1318,15 +1322,8 @@ function finishSession(){
       (l.wrong.length?' | Wrong: '+l.wrong.join(' / '):'')+
       (l.revealed?' | Answer revealed':'');
   }).filter(Boolean).join('\n')||'None';
-
-//
-//  document.getElementById('gameScreen').style.display='none';
-//  document.getElementById('finishScreen').style.display='flex';
   document.getElementById('gameScreen').style.display='none';
-const fs=document.getElementById('finishScreen');
-console.log('finishScreen found:', fs, 'display set to flex');
-if(fs) fs.style.display='flex';
-  
+  document.getElementById('finishScreen').style.display='flex';
   document.getElementById('finName').textContent=playerName+'\'s Session';
   document.getElementById('finStats').innerHTML=
     '<div class="fin-stat">Final Score <span>'+score+' pts</span></div>'+
