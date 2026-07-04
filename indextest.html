@@ -1354,16 +1354,20 @@ function finishSession(){
         form.appendChild(input);
       });
       let iframe=document.getElementById('hiddenLogFrame');
-      if(!iframe){
-        iframe=document.createElement('iframe');
-        iframe.name='hiddenLogFrame';
-        iframe.id='hiddenLogFrame';
-        iframe.style.display='none';
-        document.body.appendChild(iframe);
-      }
-      document.body.appendChild(form);
-      form.submit();
-      setTimeout(()=>form.remove(),1000);
+  if(!iframe){
+    iframe=document.createElement('iframe');
+    iframe.name='hiddenLogFrame';
+    iframe.id='hiddenLogFrame';
+    iframe.style.cssText='display:none;width:0;height:0;border:none;position:absolute;';
+    iframe.sandbox='allow-forms allow-scripts allow-same-origin';
+    document.body.appendChild(iframe);
+  }
+  // Wait for iframe to be ready before submitting
+  setTimeout(()=>{
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(()=>form.remove(),2000);
+  },100);
     }
   }catch(e){
     console.warn('Logger failed silently:',e);
