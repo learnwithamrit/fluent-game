@@ -1330,42 +1330,45 @@ function finishSession(){
     '<div class="fin-stat">Time Played <span>'+duration+'</span></div>'+
     '<div class="fin-stat">Best Streak <span>'+streak+'🔥</span></div>';
 
-  if(LOGGER_URL){
-  const payload={
-    name:playerName,
-    date:new Date().toLocaleString('en-IN'),
-    score,duration,
-    puzzlesSolved:done.size,
-    puzzlesAttempted:sessionLog.length,
-    answersRevealed:sessionLog.filter(l=>l.revealed).length,
-    mistakes:mistakeDetail,
-    detail:JSON.stringify(sessionLog)
-  };
-  const form=document.createElement('form');
-  form.method='POST';
-  form.action=LOGGER_URL;
-  form.target='hiddenLogFrame';
-  form.style.display='none';
-  Object.keys(payload).forEach(key=>{
-    const input=document.createElement('input');
-    input.name=key;
-    input.value=typeof payload[key]==='object'?JSON.stringify(payload[key]):String(payload[key]);
-    form.appendChild(input);
-  });
-  let iframe=document.getElementById('hiddenLogFrame');
-  if(!iframe){
-    iframe=document.createElement('iframe');
-    iframe.name='hiddenLogFrame';
-    iframe.id='hiddenLogFrame';
-    iframe.style.display='none';
-    document.body.appendChild(iframe);
-  }
-  document.body.appendChild(form);
-  form.submit();
-  setTimeout(()=>form.remove(),1000);
+ try{
+    if(LOGGER_URL){
+      const payload={
+        name:playerName,
+        date:new Date().toLocaleString('en-IN'),
+        score,duration,
+        puzzlesSolved:done.size,
+        puzzlesAttempted:sessionLog.length,
+        answersRevealed:sessionLog.filter(l=>l.revealed).length,
+        mistakes:mistakeDetail,
+        detail:JSON.stringify(sessionLog)
+      };
+      const form=document.createElement('form');
+      form.method='POST';
+      form.action=LOGGER_URL;
+      form.target='hiddenLogFrame';
+      form.style.display='none';
+      Object.keys(payload).forEach(key=>{
+        const input=document.createElement('input');
+        input.name=key;
+        input.value=typeof payload[key]==='object'?JSON.stringify(payload[key]):String(payload[key]);
+        form.appendChild(input);
+      });
+      let iframe=document.getElementById('hiddenLogFrame');
+      if(!iframe){
+        iframe=document.createElement('iframe');
+        iframe.name='hiddenLogFrame';
+        iframe.id='hiddenLogFrame';
+        iframe.style.display='none';
+        document.body.appendChild(iframe);
+      }
+      document.body.appendChild(form);
+      form.submit();
+      setTimeout(()=>form.remove(),1000);
+    }
+  }catch(e){
+    console.warn('Logger failed silently:',e);
   }
 }
-
 function resetAll(){
   document.getElementById('finishScreen').style.display='none';
   document.getElementById('nameScreen').style.display='flex';
