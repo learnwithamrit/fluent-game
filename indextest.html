@@ -652,31 +652,39 @@ function loadRetryPuzzle(){
   }
 
   const pz=retryQueue[0];
+
+  // Find this puzzle's position in the stage array and sync pi to it
+  const sp=stagePuzzles();
+  const foundIdx=sp.findIndex(p=>p.topic===pz.topic);
+  if(foundIdx!==-1) pi=foundIdx;
+
   if(!retryAttempts[pz.topic]) retryAttempts[pz.topic]=0;
 
-  // Set up puzzle state directly
   sel=[];locked=false;att=0;undoHistory=[];
-  currentLog={puzzle:pz.topic,level:{b:'Beginner',m:'Intermediate',v:'Advanced'}[lv],attempts:0,wrong:[],revealed:false,isRetry:true};
+  currentLog={
+    puzzle:pz.topic,
+    level:{b:'Beginner',m:'Intermediate',v:'Advanced'}[lv],
+    attempts:0,wrong:[],revealed:false,isRetry:true
+  };
 
-  // Update UI labels
   document.getElementById('ldesc').textContent=LDESC[lv];
   document.getElementById('tpc').textContent='📌 '+pz.topic+' 🔁';
-  document.getElementById('pno').textContent='Review '+(Object.keys(retryAttempts).indexOf(pz.topic)+1)+'/'+Object.keys(retryAttempts).length;
+  const queuePos=Object.keys(retryAttempts).length+1;
+  const queueTotal=retryQueue.length+Object.keys(retryAttempts).filter(k=>retryAttempts[k]>0).length;
+  document.getElementById('pno').textContent='Review '+queuePos+'/'+queueTotal;
   document.getElementById('ban').className='banner';
   document.getElementById('ansbox').className='ansbox';
   setHub('idle');
   document.getElementById('hnt').textContent=(lv!=='b'&&pz.lv[lv].h)?'💡 '+pz.lv[lv].h:'';
-  updatePips();
 
-  // Show retry attempt counter
   const attempt=retryAttempts[pz.topic]+1;
-  showBan('par','🔁 Retry attempt '+attempt+' of 2 — '+randomMotivation().split('!')[0]+'!');
+  showBan('par','🔁 Retry attempt '+attempt+' of 2');
+  updatePips();
 
   if(pz.mode===4){
     document.getElementById('gw').style.display='none';
     document.getElementById('poolArea').style.display='block';
     document.getElementById('undoBtn').style.display='flex';
-    // Override PUZZLES temporarily for buildPool to work
     buildPoolDirect(pz);
   } else {
     document.getElementById('gw').style.display='block';
@@ -685,6 +693,7 @@ function loadRetryPuzzle(){
     buildNodesDirect(pz);
     drawArcs();
   }
+
   buildDots();
   document.getElementById('ckBtn').disabled=false;
   document.getElementById('clrBtn').disabled=false;
