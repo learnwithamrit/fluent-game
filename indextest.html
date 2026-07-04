@@ -1319,8 +1319,14 @@ function finishSession(){
       (l.revealed?' | Answer revealed':'');
   }).filter(Boolean).join('\n')||'None';
 
+//
+//  document.getElementById('gameScreen').style.display='none';
+//  document.getElementById('finishScreen').style.display='flex';
   document.getElementById('gameScreen').style.display='none';
-  document.getElementById('finishScreen').style.display='flex';
+const fs=document.getElementById('finishScreen');
+console.log('finishScreen found:', fs, 'display set to flex');
+if(fs) fs.style.display='flex';
+  
   document.getElementById('finName').textContent=playerName+'\'s Session';
   document.getElementById('finStats').innerHTML=
     '<div class="fin-stat">Final Score <span>'+score+' pts</span></div>'+
