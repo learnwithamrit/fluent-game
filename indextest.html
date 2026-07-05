@@ -320,7 +320,17 @@ const LDESC = {
   v:'Connect EVERY word in the circle for the richest sentence!'
 };
 const LPT = {b:10, m:20, v:40};
-const CX=230, CY=230, R=130, R2=200;
+function getScale(){
+  return Math.min(1, (window.innerWidth-32)/460);
+}
+function getMetrics(){
+  const sc=getScale();
+  return {
+    CX:230*sc, CY:230*sc,
+    R:130*sc,  R2:200*sc,
+    SIZE:460*sc, SC:sc
+  };
+}
 
 const MOTIVATIONAL=[
   "Great try! Let's keep practicing! ✨",
@@ -575,6 +585,16 @@ function initPuzzle(){
   sel=[];locked=false;att=0;undoHistory=[];
   dotWindowStart=0;
 currentLog={puzzle:pz.topic,level:{b:'Beginner',m:'Intermediate',v:'Advanced'}[lv],attempts:0,wrong:[],revealed:false};
+  const m=getMetrics();
+const cv=document.getElementById('cv');
+const gw=document.getElementById('gw');
+cv.width=m.SIZE; cv.height=m.SIZE;
+gw.style.width=m.SIZE+'px'; gw.style.height=m.SIZE+'px';
+  const hub=document.getElementById('hub');
+const hubSize=Math.round(62*m.SC);
+hub.style.width=hubSize+'px';
+hub.style.height=hubSize+'px';
+hub.style.fontSize=Math.round(8*m.SC*10)/10+'px';
 updatePips();renderSel();buildDots();
 
 if(pz.mode===4){
@@ -861,7 +881,8 @@ function updateUndoBtn(){
   btn.disabled=(!undoHistory.length||sel.length===0||exhausted);
 }  
   
-  
+//____________Build Nodes_____________________
+//______________________________________________
 function buildNodes(){
   const gw=document.getElementById('gw');
   gw.querySelectorAll('.node').forEach(n=>n.remove());
@@ -878,7 +899,8 @@ function buildNodes(){
     const n=list.length;
     list.forEach((w,i)=>{
       const ang=(i/n)*2*Math.PI-Math.PI/2;
-      const x=CX+radius*Math.cos(ang),y=CY+radius*Math.sin(ang);
+      const m=getMetrics();
+const x=m.CX+radius*Math.cos(ang),y=m.CY+radius*Math.sin(ang);
       const isN=nd.includes(w.t);
       const div=document.createElement('div');
       div.className='node'+(w.r?' req':'')+(isN?'':' lck')+(w.outer?' outer':'');
@@ -891,8 +913,9 @@ function buildNodes(){
     });
   };
 
-  placeRing(innerWords,R);
-  if(outerWords.length) placeRing(outerWords,R2);
+ const m=getMetrics();
+placeRing(innerWords,m.R);
+if(outerWords.length) placeRing(outerWords,m.R2);
 }
   
 function toggle(word,isReq,el,nodeIdx){
@@ -1076,21 +1099,30 @@ function clearAll(){
 //  CANVAS ARCS
 // ═══════════════════════════════════════════
 function drawArcs(){
-  const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
-  ctx.clearRect(0,0,cv.width,cv.height);
+  const cv=document.getElementById('cv');
+  const {CX,CY,R,SIZE}=getMetrics();
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,SIZE,SIZE);
   ctx.beginPath();ctx.arc(CX,CY,R,0,2*Math.PI);
-  ctx.strokeStyle='#2e2e5255';ctx.lineWidth=1.5;ctx.setLineDash([5,8]);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle='#2e2e5255';ctx.lineWidth=1.5;
+  ctx.setLineDash([5,8]);ctx.stroke();ctx.setLineDash([]);
   if(sel.length<2)return;
   const pts=sel.map(entry=>nodes[entry.idx]).filter(Boolean);
   for(let i=1;i<pts.length;i++){
     const f=pts[i-1],t=pts[i];
-    ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.quadraticCurveTo(CX,CY,t.x,t.y);
+    ctx.beginPath();ctx.moveTo(f.x,f.y);
+    ctx.quadraticCurveTo(CX,CY,t.x,t.y);
     ctx.strokeStyle='#ff890625';ctx.lineWidth=9;ctx.stroke();
-    ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.quadraticCurveTo(CX,CY,t.x,t.y);
+    ctx.beginPath();ctx.moveTo(f.x,f.y);
+    ctx.quadraticCurveTo(CX,CY,t.x,t.y);
     ctx.strokeStyle='#ff890690';ctx.lineWidth=2.5;ctx.stroke();
-    ctx.beginPath();ctx.arc(t.x,t.y,5,0,2*Math.PI);ctx.fillStyle='#ff8906';ctx.fill();
+    ctx.beginPath();ctx.arc(t.x,t.y,5,0,2*Math.PI);
+    ctx.fillStyle='#ff8906';ctx.fill();
   }
-  ctx.beginPath();ctx.arc(pts[0].x,pts[0].y,5,0,2*Math.PI);ctx.fillStyle='#f9c74f';ctx.fill();
+  if(pts.length>0){
+    ctx.beginPath();ctx.arc(pts[0].x,pts[0].y,5,0,2*Math.PI);
+    ctx.fillStyle='#f9c74f';ctx.fill();
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -1257,8 +1289,12 @@ function doCheck(){
     }
   }
 }
-
-
+//______________________________Build Nodes Direct_________________
+const m=getMetrics();
+const cv=document.getElementById('cv');
+const gw=document.getElementById('gw');
+cv.width=m.SIZE; cv.height=m.SIZE;
+gw.style.width=m.SIZE+'px'; gw.style.height=m.SIZE+'px';
 function buildNodesDirect(pz){
   const gw=document.getElementById('gw');
   gw.querySelectorAll('.node').forEach(n=>n.remove());
@@ -1282,8 +1318,9 @@ function buildNodesDirect(pz){
       nodes.push({el:div,x,y,t:w.t,r:w.r,isN});
     });
   };
-  placeRing(innerWords,R);
-  if(outerWords.length)placeRing(outerWords,R2);
+  const m=getMetrics();
+placeRing(innerWords,m.R);
+if(outerWords.length) placeRing(outerWords,m.R2);
 }
 
 function buildPoolDirect(pz){
@@ -1382,6 +1419,24 @@ window.addEventListener('load', async()=>{
   clearTimeout(safetyNet);
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('nameScreen').style.display='flex';
+});
+  window.addEventListener('resize',()=>{
+  const sp=stagePuzzles();
+  if(!sp[pi]) return;
+  const pz=sp[pi];
+  if(pz.mode!==4){
+    const m=getMetrics();
+    const cv=document.getElementById('cv');
+    const gw=document.getElementById('gw');
+    cv.width=m.SIZE; cv.height=m.SIZE;
+    gw.style.width=m.SIZE+'px'; gw.style.height=m.SIZE+'px';
+    const hub=document.getElementById('hub');
+    const hubSize=Math.round(62*m.SC);
+    hub.style.width=hubSize+'px';
+    hub.style.height=hubSize+'px';
+    buildNodes();
+    drawArcs();
+  }
 });
 </script>
 </body>
