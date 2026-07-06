@@ -132,14 +132,48 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 .btn:disabled{opacity:.35;cursor:not-allowed;}
 
 /* dots */
-.dots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:340px;margin-bottom:12px;}
-.dot{width:9px;height:9px;border-radius:50%;background:var(--brd);cursor:pointer;transition:background .2s;}
+.dots-wrapper{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  max-width:420px;
+  margin-bottom:12px;
+}
+.dots{
+  display:flex;
+  gap:4px;
+  flex-wrap:nowrap;
+  justify-content:center;
+}
+.dot{
+  width:9px;height:9px;
+  border-radius:50%;
+  background:var(--brd);
+  cursor:pointer;
+  transition:background .2s;
+  flex-shrink:0;
+}
 .dot.cur{background:var(--acc);}
 .dot.ok{background:var(--grn);}
 .dot.rev{background:var(--red);}
+.dot-arrow{
+  background:none;
+  border:none;
+  color:var(--mut);
+  font-size:2.5rem;
+  cursor:pointer;
+  padding:10px 20px;
+  border-radius:6px;
+  transition:color .2s;
+  user-select:none;
+  flex-shrink:0;
+}
+.dot-arrow:hover{color:var(--txt);}
+.dot-arrow:disabled{opacity:0.2;cursor:not-allowed;}
 
 /* finish screen */
-#finishScreen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;text-align:center;gap:12px;}
+#finishScreen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;text-align:center;gap:12px;background:var(--bg);}
 .fin-emoji{font-size:3rem;}
 .fin-title{font-size:1.5rem;font-weight:900;color:var(--acc);}
 .fin-name{font-size:1rem;color:var(--txt);font-weight:700;}
@@ -148,7 +182,22 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 .fin-stat span{color:var(--txt);font-weight:800;}
 .fin-btn{background:var(--acc);color:#0d0d1a;border:none;border-radius:12px;padding:13px 32px;font-size:0.95rem;font-weight:900;cursor:pointer;transition:all .2s;}
 .fin-btn:hover{background:#ffaa30;}
-.fin-note{font-size:0.66rem;color:var(--mut);max-width:280px;line-height:1.6;}
+.fin-note{font-size:0.66rem;color:var(--mut);max-width:280px;line-height:1.6;
+.feedback-link{
+  font-size:0.62rem;
+  color:var(--mut);
+  text-align:center;
+  text-decoration:none;
+  max-width:280px;
+  line-height:1.6;
+  display:block;
+  margin-top:4px;
+  transition:color .2s;
+}
+.feedback-link:hover{
+  color:var(--acc);
+}
+}
 
 /* Undo Button */
 
@@ -186,6 +235,113 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 .spin{width:40px;height:40px;border:3px solid var(--brd);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .load-txt{font-size:0.8rem;color:var(--mut);}
+
+/* ══════════════════════════════════════
+   RESPONSIVE — iPad, Laptop, Desktop
+   ══════════════════════════════════════ */
+
+#gameScreen{
+  max-width:480px;
+  margin:0 auto;
+}
+
+/* ── iPad (768px and up) ── */
+@media(min-width:768px){
+  #nameScreen{padding:48px 32px;}
+  .ns-avatar{width:130px;height:130px;}
+  .ns-title{font-size:2.4rem;}
+  .ns-by{font-size:1.2rem;margin-bottom:40px;}
+  .ns-label{font-size:1rem;}
+  .ns-input{font-size:1.15rem;padding:16px 24px;max-width:380px;}
+  .ns-btn{font-size:1.1rem;padding:16px 48px;max-width:380px;}
+  .ns-note{font-size:0.8rem;}
+
+  #finishScreen{padding:48px 32px;}
+  .fin-emoji{font-size:3.8rem;}
+  .fin-title{font-size:1.8rem;}
+  .fin-name{font-size:1.1rem;}
+  .fin-stats{max-width:420px;padding:20px 32px;}
+  .fin-stat{font-size:0.92rem;}
+  .fin-btn{font-size:1.05rem;padding:15px 40px;}
+
+  .g-title{font-size:1.6rem;}
+  .g-sub{font-size:0.85rem;}
+  .scorebar{padding:8px 24px;font-size:0.75rem;}
+  .scorebar .sv{font-size:1.05rem;}
+  .tab{padding:8px 16px;font-size:0.8rem;}
+  .lvldesc{font-size:0.72rem;}
+  .topic{font-size:0.68rem;}
+  .sentbox{max-width:520px;}
+  .slabel{font-size:0.6rem;}
+  .sbuilt{font-size:0.92rem;}
+  .chip{padding:10px 18px;font-size:0.85rem;}
+  .btnrow{max-width:520px;}
+  .btn{padding:11px;font-size:0.8rem;}
+  .hint{max-width:520px;font-size:0.75rem;}
+  .banner{max-width:520px;}
+  .ansbox{max-width:520px;}
+  .dots-wrapper{max-width:520px;}
+  .pool-grid{max-width:520px;}
+  .pool-word{padding:8px 16px;font-size:0.85rem;}
+}
+
+/* ── Laptop (1024px and up) ── */
+@media(min-width:1024px){
+  body{padding-top:32px;}
+
+  #nameScreen{padding:56px 40px;}
+  .ns-avatar{width:150px;height:150px;border-width:4px;}
+  .ns-title{font-size:2.8rem;letter-spacing:3px;}
+  .ns-by{font-size:1.3rem;margin-bottom:44px;}
+  .ns-label{font-size:1.05rem;margin-bottom:12px;}
+  .ns-input{font-size:1.2rem;padding:18px 28px;max-width:400px;}
+  .ns-btn{font-size:1.15rem;padding:18px 56px;max-width:400px;}
+  .ns-note{font-size:0.82rem;max-width:340px;}
+
+  #finishScreen{padding:56px 40px;}
+  .fin-emoji{font-size:4.2rem;}
+  .fin-title{font-size:2rem;}
+  .fin-name{font-size:1.2rem;}
+  .fin-stats{max-width:460px;padding:22px 36px;gap:12px;}
+  .fin-stat{font-size:0.95rem;}
+  .fin-note{font-size:0.72rem;max-width:340px;}
+  .fin-btn{font-size:1.1rem;padding:16px 48px;border-radius:14px;}
+
+  .g-title{font-size:1.9rem;letter-spacing:3px;}
+  .g-sub{font-size:0.9rem;margin-bottom:14px;}
+  .scorebar{padding:10px 28px;font-size:0.8rem;gap:24px;}
+  .scorebar .sv{font-size:1.15rem;}
+  .tab{padding:9px 20px;font-size:0.85rem;}
+  .lvldesc{font-size:0.78rem;}
+  .topic{font-size:0.72rem;padding:4px 16px;}
+  .sentbox{max-width:580px;padding:14px 18px;}
+  .slabel{font-size:0.65rem;}
+  .sbuilt{font-size:1rem;}
+  .chip{padding:10px 18px;font-size:0.85rem;}
+  .btnrow{max-width:580px;}
+  .btn{padding:12px;font-size:0.85rem;border-radius:11px;}
+  .hint{font-size:0.78rem;max-width:580px;}
+  .banner{max-width:580px;font-size:0.85rem;}
+  .ansbox{max-width:580px;}
+  .dots-wrapper{max-width:580px;}
+  .pool-grid{max-width:580px;}
+  .pool-word{padding:9px 18px;font-size:0.88rem;}
+  .att-row{font-size:0.75rem;}
+  .pip{width:13px;height:13px;}
+}
+
+/* ── Large Desktop (1280px and up) ── */
+@media(min-width:1280px){
+  #gameScreen{max-width:560px;}
+  .sentbox{max-width:640px;}
+  .btnrow{max-width:640px;}
+  .dots-wrapper{max-width:640px;}
+  .banner{max-width:640px;}
+  .ansbox{max-width:640px;}
+  .hint{max-width:640px;}
+  .pool-grid{max-width:640px;}
+}
+
 </style>
 </head>
 <body>
@@ -205,6 +361,7 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
   <input class="ns-input" id="nameInput" type="text" placeholder="Type your name here…" maxlength="40" autocomplete="off">
   <button class="ns-btn" onclick="startGame()">Let's Play →</button>
   <div class="ns-note">Build English sentences step by step.<br>Tap the words, connect the dots, grow your fluency!</div>
+<a href="mailto:ilearnwithamrit@gmail.com" class="feedback-link">Have some feedback about the game? Write to me at ilearnwithamrit@gmail.com</a>
 </div>
 
 <!-- GAME -->
@@ -254,10 +411,13 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
     <button class="btn btn-k" id="ckBtn"  onclick="doCheck()">✔ Check</button>
     <button class="btn btn-n"             onclick="nextP()">Next ▶</button>
   </div>
+  <div class="dots-wrapper">
+  <button class="dot-arrow" id="dotsLeft" onclick="scrollDots(-1)">‹</button>
   <div class="dots" id="dots"></div>
-  <button class="btn btn-c" style="width:340px;margin-top:4px;font-size:0.7rem;" onclick="finishSession()">⏹ Finish Session</button>
+  <button class="dot-arrow" id="dotsRight" onclick="scrollDots(1)">›</button>
 </div>
-
+<button class="btn btn-c" style="width:340px;margin-top:4px;font-size:0.7rem;" onclick="finishSession()">⏹ Finish Session</button>
+</div>
 <!-- FINISH -->
 <div id="finishScreen">
   <div class="fin-emoji">🎉</div>
@@ -265,6 +425,7 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
   <div class="fin-name" id="finName"></div>
   <div class="fin-stats" id="finStats"></div>
   <div class="fin-note">Your results have been saved. Great work today!</div>
+<a href="mailto:ilearnwithamrit@gmail.com" class="feedback-link">Have some feedback about the game? Write to me at ilearnwithamrit@gmail.com</a>
   <button class="fin-btn" onclick="resetAll()">Play Again</button>
 </div>
 
@@ -284,8 +445,29 @@ const LDESC = {
   v:'Connect EVERY word in the circle for the richest sentence!'
 };
 const LPT = {b:10, m:20, v:40};
-const CX=230, CY=230, R=130, R2=200;
+function getScale(){
+  return Math.min(1.4, (window.innerWidth-64)/460);
+}
+function getMetrics(){
+  const sc=getScale();
+  return {
+    CX:230*sc, CY:230*sc,
+    R:130*sc,  R2:200*sc,
+    SIZE:460*sc, SC:sc
+  };
+}
 
+const MOTIVATIONAL=[
+  "Great try! Let's keep practicing! ✨",
+  "You're getting closer, let's try again! 💪",
+  "Mistakes help us learn. You've got this! 🌟",
+  "Every attempt makes you smarter. Keep going! 🚀",
+  "Awesome effort! Let's give it one more shot! 🎉"
+];
+function randomMotivation(){
+  return MOTIVATIONAL[Math.floor(Math.random()*MOTIVATIONAL.length)];
+}
+  
 // ═══════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════
@@ -296,6 +478,12 @@ let nodes=[], timerInterval=null, elapsed=0;
 let sessionLog=[], currentLog=null;
 let pool=[];
 let undoHistory=[];
+let dotWindowStart=0;
+let wrongPuzzles=[];
+let retryQueue=[];
+let isRetryMode=false;
+let retryAttempts={};
+let scoreFrozen=false;
 let currentStage=1;
 const STAGE_SIZE=10;
 function stagePuzzles(){
@@ -305,8 +493,9 @@ function stagePuzzles(){
 }
 
 function stageComplete(){
-  const sp=stagePuzzles();
-  return sp.length>0 && sp.every(p=>done.has(PUZZLES.indexOf(p)));
+  const sp = stagePuzzles();
+  if(!sp.length) return false;
+  return sp.every(p => done.has(PUZZLES.indexOf(p)));
 }
 
 // ═══════════════════════════════════════════
@@ -452,7 +641,8 @@ playerName=n;
   document.getElementById('gameScreen').style.display='flex';
   document.getElementById('playerLabel').textContent='Hi, '+playerName+'!';
   startTimer();
-  pi=0;score=0;streak=0;done=new Set();revd=new Set();sessionLog=[];currentStage=1;
+  pi=0;score=0;streak=0;done=new Set();revd=new Set();sessionLog=[];dotWindowStart=0;
+wrongPuzzles=[];retryQueue=[];isRetryMode=false;retryAttempts={};scoreFrozen=false;currentStage=1;
   initPuzzle();
 }
 
@@ -518,7 +708,18 @@ function initPuzzle(){
   setHub('idle');
   document.getElementById('hnt').textContent=(lv!=='b'&&lvd.h)?'💡 '+lvd.h:'';
   sel=[];locked=false;att=0;undoHistory=[];
+  dotWindowStart=0;
 currentLog={puzzle:pz.topic,level:{b:'Beginner',m:'Intermediate',v:'Advanced'}[lv],attempts:0,wrong:[],revealed:false};
+  const m=getMetrics();
+const cv=document.getElementById('cv');
+const gw=document.getElementById('gw');
+cv.width=m.SIZE; cv.height=m.SIZE;
+gw.style.width=m.SIZE+'px'; gw.style.height=m.SIZE+'px';
+  const hub=document.getElementById('hub');
+const hubSize=Math.round(62*m.SC);
+hub.style.width=hubSize+'px';
+hub.style.height=hubSize+'px';
+hub.style.fontSize=Math.round(8*m.SC*10)/10+'px';
 updatePips();renderSel();buildDots();
 
 if(pz.mode===4){
@@ -545,19 +746,141 @@ function setLv(l){
 }
 
 function nextP(){
-  if(currentLog)sessionLog.push({...currentLog});
-  const sp=stagePuzzles();
-  pi=(pi+1)%sp.length;
+  if(currentLog && !isRetryMode) sessionLog.push({...currentLog});
+  currentLog = null;
+
+  if(isRetryMode){
+    // Already shifted queue in doCheck on correct, or need to shift here on reveal
+    if(retryQueue.length>0 && locked){
+      retryQueue.shift();
+    }
+    if(retryQueue.length>0){
+      loadRetryPuzzle();
+    } else {
+      // All retries done
+      isRetryMode  = false;
+      scoreFrozen  = false;
+      wrongPuzzles = [];
+      retryAttempts= {};
+      advanceOrFinish();
+    }
+    return;
+  }
+
+  // Normal mode
+  const sp = stagePuzzles();
+  pi = (pi+1) % sp.length;
 
   if(stageComplete()){
-    if(currentStage*STAGE_SIZE>=PUZZLES.length){
-      finishSession();return;
+    console.log('Stage complete. wrongPuzzles:', wrongPuzzles.length);
+    if(wrongPuzzles.length>0){
+      startRetryMode();
     } else {
-      showStageComplete();return;
+      advanceOrFinish();
     }
+    return;
   }
+
   initPuzzle();
 }
+
+function advanceOrFinish(){
+  const nextStageExists=PUZZLES.some(p=>p.stage===currentStage+1);
+  if(!nextStageExists){
+    finishSession();
+  } else {
+    showStageComplete();
+  }
+}
+
+ function startRetryMode(){
+  isRetryMode=true;
+  scoreFrozen=true;
+  retryQueue=[...wrongPuzzles];
+  retryAttempts={};
+  wrongPuzzles=[];
+  showRetryIntro();
+}
+
+function showRetryIntro(){
+  document.getElementById('gameScreen').style.display='none';
+  const existing=document.getElementById('retryIntroScreen');
+  if(existing)existing.remove();
+  const el=document.createElement('div');
+  el.id='retryIntroScreen';
+  el.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px;text-align:center;gap:14px;background:#0d0d1a;';
+  el.innerHTML=
+    '<div style="font-size:3rem;">🔁</div>'+
+    '<div style="font-size:1.3rem;font-weight:900;color:#ff8906;">Quick Review!</div>'+
+    '<div style="font-size:0.85rem;color:#7070a0;max-width:280px;line-height:1.6;">You got <strong style="color:#e8e8f0;">'+retryQueue.length+'</strong> puzzle'+(retryQueue.length>1?'s':'')+' wrong. Let\'s try them again — you\'ve got this!</div>'+
+    '<div style="font-size:0.75rem;color:#7070a0;max-width:280px;">Score is locked. Focus on getting them right!</div>'+
+    '<button onclick="beginRetry()" style="background:#ff8906;color:#0d0d1a;border:none;border-radius:14px;padding:14px 36px;font-size:1rem;font-weight:900;cursor:pointer;">Let\'s Go! →</button>';
+  document.body.appendChild(el);
+}
+
+function beginRetry(){
+  const el=document.getElementById('retryIntroScreen');
+  if(el)el.remove();
+  document.getElementById('gameScreen').style.display='flex';
+  loadRetryPuzzle();
+}
+
+function loadRetryPuzzle(){
+  if(!retryQueue.length){
+    isRetryMode=false;
+    scoreFrozen=false;
+    retryAttempts={};
+    advanceOrFinish();
+    return;
+  }
+
+  const pz=retryQueue[0];
+
+  // Find this puzzle's position in the stage array and sync pi to it
+  const sp=stagePuzzles();
+  const foundIdx=sp.findIndex(p=>p.topic===pz.topic);
+  if(foundIdx!==-1) pi=foundIdx;
+
+  if(!retryAttempts[pz.topic]) retryAttempts[pz.topic]=0;
+
+  sel=[];locked=false;att=0;undoHistory=[];
+  currentLog={
+    puzzle:pz.topic,
+    level:{b:'Beginner',m:'Intermediate',v:'Advanced'}[lv],
+    attempts:0,wrong:[],revealed:false,isRetry:true
+  };
+
+  document.getElementById('ldesc').textContent=LDESC[lv];
+  document.getElementById('tpc').textContent='📌 '+pz.topic+' 🔁';
+  const queuePos=Object.keys(retryAttempts).length+1;
+  const queueTotal=retryQueue.length+Object.keys(retryAttempts).filter(k=>retryAttempts[k]>0).length;
+  document.getElementById('pno').textContent='Review '+queuePos+'/'+queueTotal;
+  document.getElementById('ban').className='banner';
+  document.getElementById('ansbox').className='ansbox';
+  setHub('idle');
+  document.getElementById('hnt').textContent=(lv!=='b'&&pz.lv[lv].h)?'💡 '+pz.lv[lv].h:'';
+
+  const attempt=retryAttempts[pz.topic]+1;
+  showBan('par','🔁 Retry attempt '+attempt+' of 2');
+  updatePips();
+
+  if(pz.mode===4){
+    document.getElementById('gw').style.display='none';
+    document.getElementById('poolArea').style.display='block';
+    document.getElementById('undoBtn').style.display='flex';
+    buildPoolDirect(pz);
+  } else {
+    document.getElementById('gw').style.display='block';
+    document.getElementById('poolArea').style.display='none';
+    document.getElementById('undoBtn').style.display='none';
+    buildNodesDirect(pz);
+    drawArcs();
+  }
+
+  buildDots();
+  document.getElementById('ckBtn').disabled=false;
+  document.getElementById('clrBtn').disabled=false;
+} 
 
 function showStageComplete(){
   document.getElementById('gameScreen').style.display='none';
@@ -683,7 +1006,8 @@ function updateUndoBtn(){
   btn.disabled=(!undoHistory.length||sel.length===0||exhausted);
 }  
   
-  
+//____________Build Nodes_____________________
+//______________________________________________
 function buildNodes(){
   const gw=document.getElementById('gw');
   gw.querySelectorAll('.node').forEach(n=>n.remove());
@@ -700,7 +1024,8 @@ function buildNodes(){
     const n=list.length;
     list.forEach((w,i)=>{
       const ang=(i/n)*2*Math.PI-Math.PI/2;
-      const x=CX+radius*Math.cos(ang),y=CY+radius*Math.sin(ang);
+      const m=getMetrics();
+const x=m.CX+radius*Math.cos(ang),y=m.CY+radius*Math.sin(ang);
       const isN=nd.includes(w.t);
       const div=document.createElement('div');
       div.className='node'+(w.r?' req':'')+(isN?'':' lck')+(w.outer?' outer':'');
@@ -713,8 +1038,9 @@ function buildNodes(){
     });
   };
 
-  placeRing(innerWords,R);
-  if(outerWords.length) placeRing(outerWords,R2);
+ const m=getMetrics();
+placeRing(innerWords,m.R);
+if(outerWords.length) placeRing(outerWords,m.R2);
 }
   
 function toggle(word,isReq,el,nodeIdx){
@@ -898,21 +1224,30 @@ function clearAll(){
 //  CANVAS ARCS
 // ═══════════════════════════════════════════
 function drawArcs(){
-  const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
-  ctx.clearRect(0,0,cv.width,cv.height);
+  const cv=document.getElementById('cv');
+  const {CX,CY,R,SIZE}=getMetrics();
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,SIZE,SIZE);
   ctx.beginPath();ctx.arc(CX,CY,R,0,2*Math.PI);
-  ctx.strokeStyle='#2e2e5255';ctx.lineWidth=1.5;ctx.setLineDash([5,8]);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle='#2e2e5255';ctx.lineWidth=1.5;
+  ctx.setLineDash([5,8]);ctx.stroke();ctx.setLineDash([]);
   if(sel.length<2)return;
   const pts=sel.map(entry=>nodes[entry.idx]).filter(Boolean);
   for(let i=1;i<pts.length;i++){
     const f=pts[i-1],t=pts[i];
-    ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.quadraticCurveTo(CX,CY,t.x,t.y);
+    ctx.beginPath();ctx.moveTo(f.x,f.y);
+    ctx.quadraticCurveTo(CX,CY,t.x,t.y);
     ctx.strokeStyle='#ff890625';ctx.lineWidth=9;ctx.stroke();
-    ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.quadraticCurveTo(CX,CY,t.x,t.y);
+    ctx.beginPath();ctx.moveTo(f.x,f.y);
+    ctx.quadraticCurveTo(CX,CY,t.x,t.y);
     ctx.strokeStyle='#ff890690';ctx.lineWidth=2.5;ctx.stroke();
-    ctx.beginPath();ctx.arc(t.x,t.y,5,0,2*Math.PI);ctx.fillStyle='#ff8906';ctx.fill();
+    ctx.beginPath();ctx.arc(t.x,t.y,5,0,2*Math.PI);
+    ctx.fillStyle='#ff8906';ctx.fill();
   }
-  ctx.beginPath();ctx.arc(pts[0].x,pts[0].y,5,0,2*Math.PI);ctx.fillStyle='#f9c74f';ctx.fill();
+  if(pts.length>0){
+    ctx.beginPath();ctx.arc(pts[0].x,pts[0].y,5,0,2*Math.PI);
+    ctx.fillStyle='#f9c74f';ctx.fill();
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -933,17 +1268,56 @@ function showBan(type,msg){
 // ═══════════════════════════════════════════
 //  DOTS
 // ═══════════════════════════════════════════
+const DOTS_WINDOW=10;
+
 function buildDots(){
-  const row=document.getElementById('dots');row.innerHTML='';
+  const row=document.getElementById('dots');
+  row.innerHTML='';
   const sp=stagePuzzles();
-  sp.forEach((p,i)=>{
+  const total=sp.length;
+
+  // Clamp window start so current puzzle is always visible
+  const localPi=isRetryMode
+    ? sp.findIndex(p=>p.topic===(retryQueue[0]&&retryQueue[0].topic))
+    : pi;
+  const effectivePi=localPi===-1?pi:localPi;
+
+  if(effectivePi<dotWindowStart) dotWindowStart=effectivePi;
+  if(effectivePi>=dotWindowStart+DOTS_WINDOW) dotWindowStart=effectivePi-DOTS_WINDOW+1;
+  dotWindowStart=Math.max(0,Math.min(dotWindowStart,total-DOTS_WINDOW));
+
+  const windowEnd=Math.min(dotWindowStart+DOTS_WINDOW,total);
+
+  for(let i=dotWindowStart;i<windowEnd;i++){
+    const p=sp[i];
     const globalIdx=PUZZLES.indexOf(p);
     const d=document.createElement('div');
-    d.className='dot'+(i===pi?' cur':done.has(globalIdx)?' ok':revd.has(globalIdx+'-'+lv)?' rev':'');
+    d.className='dot'
+      +(i===effectivePi?' cur'
+      :done.has(globalIdx)?' ok'
+      :revd.has(globalIdx+'-'+lv)?' rev':'');
     d.title=p.topic;
-    d.onclick=()=>{if(currentLog)sessionLog.push({...currentLog});pi=i;initPuzzle();};
+    d.onclick=()=>{
+      if(currentLog)sessionLog.push({...currentLog});
+      pi=i;
+      isRetryMode=false;
+      initPuzzle();
+    };
     row.appendChild(d);
-  });
+  }
+
+  // Update arrow states
+  const leftBtn=document.getElementById('dotsLeft');
+  const rightBtn=document.getElementById('dotsRight');
+  if(leftBtn)  leftBtn.disabled=(dotWindowStart<=0);
+  if(rightBtn) rightBtn.disabled=(dotWindowStart+DOTS_WINDOW>=total);
+}
+
+function scrollDots(dir){
+  const sp=stagePuzzles();
+  const total=sp.length;
+  dotWindowStart=Math.max(0,Math.min(dotWindowStart+dir*DOTS_WINDOW,total-DOTS_WINDOW));
+  buildDots();
 }
 
 // ═══════════════════════════════════════════
@@ -953,57 +1327,152 @@ function doCheck(){
   if(locked){showBan('par','✅ Already solved! Hit Next ▶');return;}
   if(!sel.length){showBan('err','🤔 Tap some words first!');return;}
 
-  const sp=stagePuzzles();
-  const lvd=sp[pi].lv[lv];
-  const selWords=sel.map(s=>s.t);
-  const extra  =selWords.filter(w=>!lvd.n.includes(w));
-  const missing=lvd.n.filter(w=>!selWords.includes(w));
+  const currentPz = isRetryMode ? retryQueue[0] : stagePuzzles()[pi];
+  if(!currentPz) return;
+  const lvd = currentPz.lv[lv];
+
+  const selWords = sel.map(s=>s.t);
+  const extra    = selWords.filter(w=>!lvd.n.includes(w));
+  const missing  = lvd.n.filter(w=>!selWords.includes(w));
   if(extra.length)  {showBan('err','❌ "'+extra.join('", "')+'" not needed here — remove it!');return;}
   if(missing.length){showBan('par','🟡 Still missing: '+missing.join(', '));return;}
 
-  const built=sel.map(s=>s.t).join(' ')+'.';
-  const correct=checkAnswer(built,lvd.ans);
+  const built   = selWords.join(' ')+'.';
+  const correct = checkAnswer(built, lvd.ans);
 
   if(correct){
-    locked=true;
-    score+=LPT[lv];streak++;
-    document.getElementById('sc').textContent=score;
-    document.getElementById('str').textContent=streak+'🔥';
-    const globalIdx=PUZZLES.indexOf(stagePuzzles()[pi]);
-    done.add(globalIdx);
+    locked = true;
     setHub('win');
-    if(currentLog)currentLog.attempts=att+1;
-    const pre={b:'✅',m:'🔥',v:'⚡'}[lv];
-    const msgs={b:'Perfect! Clean and simple!',m:'Excellent! Great detail!',v:'Outstanding! You used every word!'};
-    showBan('suc',pre+' '+msgs[lv]+' +'+LPT[lv]+' pts');
-    buildDots();
+
+    if(isRetryMode){
+      // Score frozen in retry mode
+      showBan('suc','✅ Correct! Well done! Moving on…');
+      // Remove from retry queue
+      retryQueue.shift();
+      if(currentLog) sessionLog.push({...currentLog});
+      buildDots();
+    } else {
+      // Normal mode scoring
+      if(!scoreFrozen){
+        score += LPT[lv]; streak++;
+        document.getElementById('sc').textContent = score;
+        document.getElementById('str').textContent = streak+'🔥';
+      }
+      // Remove from wrong list if they got it right
+      wrongPuzzles = wrongPuzzles.filter(p=>p.topic!==currentPz.topic);
+      const globalIdx = PUZZLES.indexOf(currentPz);
+      done.add(globalIdx);
+      if(currentLog) currentLog.attempts = att+1;
+      const pre = {b:'✅',m:'🔥',v:'⚡'}[lv];
+      const msgs = {b:'Perfect! Clean and simple!',m:'Excellent! Great detail!',v:'Outstanding! You used every word!'};
+      showBan('suc', pre+' '+msgs[lv]+' +'+LPT[lv]+' pts');
+      buildDots();
+    }
+
   } else {
-    att++;streak=0;
+    // Wrong answer
+    att++; streak=0;
     document.getElementById('str').textContent='0🔥';
     if(currentLog){currentLog.attempts=att;currentLog.wrong.push(built);}
     updatePips();
-    if(att>=3){
-      locked=true;
-      if(currentLog)currentLog.revealed=true;
-      const globalIdx=PUZZLES.indexOf(stagePuzzles()[pi]);
-      revd.add(globalIdx+'-'+lv);
-      // Show first accepted answer
-      document.getElementById('anstxt').textContent=lvd.ans[0]||'Try rearranging the words!';
-      document.getElementById('ansbox').className='ansbox show';
-      setHub('fail');
-      showBan('err','❌ 3 wrong attempts — see the answer above. Hit Next ▶ to continue!');
-      buildDots();
+
+    if(isRetryMode){
+      // Track retry attempts
+      const topic = currentPz.topic;
+      retryAttempts[topic] = (retryAttempts[topic]||0)+1;
+      if(retryAttempts[topic]>=2){
+        // Used both retries — reveal and move on
+        locked = true;
+        document.getElementById('anstxt').textContent = lvd.ans[0]||'Try rearranging!';
+        document.getElementById('ansbox').className = 'ansbox show';
+        setHub('fail');
+        showBan('err','💡 Answer revealed. Hit Next ▶ to continue!');
+        if(currentLog) currentLog.revealed = true;
+      } else {
+        showBan('err', randomMotivation());
+      }
     } else {
-      showBan('err','❌ Attempt '+att+'/3 — Check your word order and try again!');
+      // Normal mode — track as wrong for retry queue
+      if(!wrongPuzzles.find(p=>p.topic===currentPz.topic)){
+        wrongPuzzles.push(currentPz);
+        console.log('Added to wrongPuzzles:', currentPz.topic, '| Total wrong:', wrongPuzzles.length);
+      }
+
+      if(att>=3){
+        locked = true;
+        const globalIdx = PUZZLES.indexOf(currentPz);
+        revd.add(globalIdx+'-'+lv);
+        document.getElementById('anstxt').textContent = lvd.ans[0]||'Try rearranging!';
+        document.getElementById('ansbox').className = 'ansbox show';
+        setHub('fail');
+        showBan('err','💡 Answer revealed. Hit Next ▶ to continue!');
+        if(currentLog) currentLog.revealed = true;
+        buildDots();
+      } else {
+        showBan('err', randomMotivation());
+      }
     }
   }
 }
+//______________________________Build Nodes Direct_________________
+const m=getMetrics();
+const cv=document.getElementById('cv');
+const gw=document.getElementById('gw');
+cv.width=m.SIZE; cv.height=m.SIZE;
+gw.style.width=m.SIZE+'px'; gw.style.height=m.SIZE+'px';
+function buildNodesDirect(pz){
+  const gw=document.getElementById('gw');
+  gw.querySelectorAll('.node').forEach(n=>n.remove());
+  nodes=[];
+  const nd=pz.lv[lv].n;
+  const innerWords=pz.words.filter(w=>!w.outer);
+  const outerWords=pz.words.filter(w=>w.outer);
+  const placeRing=(list,radius)=>{
+    const n=list.length;
+    list.forEach((w,i)=>{
+      const ang=(i/n)*2*Math.PI-Math.PI/2;
+      const x=CX+radius*Math.cos(ang),y=CY+radius*Math.sin(ang);
+      const isN=nd.includes(w.t);
+      const div=document.createElement('div');
+      div.className='node'+(w.r?' req':'')+(isN?'':' lck')+(w.outer?' outer':'');
+      div.textContent=w.t;
+      div.style.left=x+'px';div.style.top=y+'px';
+      const nodeIdx=nodes.length;
+      if(isN)div.onclick=()=>toggle(w.t,w.r,div,nodeIdx);
+      gw.appendChild(div);
+      nodes.push({el:div,x,y,t:w.t,r:w.r,isN});
+    });
+  };
+  const m=getMetrics();
+placeRing(innerWords,m.R);
+if(outerWords.length) placeRing(outerWords,m.R2);
+}
 
+function buildPoolDirect(pz){
+  undoHistory=[];
+  updateUndoBtn();
+  const lvd=pz.lv[lv];
+  const needed=[...lvd.n];
+  const availableWords=[];
+  for(const w of pz.words){
+    const idx=needed.indexOf(w.t);
+    if(idx!==-1){availableWords.push(w);needed.splice(idx,1);}
+  }
+  pool=shuffle([...availableWords]).map((w,i)=>({...w,poolIdx:i}));
+  renderPool();
+}
+   
+
+  
 // ═══════════════════════════════════════════
 //  FINISH SESSION
 // ═══════════════════════════════════════════
 function finishSession(){
   clearInterval(timerInterval);
+  ['stageCompleteScreen','retryIntroScreen','adminPanel'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.remove();
+});
   if(currentLog&&!sessionLog.find(l=>l.puzzle===currentLog.puzzle&&l.level===currentLog.level)){
     sessionLog.push({...currentLog});
   }
@@ -1015,7 +1484,6 @@ function finishSession(){
       (l.wrong.length?' | Wrong: '+l.wrong.join(' / '):'')+
       (l.revealed?' | Answer revealed':'');
   }).filter(Boolean).join('\n')||'None';
-
   document.getElementById('gameScreen').style.display='none';
   document.getElementById('finishScreen').style.display='flex';
   document.getElementById('finName').textContent=playerName+'\'s Session';
@@ -1027,48 +1495,38 @@ function finishSession(){
     '<div class="fin-stat">Time Played <span>'+duration+'</span></div>'+
     '<div class="fin-stat">Best Streak <span>'+streak+'🔥</span></div>';
 
+try{
   if(LOGGER_URL){
-  const payload={
-    name:playerName,
-    date:new Date().toLocaleString('en-IN'),
-    score,duration,
-    puzzlesSolved:done.size,
-    puzzlesAttempted:sessionLog.length,
-    answersRevealed:sessionLog.filter(l=>l.revealed).length,
-    mistakes:mistakeDetail,
-    detail:JSON.stringify(sessionLog)
-  };
-  const form=document.createElement('form');
-  form.method='POST';
-  form.action=LOGGER_URL;
-  form.target='hiddenLogFrame';
-  form.style.display='none';
-  Object.keys(payload).forEach(key=>{
-    const input=document.createElement('input');
-    input.name=key;
-    input.value=typeof payload[key]==='object'?JSON.stringify(payload[key]):String(payload[key]);
-    form.appendChild(input);
-  });
-  let iframe=document.getElementById('hiddenLogFrame');
-  if(!iframe){
-    iframe=document.createElement('iframe');
-    iframe.name='hiddenLogFrame';
-    iframe.id='hiddenLogFrame';
-    iframe.style.display='none';
-    document.body.appendChild(iframe);
+    const payload={
+      name:playerName,
+      date:new Date().toLocaleString('en-IN'),
+      score,duration,
+      puzzlesSolved:done.size,
+      puzzlesAttempted:sessionLog.length,
+      answersRevealed:sessionLog.filter(l=>l.revealed).length,
+      mistakes:mistakeDetail,
+      detail:JSON.stringify(sessionLog)
+    };
+    fetch(LOGGER_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:Object.keys(payload)
+        .map(k=>encodeURIComponent(k)+'='+encodeURIComponent(payload[k]))
+        .join('&')
+    }).catch(()=>{});
   }
-  document.body.appendChild(form);
-  form.submit();
-  setTimeout(()=>form.remove(),1000);
-  }
+}catch(e){
+  console.warn('Logger failed silently:',e);
 }
-
+}
 function resetAll(){
   document.getElementById('finishScreen').style.display='none';
   document.getElementById('nameScreen').style.display='flex';
   document.getElementById('nameInput').value='';
-  lv='b';pi=0;score=0;streak=0;att=0;pool=[];currentStage=1;
-  sel=[];done=new Set();revd=new Set();sessionLog=[];currentLog=null;
+  lv='b';pi=0;score=0;streak=0;att=0;pool=[];currentStage=1;dotWindowStart=0;
+sel=[];done=new Set();revd=new Set();sessionLog=[];currentLog=null;
+wrongPuzzles=[];retryQueue=[];isRetryMode=false;retryAttempts={};scoreFrozen=false;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelector('.tab.beg').classList.add('active');
 }
@@ -1086,6 +1544,24 @@ window.addEventListener('load', async()=>{
   clearTimeout(safetyNet);
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('nameScreen').style.display='flex';
+});
+  window.addEventListener('resize',()=>{
+  const sp=stagePuzzles();
+  if(!sp[pi]) return;
+  const pz=sp[pi];
+  if(pz.mode!==4){
+    const m=getMetrics();
+    const cv=document.getElementById('cv');
+    const gw=document.getElementById('gw');
+    cv.width=m.SIZE; cv.height=m.SIZE;
+    gw.style.width=m.SIZE+'px'; gw.style.height=m.SIZE+'px';
+    const hub=document.getElementById('hub');
+    const hubSize=Math.round(62*m.SC);
+    hub.style.width=hubSize+'px';
+    hub.style.height=hubSize+'px';
+    buildNodes();
+    drawArcs();
+  }
 });
 </script>
 </body>
