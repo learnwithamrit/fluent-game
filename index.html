@@ -256,6 +256,35 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .load-txt{font-size:0.8rem;color:var(--mut);}
 
+
+
+/* HUB SCREEN */
+#hubScreen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;text-align:center;gap:16px;background:var(--bg);}
+.hub-greeting{font-size:1rem;color:var(--mut);font-weight:700;letter-spacing:.5px;}
+.hub-title{font-size:1.5rem;font-weight:900;color:var(--acc);margin-bottom:4px;}
+.hub-cards{display:flex;flex-direction:column;gap:14px;width:100%;max-width:340px;margin-top:8px;}
+.hub-card{background:var(--sur);border:2px solid var(--brd);border-radius:18px;padding:22px 20px;cursor:pointer;transition:all .22s;display:flex;align-items:center;gap:18px;text-align:left;}
+.hub-card:hover,.hub-card:active{border-color:var(--acc);background:var(--sur2);transform:translateY(-2px);box-shadow:0 8px 24px #ff890622;}
+.hub-card-icon{width:52px;height:52px;flex-shrink:0;}
+.hub-card-label{font-size:1.05rem;font-weight:900;color:var(--txt);margin-bottom:3px;}
+.hub-card-desc{font-size:0.72rem;color:var(--mut);line-height:1.4;}
+ 
+/* STAGE SELECTION SCREEN */
+#stageScreen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;text-align:center;gap:14px;background:var(--bg);}
+.stage-title{font-size:1.2rem;font-weight:900;color:var(--acc);}
+.stage-sub{font-size:0.78rem;color:var(--mut);max-width:280px;line-height:1.6;}
+.stage-cards{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;}
+.stage-card{background:var(--sur);border:2px solid var(--brd);border-radius:14px;padding:16px 20px;cursor:pointer;transition:all .2s;text-align:left;display:flex;justify-content:space-between;align-items:center;}
+.stage-card:hover,.stage-card:active{border-color:var(--acc);background:var(--sur2);}
+.stage-card-label{font-size:0.95rem;font-weight:800;color:var(--txt);}
+.stage-card-desc{font-size:0.7rem;color:var(--mut);margin-top:2px;}
+.stage-card-arrow{color:var(--acc);font-size:1.1rem;}
+
+
+
+
+
+  
 /* ══════════════════════════════════════
    RESPONSIVE — iPad, Laptop, Desktop
    ══════════════════════════════════════ */
@@ -384,6 +413,58 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 <a href="mailto:ilearnwithamrit@gmail.com" class="feedback-link">Have some feedback about the game? <br>Write to me at ilearnwithamrit@gmail.com</a>
 </div>
 
+<!-- Hubscreen -->
+
+ <div id="hubScreen">
+  <div class="hub-greeting" id="hubGreeting">Hi there!</div>
+  <div class="hub-title">What would you like to do?</div>
+  <div class="hub-cards">
+    <div class="hub-card" onclick="goToGame('fluent')">
+      <svg class="hub-card-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="26" cy="26" r="25" stroke="#ff8906" stroke-width="2" fill="#161628"/>
+        <circle cx="26" cy="10" r="3.5" fill="#ff8906"/>
+        <circle cx="40" cy="20" r="3.5" fill="#ff8906"/>
+        <circle cx="40" cy="36" r="3.5" fill="#ff8906"/>
+        <circle cx="26" cy="44" r="3.5" fill="#ff8906"/>
+        <circle cx="12" cy="36" r="3.5" fill="#ff8906"/>
+        <circle cx="12" cy="20" r="3.5" fill="#ff8906"/>
+        <circle cx="26" cy="26" r="5" fill="#ff8906" opacity="0.9"/>
+        <line x1="26" y1="13.5" x2="26" y2="21" stroke="#ff890688" stroke-width="1.5"/>
+        <line x1="38" y1="22.5" x2="31" y2="24" stroke="#ff890688" stroke-width="1.5"/>
+        <line x1="38" y1="33.5" x2="31" y2="28" stroke="#ff890688" stroke-width="1.5"/>
+        <line x1="26" y1="40.5" x2="26" y2="31" stroke="#ff890688" stroke-width="1.5"/>
+        <line x1="14" y1="33.5" x2="21" y2="28" stroke="#ff890688" stroke-width="1.5"/>
+        <line x1="14" y1="22.5" x2="21" y2="24" stroke="#ff890688" stroke-width="1.5"/>
+      </svg>
+      <div>
+        <div class="hub-card-label">Word Puzzle</div>
+        <div class="hub-card-desc">Build sentences level by level.<br>Connect the dots, grow your fluency.</div>
+      </div>
+    </div>
+    <div class="hub-card" onclick="goToGame('quiz')" style="border-color:var(--blu);">
+      <svg class="hub-card-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="48" height="48" rx="14" stroke="#3da9fc" stroke-width="2" fill="#161628"/>
+        <text x="26" y="20" text-anchor="middle" font-size="11" font-weight="900" fill="#3da9fc" font-family="Segoe UI,sans-serif">MCQ</text>
+        <rect x="10" y="26" width="32" height="3.5" rx="1.75" fill="#3da9fc" opacity="0.3"/>
+        <rect x="10" y="32" width="24" height="3.5" rx="1.75" fill="#3da9fc" opacity="0.3"/>
+        <rect x="10" y="38" width="28" height="3.5" rx="1.75" fill="#3da9fc" opacity="0.3"/>
+        <circle cx="42" cy="10" r="7" fill="#ff8906"/>
+        <text x="42" y="14" text-anchor="middle" font-size="11" font-weight="900" fill="#0d0d1a" font-family="Segoe UI,sans-serif">?</text>
+      </svg>
+      <div>
+        <div class="hub-card-label" style="color:var(--blu)">Quiz</div>
+        <div class="hub-card-desc">Test your vocabulary.<br>Pick the right answer from 3 options.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="stageScreen">
+  <div class="stage-title">📚 Choose Your Stage</div>
+  <div class="stage-sub">Pick up where you left off, or start fresh from Stage 1.</div>
+  <div class="stage-cards" id="stageCards"></div>
+</div>
+</div>
+  
 <!-- GAME -->
 <div id="gameScreen">
   <div class="g-title">Fluent</div>
