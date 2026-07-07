@@ -260,10 +260,10 @@ body{background:var(--bg);color:var(--txt);font-family:"Segoe UI",system-ui,sans
 
   <!-- Buttons -->
   <div class="btn-row">
-    <button class="btn btn-cat" onclick="showCategoryScreen()">⇄ Categories</button>
-    <button class="btn btn-next" onclick="nextQuestion()">Next ▶</button>
-  </div>
+  <button class="btn btn-cat" onclick="showCategoryScreen()">⇄ Categories</button>
+  <button class="btn btn-next" onclick="nextQuestion()">Next ▶</button>
 </div>
+<button class="btn btn-cat" style="width:100%;max-width:400px;margin-top:6px;font-size:0.7rem;" onclick="finishSession()">⏹ Finish Session</button>
 
 <!-- EXPLANATION POP-UP -->
 <div id="popupOverlay">
@@ -761,23 +761,32 @@ function startTimer(){
 // ═══════════════════════════════════════════
 function finishSession(){
   clearInterval(timerInterval);
+
+  // Clean up any overlays
+  document.getElementById('popupOverlay').classList.remove('show');
+  document.getElementById('checkpointOverlay').classList.remove('show');
+
   const mins=Math.floor(elapsed/60), secs=elapsed%60;
   const duration=mins+'m '+(secs<10?'0':'')+secs+'s';
-  const correct1st = sessionLog.filter(l=>l.correct&&l.attempts===0).length;
-  const correct2nd = sessionLog.filter(l=>l.correct&&l.attempts===1).length;
-  const wrong      = sessionLog.filter(l=>!l.correct).length;
+  const correct1st=sessionLog.filter(l=>l.correct&&l.attempts===0).length;
+  const correct2nd=sessionLog.filter(l=>l.correct&&l.attempts===1).length;
+  const wrong=sessionLog.filter(l=>!l.correct).length;
+  const skipped=sessionLog.filter(l=>l.skipped).length;
 
+  // Show finish screen
   document.getElementById('gameScreen').style.display='none';
   document.getElementById('finishScreen').style.display='flex';
   document.getElementById('finName').textContent=(playerName||'Player')+"'s Session";
   document.getElementById('finStats').innerHTML=
     '<div class="fin-stat">Final Score <span>'+score+' pts</span></div>'+
     '<div class="fin-stat">Questions Answered <span>'+answeredCount+'</span></div>'+
-    '<div class="fin-stat">Correct (1st attempt) <span>'+correct1st+'</span></div>'+
-    '<div class="fin-stat">Correct (2nd attempt) <span>'+correct2nd+'</span></div>'+
-    '<div class="fin-stat">Wrong <span>'+wrong+'</span></div>'+
+    '<div class="fin-stat">Correct (1st attempt) <span>'+correct1st+' ✅</span></div>'+
+    '<div class="fin-stat">Correct (2nd attempt) <span>'+correct2nd+' 🔁</span></div>'+
+    '<div class="fin-stat">Wrong (both attempts) <span>'+wrong+' ❌</span></div>'+
+    '<div class="fin-stat">Category <span>'+currentCat+'</span></div>'+
     '<div class="fin-stat">Time Played <span>'+duration+'</span></div>';
 
+  // Silent logger
   try{
     if(LOGGER_URL && LOGGER_URL!=='YOUR_APPS_SCRIPT_URL_HERE'){
       const payload={
@@ -791,9 +800,12 @@ function finishSession(){
         detail:JSON.stringify(sessionLog)
       };
       fetch(LOGGER_URL,{
-        method:'POST', mode:'no-cors',
+        method:'POST',
+        mode:'no-cors',
         headers:{'Content-Type':'application/x-www-form-urlencoded'},
-        body:Object.keys(payload).map(k=>encodeURIComponent(k)+'='+encodeURIComponent(payload[k])).join('&')
+        body:Object.keys(payload)
+          .map(k=>encodeURIComponent(k)+'='+encodeURIComponent(payload[k]))
+          .join('&')
       }).catch(()=>{});
     }
   }catch(e){}
@@ -801,11 +813,19 @@ function finishSession(){
 
 function resetQuiz(){
   document.getElementById('finishScreen').style.display='none';
-  score=0; elapsed=0; answeredCount=0; sessionLog=[];
-  // Go back to hub if came from there, else category screen
-  if(window.history.length>1 && playerName){
+  score=0; elapsed=0; answeredCount=0;
+  sessionLog=[]; usedIds=new Set();
+  activeQueue=[]; skippedQueue=[];
+  answeredInSet=0; currentQ=null;
+  document.getElementById('sc').textContent='0';
+  document.getElementById('qCount').textContent='0';
+  document.getElementById('timer').textContent='0:00';
+
+  // If came from hub (has name), go back to hub
+  if(playerName){
     window.location.href='index.html';
   } else {
+    // Direct URL access — go back to category screen
     document.getElementById('categoryScreen').style.display='flex';
   }
 }
