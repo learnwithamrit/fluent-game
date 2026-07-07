@@ -306,8 +306,8 @@ body{background:var(--bg);color:var(--txt);font-family:"Segoe UI",system-ui,sans
 // ═══════════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════════
-const SHEET_URL  = 'YOUR_QUIZ_SHEET_CSV_URL_HERE';
-const LOGGER_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+const SHEET_URL  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuq4nTF9Tw_KcruaINmu_ynHkm8HUd0mIsj9Vm-jVJ_1g81CTfOY0pozxDRsT9OsoC5Z4ewiN9vx2J/pub?gid=0&single=true&output=csv';
+const LOGGER_URL = 'https://script.google.com/macros/s/AKfycbwoBqKG1i-JQsL84A6V0P8NeUEA3U7XljXELZA4RD9A7fja-nFcqhsTALOGtkEZOT8/exec';
 const SET_SIZE   = 20;
 
 // ═══════════════════════════════════════════
@@ -349,7 +349,7 @@ window.addEventListener('load', async () => {
 //  LOAD QUESTIONS FROM SHEET
 // ═══════════════════════════════════════════
 async function loadQuestions(){
-  if(!SHEET_URL || SHEET_URL==='YOUR_QUIZ_SHEET_CSV_URL_HERE'){
+  if(!SHEET_URL || SHEET_URL==='https://docs.google.com/spreadsheets/d/e/2PACX-1vSuq4nTF9Tw_KcruaINmu_ynHkm8HUd0mIsj9Vm-jVJ_1g81CTfOY0pozxDRsT9OsoC5Z4ewiN9vx2J/pub?gid=0&single=true&output=csv'){
     allQuestions = getFallback();
     buildCategories();
     return;
