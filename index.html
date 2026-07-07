@@ -738,12 +738,67 @@ if(n.toLowerCase()==='amhead'){
 
 playerName=n;
   sessionStart=Date.now();
-  document.getElementById('nameScreen').style.display='none';
+ document.getElementById('nameScreen').style.display='none';
+  showHub();
+}
+
+function showHub(){
+  // Hide all screens
+  ['nameScreen','gameScreen','finishScreen','stageScreen'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+  ['adminPanel','stageCompleteScreen','retryIntroScreen'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.remove();
+  });
+  document.getElementById('hubGreeting').textContent='Hi, '+playerName+'!';
+  document.getElementById('hubScreen').style.display='flex';
+}
+ 
+function goToGame(type){
+  document.getElementById('hubScreen').style.display='none';
+  if(type==='quiz'){
+    window.location.href='quiz.html?name='+encodeURIComponent(playerName);
+    return;
+  }
+  // Word Puzzle — show stage selection
+  showStageSelection();
+}
+ 
+function showStageSelection(){
+  document.getElementById('hubScreen').style.display='none';
+  // Build stage cards dynamically based on available stages in PUZZLES
+  const stageNums=[...new Set(PUZZLES.map(p=>p.stage))].sort((a,b)=>a-b);
+  const stageDescriptions={
+    1:'Single word ring · Simple sentences',
+    2:'Single word ring · More complex sentences',
+    3:'Double word ring · Advanced sentences',
+    4:'Word pool · Drag and arrange'
+  };
+  document.getElementById('stageCards').innerHTML=
+    stageNums.map(s=>
+      '<div class="stage-card" onclick="beginStage('+s+')">'+
+      '<div>'+
+      '<div class="stage-card-label">Stage '+s+'</div>'+
+      '<div class="stage-card-desc">'+(stageDescriptions[s]||'')+'</div>'+
+      '</div>'+
+      '<div class="stage-card-arrow">▶</div>'+
+      '</div>'
+    ).join('');
+  document.getElementById('stageScreen').style.display='flex';
+}
+ 
+function beginStage(stage){
+  document.getElementById('stageScreen').style.display='none';
+  currentStage=stage;
+  pi=0;score=0;streak=0;att=0;
+  sel=[];done=new Set();revd=new Set();sessionLog=[];currentLog=null;
+  elapsed=0;dotWindowStart=0;pool=[];undoHistory=[];
+  wrongPuzzles=[];retryQueue=[];isRetryMode=false;retryAttempts={};scoreFrozen=false;
+  startTimer();
   document.getElementById('gameScreen').style.display='flex';
   document.getElementById('playerLabel').textContent='Hi, '+playerName+'!';
-  startTimer();
-  pi=0;score=0;streak=0;done=new Set();revd=new Set();sessionLog=[];dotWindowStart=0;
-wrongPuzzles=[];retryQueue=[];isRetryMode=false;retryAttempts={};scoreFrozen=false;currentStage=1;
   initPuzzle();
 }
 
@@ -1621,15 +1676,16 @@ try{
   console.warn('Logger failed silently:',e);
 }
 }
+
+ //__________Reset All______________// 
 function resetAll(){
   document.getElementById('finishScreen').style.display='none';
-  document.getElementById('nameScreen').style.display='flex';
-  document.getElementById('nameInput').value='';
   lv='b';pi=0;score=0;streak=0;att=0;pool=[];currentStage=1;dotWindowStart=0;
-sel=[];done=new Set();revd=new Set();sessionLog=[];currentLog=null;
-wrongPuzzles=[];retryQueue=[];isRetryMode=false;retryAttempts={};scoreFrozen=false;
+  sel=[];done=new Set();revd=new Set();sessionLog=[];currentLog=null;
+  wrongPuzzles=[];retryQueue=[];isRetryMode=false;retryAttempts={};scoreFrozen=false;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelector('.tab.beg').classList.add('active');
+  showHub();
 }
 
 // ═══════════════════════════════════════════
