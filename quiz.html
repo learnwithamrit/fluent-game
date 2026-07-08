@@ -607,17 +607,16 @@ function renderQuestion(){
   // Options
   const optDiv = document.getElementById('options');
   optDiv.innerHTML = ['A','B','C'].map(k=>`
-  document.querySelectorAll('.opt-btn').forEach(b=>{
-  b.classList.remove('correct','wrong','reveal','locked','selected');
-  b.style.pointerEvents='';
-  b.style.opacity='';
-});
     <button class="opt-btn" data-key="${k}" onclick="selectOption('${k}')">
       <span class="opt-label">${k}</span>
       ${q.options[k]}
     </button>
   `).join('');
-
+  document.querySelectorAll('.opt-btn').forEach(b=>{
+  b.classList.remove('correct','wrong','reveal','locked','selected');
+  b.style.pointerEvents='';
+  b.style.opacity='';
+});
   // Reset card
   const card = document.getElementById('qCard');
   card.className = 'q-card';
