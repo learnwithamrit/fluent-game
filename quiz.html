@@ -142,7 +142,7 @@ body{background:var(--bg);color:var(--txt);font-family:"Segoe UI",system-ui,sans
 .popup-answer{font-size:1rem;font-weight:900;color:var(--grn);margin-bottom:16px;}
 .popup-meaning{font-size:0.82rem;color:var(--txt);line-height:1.6;margin-bottom:8px;
   background:var(--sur2);border-radius:10px;padding:10px 14px;}
-.popup-example{font-size:0.78rem;color:var(--mut);line-height:1.6;font-style:italic;
+.popup-example{font-size:1.5rem;color:var(--mut);line-height:1.6;font-style:italic;
   border-left:3px solid var(--acc);padding-left:12px;margin-bottom:20px;}
 .popup-btn{background:var(--acc);color:#0d0d1a;border:none;border-radius:14px;
   padding:13px;font-size:0.88rem;font-weight:900;cursor:pointer;width:100%;
@@ -233,10 +233,18 @@ body{background:var(--bg);color:var(--txt);font-family:"Segoe UI",system-ui,sans
     <div class="q-meta" id="qMeta"></div>
   </div>
   <div class="scorebar">
-    <div><span class="sv" id="sc">0</span>Score</div>
-    <div><span class="sv" id="qCount">0</span>Answered</div>
-    <div><span class="sv" id="timer">0:00</span>Time</div>
+  <div><span class="sv" id="sc">0</span>Score</div>
+  <div><span class="sv" id="qCount">0</span>Answered</div>
+  <div><span class="sv" id="timer">0:00</span>Time</div>
+  <div>
+    <span class="sv" style="display:flex;gap:5px;justify-content:center;">
+      <span class="pip" id="pip1"></span>
+      <span class="pip" id="pip2"></span>
+    </span>
+    Attempts
   </div>
+</div>
+<div class="try-again" id="tryAgain"></div>
   <div class="cat-badge" id="catBadge"></div>
 
   <!-- Card -->
@@ -247,14 +255,15 @@ body{background:var(--bg);color:var(--txt);font-family:"Segoe UI",system-ui,sans
     <div class="swipe-hint">← swipe to skip &nbsp;·&nbsp; swipe right for previous →</div>
   </div>
 
-  <!-- Attempts -->
+  <!-- Attempts --><!-- __________________Deleted from this position_______________ -->
+  <!--
   <div class="att-row">
     <span>Attempts:</span>
     <div class="pip" id="pip1"></div>
     <div class="pip" id="pip2"></div>
   </div>
   <div class="try-again" id="tryAgain"></div>
-
+  -->
   <!-- Options -->
   <div class="options" id="options"></div>
 
@@ -263,7 +272,8 @@ body{background:var(--bg);color:var(--txt);font-family:"Segoe UI",system-ui,sans
   <button class="btn btn-cat" onclick="showCategoryScreen()">⇄ Categories</button>
   <button class="btn btn-next" onclick="nextQuestion()">Next ▶</button>
 </div>
-<button class="btn btn-cat" style="width:100%;max-width:400px;margin-top:6px;font-size:0.7rem;" onclick="finishSession()">⏹ Finish Session</button>
+<button class="btn btn-cat" style="width:100%;max-width:400px;margin-top:20px;font-size:0.7rem;" onclick="finishSession()">⏹ Finish Session</button>
+</div>
 
 <!-- EXPLANATION POP-UP -->
 <div id="popupOverlay">
@@ -349,7 +359,7 @@ window.addEventListener('load', async () => {
 //  LOAD QUESTIONS FROM SHEET
 // ═══════════════════════════════════════════
 async function loadQuestions(){
-  if(!SHEET_URL || SHEET_URL==='https://docs.google.com/spreadsheets/d/e/2PACX-1vSuq4nTF9Tw_KcruaINmu_ynHkm8HUd0mIsj9Vm-jVJ_1g81CTfOY0pozxDRsT9OsoC5Z4ewiN9vx2J/pub?gid=0&single=true&output=csv'){
+  if(!SHEET_URL || SHEET_URL==='YOUR_QUIZ_SHEET_CSV_URL_HERE'){
     allQuestions = getFallback();
     buildCategories();
     return;
