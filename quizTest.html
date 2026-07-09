@@ -101,6 +101,20 @@ body{background:var(--bg);color:var(--txt);font-family:"Segoe UI",system-ui,sans
 .q-card.swiping{transition:none;}
 .q-card.slide-left{transform:translateX(-120%) rotate(-8deg);opacity:0;}
 .q-card.slide-right{transform:translateX(120%) rotate(8deg);opacity:0;}
+.q-card.enter-from-right{
+  animation:enterFromRight .35s cubic-bezier(.34,1.2,.64,1) forwards;
+}
+.q-card.enter-from-left{
+  animation:enterFromLeft .35s cubic-bezier(.34,1.2,.64,1) forwards;
+}
+@keyframes enterFromRight{
+  from{transform:translateX(110%) rotate(5deg);opacity:0;}
+  to{transform:translateX(0) rotate(0deg);opacity:1;}
+}
+@keyframes enterFromLeft{
+  from{transform:translateX(-110%) rotate(-5deg);opacity:0;}
+  to{transform:translateX(0) rotate(0deg);opacity:1;}
+}
 .q-card.shake{animation:shake .4s ease;}
 .q-card.glow-green{
   border-color:var(--grn);
@@ -576,7 +590,7 @@ function shuffle(arr){
 // ═══════════════════════════════════════════
 //  QUESTION LOADING
 // ═══════════════════════════════════════════
-function loadNextQuestion(){
+function loadNextQuestion(direction='right'){
   // If active queue empty, move skipped back in
   if(!activeQueue.length && skippedQueue.length){
     activeQueue = [...skippedQueue];
@@ -591,10 +605,10 @@ function loadNextQuestion(){
 
   currentQ = activeQueue[0];
   attemptsLeft = 2;
-  renderQuestion();
+  renderQuestion(direction);
 }
 
-function renderQuestion(){
+function renderQuestion(direction='right'){
   const q = currentQ;
   document.getElementById('qText').textContent = q.question;
   document.getElementById('qMeta').textContent = answeredCount+' answered';
@@ -605,21 +619,33 @@ function renderQuestion(){
   document.getElementById('pip2').className = 'pip';
 
   // Options
-  const optDiv = document.getElementById('options');
-  optDiv.innerHTML = ['A','B','C'].map(k=>`
-    <button class="opt-btn" data-key="${k}" onclick="selectOption('${k}')">
-      <span class="opt-label">${k}</span>
-      ${q.options[k]}
-    </button>
-  `).join('');
+  // Destroy and recreate options div to force Safari to fully reset button states
+const oldOpts = document.getElementById('options');
+const newOpts = document.createElement('div');
+newOpts.id = 'options';
+newOpts.className = 'options';
+oldOpts.parentNode.replaceChild(newOpts, oldOpts);
+
+['A','B','C'].forEach(k=>{
+  const btn = document.createElement('button');
+  btn.className = 'opt-btn';
+  btn.setAttribute('data-key', k);
+  btn.innerHTML = `<span class="opt-label">${k}</span>${q.options[k]}`;
+  btn.onclick = () => selectOption(k);
+  newOpts.appendChild(btn);
+});
 
   // Reset card
-  const card = document.getElementById('qCard');
-  card.className = 'q-card';
-  card.style.transform = '';
-  card.style.opacity = '';
-  card.style.borderColor = '';
-  card.style.boxShadow = '';
+const card = document.getElementById('qCard');
+card.className = 'q-card';
+card.style.transform = '';
+card.style.opacity = '';
+card.style.borderColor = '';
+card.style.boxShadow = '';
+// Trigger entrance from correct direction
+const enterClass = direction==='right' ? 'enter-from-right' : 'enter-from-left';
+card.classList.add(enterClass);
+setTimeout(()=>card.classList.remove(enterClass), 380);
 
   setupSwipe();
 }
@@ -782,7 +808,7 @@ function skipQuestion(){
   if(!currentQ) return;
   skippedQueue.push(activeQueue.shift());
   setTimeout(()=>{
-    loadNextQuestion();
+    loadNextQuestion('right');
   }, 350);
 }
 
@@ -806,7 +832,7 @@ function goToPrevious(){
   if(currentQ && activeQueue[0]!==currentQ) activeQueue.splice(1,0,currentQ);
   // Dedup
   activeQueue = activeQueue.filter((q,i,a)=>a.findIndex(x=>x.id===q.id)===i);
-  loadNextQuestion();
+  loadNextQuestion('left');
 }
 
 function nextQuestion(){
