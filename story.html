@@ -73,25 +73,37 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         /* Modal overlay */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal.show {
-            display: flex;
-        }
-        .modal-content {
-            background: white;
-            border-radius: 30px;
-            padding: 30px;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
+/* Modal overlay – always flex, hidden with opacity */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;                /* always flex, never hidden via display */
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;        /* disabled when invisible */
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    z-index: 1000;               /* ensure it’s on top */
+}
+.modal.show {
+    pointer-events: auto;
+    opacity: 1;
+}
+
+/* Modal card – smooth transform + opacity */
+.modal-content {
+    background: white;
+    border-radius: 30px;
+    padding: 30px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+    will-change: transform, opacity;
+}
         .got-it-btn {
             margin-top: 20px;
             padding: 12px 30px;
@@ -243,6 +255,114 @@ body.dark #themeToggle {
         const modalDefinition = document.getElementById('modalDefinition');
         const modalExample = document.getElementById('modalExample');
 
+
+        // ========== Animated Modal Logic ==========
+let currentPillRect = null;   // stores the pill's bounding rectangle
+
+function showModal(pillElement, word, vocab) {
+    // 1. Save the pill’s position
+    currentPillRect = pillElement.getBoundingClientRect();
+    const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
+    const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+
+    // 2. Set modal word data
+    modalWord.textContent = word;
+    modalDefinition.textContent = vocab.definition;
+    modalExample.textContent = vocab.example;
+    wordModal.dataset.currentWord = word;
+
+    // 3. Position the modal-content at the pill’s location, scaled down
+    const content = document.querySelector('.modal-content');
+    // Calculate offset: (pill center) - (screen center)
+    const offsetX = pillCenterX - viewportW / 2;
+    const offsetY = pillCenterY - viewportH / 2;
+    content.style.transition = 'none';                   // disable transition for instant move
+    content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
+    content.style.opacity = '0';
+
+    // 4. Show the overlay (fades in)
+    wordModal.classList.add('show');
+
+    // 5. Force a reflow, then animate to center with transition
+    content.getBoundingClientRect();                     // trigger reflow
+    content.style.transition = '';                       // re-enable transition
+    content.style.transform = 'translate(0, 0) scale(1)';
+    content.style.opacity = '1';
+}
+
+function hideModal() {
+    if (!currentPillRect) {
+        // fallback: just hide without reverse animation
+        wordModal.classList.remove('show');
+        return;
+    }
+
+    const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
+    const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+    const offsetX = pillCenterX - viewportW / 2;
+    const offsetY = pillCenterY - viewportH / 2;
+
+    const content = document.querySelector('.modal-content');
+    // Animate back to pill
+    content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
+    content.style.opacity = '0';
+
+    // After the transition ends, hide overlay and reset
+    setTimeout(() => {
+        wordModal.classList.remove('show');
+        // Reset transform so it’s ready for next time (no visual glitch)
+        content.style.transition = 'none';
+        content.style.transform = 'translate(0, 0) scale(1)';
+        content.style.opacity = '1';
+        currentPillRect = null;
+    }, 350); // match the longest transition duration (0.35s)
+}
+
+// ----- Pill click handler (replaces old one) -----
+document.getElementById('storyContent').addEventListener('click', (e) => {
+    const pill = e.target.closest('.pill');
+    if (!pill) return;
+
+    const word = pill.dataset.word;
+    const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
+    const vocab = vocabMap.get(lookupKey);
+    if (!vocab) {
+        alert(`Definition not found for "${word}" in level ${currentLevel}.`);
+        return;
+    }
+    showModal(pill, word, vocab);
+});
+
+// ----- "Got it" button handler (replaces old one) -----
+document.getElementById('gotItBtn').addEventListener('click', () => {
+    const word = wordModal.dataset.currentWord;
+    if (!word) return;
+    const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
+    const vocab = vocabMap.get(lookupKey);
+    // Add to learnedWords if not already learned
+    if (!learnedWords[word.toLowerCase()]) {
+        learnedWords[word.toLowerCase()] = {
+            word: word,
+            definition: vocab ? vocab.definition : '',
+            example: vocab ? vocab.example : ''
+        };
+        learntCount++;
+        updateCounter();
+    }
+    // Pop back into the pill
+    hideModal();
+});
+
+// ----- Optional: close modal by clicking overlay (reverse animation) -----
+wordModal.addEventListener('click', (e) => {
+    if (e.target === wordModal) hideModal();
+});
+
+        
         // Helper: parse TSV text (ignoring header row)
         function parseTSV(tsvText) {
             const lines = tsvText.trim().split('\n');
