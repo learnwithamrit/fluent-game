@@ -121,11 +121,56 @@
             padding: 12px;
             border-radius: 12px;
         }
+        /* ========== Dark Mode Styles ========== */
+body.dark {
+    background: #1e1e2f;
+    color: #e0e0e0;
+}
+body.dark .counter {
+    background: #3a3a5c;
+    color: #ffd54f;
+}
+body.dark .level-btn {
+    background: #2e7d32;
+    color: #e8f5e9;
+}
+body.dark .story-btn {
+    background: #4e342e;
+    border-color: #ffb74d;
+    color: #ffe0b2;
+}
+body.dark .pill {
+    background: #d84315;
+    color: #fff;
+}
+body.dark .story-text {
+    background: #2c2c3e;
+    color: #f0f0f0;
+}
+body.dark .modal-content {
+    background: #2c2c3e;
+    color: #f0f0f0;
+}
+body.dark .got-it-btn {
+    background: #388e3c;
+}
+body.dark .menu-btn {
+    background: #1565c0;
+}
+body.dark .summary-list li {
+    background: #37474f;
+    color: #eceff1;
+}
+body.dark #themeToggle {
+    filter: invert(1);
+}
     </style>
 </head>
 <body>
 
     <!-- Persistent counter -->
+    <!-- Dark / Light mode toggle -->
+<button id="themeToggle" style="position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.8em; cursor: pointer;" title="Switch theme">🌙</button>
     <div class="counter" id="counter">Words Learnt: <span id="counterNum">0</span></div>
 
     <!-- Screen: Level Selection -->
@@ -387,6 +432,28 @@
                 levelScreen.innerHTML = '<h1>🌟 Choose Your Level</h1><p>No stories loaded. Please check the Google Sheet links.</p>';
             }
         });
+        // ---------- Dark / Light mode toggle ----------
+const themeToggle = document.getElementById('themeToggle');
+const body = document.body;
+
+// Check saved preference
+if (localStorage.getItem('theme') === 'dark') {
+    body.classList.add('dark');
+    themeToggle.textContent = '☀️';
+} else {
+    themeToggle.textContent = '🌙';
+}
+
+themeToggle.addEventListener('click', () => {
+    body.classList.toggle('dark');
+    if (body.classList.contains('dark')) {
+        localStorage.setItem('theme', 'dark');
+        themeToggle.textContent = '☀️';
+    } else {
+        localStorage.setItem('theme', 'light');
+        themeToggle.textContent = '🌙';
+    }
+});
     </script>
 </body>
 </html>
