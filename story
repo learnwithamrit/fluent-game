@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocab Story Game</title>
+    <style>
+        /* Simple, child-friendly styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f0e8;
+            color: #333;
+            max-width: 700px;
+            margin: auto;
+            padding: 20px;
+        }
+        .counter {
+            text-align: center;
+            font-size: 1.4em;
+            background: #ffecb3;
+            padding: 10px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            display: none; /* hidden until first word is learned */
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .level-btn, .story-btn, .pill, .got-it-btn, .menu-btn {
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .level-btn {
+            display: block;
+            width: 80%;
+            margin: 15px auto;
+            padding: 20px;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 20px;
+            background: #a5d6a7;
+            color: #1e3d1e;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .story-btn {
+            display: block;
+            width: 90%;
+            margin: 10px auto;
+            padding: 15px;
+            font-size: 1.2em;
+            background: #fff9c4;
+            border: 2px solid #fbc02d;
+            border-radius: 15px;
+        }
+        .pill {
+            display: inline-block;
+            background: #ff8a65;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin: 0 3px;
+            font-weight: bold;
+        }
+        .story-text {
+            line-height: 2;
+            font-size: 1.2em;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        /* Modal overlay */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .got-it-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 1.2em;
+            background: #81c784;
+            border: none;
+            border-radius: 40px;
+            color: white;
+        }
+        .menu-btn {
+            background: #64b5f6;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            color: white;
+            border-radius: 30px;
+            margin-top: 20px;
+        }
+        .summary-list {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+        }
+        .summary-list li {
+            background: #f1f8e9;
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Persistent counter -->
+    <div class="counter" id="counter">Words Learnt: <span id="counterNum">0</span></div>
+
+    <!-- Screen: Level Selection -->
+    <div id="levelScreen" class="screen active">
+        <h1>🌟 Choose Your Level</h1>
+        <button class="level-btn" data-level="Beginner">Beginner 🐣</button>
+        <button class="level-btn" data-level="Intermediate">Intermediate 🐥</button>
+        <button class="level-btn" data-level="Advanced">Advanced 🦉</button>
+    </div>
+
+    <!-- Screen: Story List -->
+    <div id="listScreen" class="screen">
+        <h2 id="levelTitle"></h2>
+        <div id="storyButtons"></div>
+        <button class="menu-btn" id="backToLevels">⬅ Back to Levels</button>
+    </div>
+
+    <!-- Screen: Active Story -->
+    <div id="storyScreen" class="screen">
+        <h2 id="storyTitle"></h2>
+        <div class="story-text" id="storyContent"></div>
+        <button class="menu-btn" id="finishStory">📚 I finished the story!</button>
+    </div>
+
+    <!-- Screen: Summary -->
+    <div id="summaryScreen" class="screen">
+        <h1>🎉 Great Job!</h1>
+        <p>Words you learned this session:</p>
+        <ul id="summaryList" class="summary-list"></ul>
+        <button class="menu-btn" id="backToMenu">🔙 Back to Menu</button>
+    </div>
+
+    <!-- Modal for word definitions -->
+    <div class="modal" id="wordModal">
+        <div class="modal-content">
+            <h2 id="modalWord"></h2>
+            <p><strong>Meaning:</strong> <span id="modalDefinition"></span></p>
+            <p><em>Example:</em> <span id="modalExample"></span></p>
+            <button class="got-it-btn" id="gotItBtn">Got it! 👍</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== CONFIGURATION ==========
+        // Replace these with the two links you copied from Google Sheets.
+        const STORIES_URL = 'https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=tsv';
+        const VOCAB_URL   = 'https://docs.google.com/spreadsheets/d/e/.../pub?gid=...&single=true&output=tsv';
+        // ===================================
+
+        // Global data
+        let allStories = [];          // list of story objects
+        let vocabMap = new Map();     // key: "word::level" -> { definition, example }
+        let currentLevel = null;
+        let currentStories = [];      // stories for chosen level (shuffled)
+        let currentStoryIndex = 0;    // index when reading a story
+
+        // Session learned words (persist across stories)
+        let learnedWords = {};        // key: lowercased word -> { word, definition, example }
+        let learntCount = 0;
+
+        // UI elements
+        const counterDiv = document.getElementById('counter');
+        const counterNum = document.getElementById('counterNum');
+        const levelScreen = document.getElementById('levelScreen');
+        const listScreen = document.getElementById('listScreen');
+        const storyScreen = document.getElementById('storyScreen');
+        const summaryScreen = document.getElementById('summaryScreen');
+        const wordModal = document.getElementById('wordModal');
+        const modalWord = document.getElementById('modalWord');
+        const modalDefinition = document.getElementById('modalDefinition');
+        const modalExample = document.getElementById('modalExample');
+
+        // Helper: parse TSV text (ignoring header row)
+        function parseTSV(tsvText) {
+            const lines = tsvText.trim().split('\n');
+            if (lines.length < 2) return [];
+            const headers = lines[0].split('\t');
+            const result = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split('\t');
+                const obj = {};
+                headers.forEach((header, idx) => {
+                    obj[header.trim()] = (values[idx] || '').trim();
+                });
+                result.push(obj);
+            }
+            return result;
+        }
+
+        // Load both TSV files
+        async function loadData() {
+            try {
+                const [storiesResp, vocabResp] = await Promise.all([
+                    fetch(STORIES_URL),
+                    fetch(VOCAB_URL)
+                ]);
+                const storiesTSV = await storiesResp.text();
+                const vocabTSV = await vocabResp.text();
+
+                allStories = parseTSV(storiesTSV);
+                const vocabRows = parseTSV(vocabTSV);
+
+                // Build vocabMap
+                vocabRows.forEach(row => {
+                    const word = row.Word.toLowerCase();
+                    const level = row.Level;
+                    const key = `${word}::${level}`;
+                    vocabMap.set(key, {
+                        definition: row.Definition,
+                        example: row.Example
+                    });
+                });
+                console.log(`Loaded ${allStories.length} stories and ${vocabRows.length} vocabulary entries.`);
+            } catch (err) {
+                alert('Oops! Could not load the story data. Check your internet and the links.');
+                console.error(err);
+            }
+        }
+
+        // Shuffle array in place
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        // Show a specific screen
+        function showScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            screen.classList.add('active');
+        }
+
+        // Update counter display
+        function updateCounter() {
+            if (learntCount > 0) {
+                counterDiv.style.display = 'block';
+                counterNum.textContent = learntCount;
+            } else {
+                counterDiv.style.display = 'none';
+            }
+        }
+
+        // ---- Level Selection ----
+        document.querySelectorAll('.level-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentLevel = btn.dataset.level;
+                document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
+                // Filter stories by level
+                currentStories = allStories.filter(s => s.Level === currentLevel);
+                shuffleArray(currentStories);
+                // Build story buttons
+                const container = document.getElementById('storyButtons');
+                container.innerHTML = '';
+                if (currentStories.length === 0) {
+                    container.innerHTML = '<p>No stories yet for this level. Add some in the Google Sheet!</p>';
+                } else {
+                    currentStories.forEach((story, idx) => {
+                        const btn = document.createElement('button');
+                        btn.className = 'story-btn';
+                        btn.textContent = story.Title;
+                        btn.addEventListener('click', () => startStory(idx));
+                        container.appendChild(btn);
+                    });
+                }
+                showScreen(listScreen);
+            });
+        });
+
+        // Back to level selection
+        document.getElementById('backToLevels').addEventListener('click', () => {
+            showScreen(levelScreen);
+        });
+
+        // ---- Start a Story ----
+        function startStory(index) {
+            currentStoryIndex = index;
+            const story = currentStories[index];
+            document.getElementById('storyTitle').textContent = story.Title;
+            const storyText = story.StoryText;
+            // Turn [word] into pill spans
+            const replaced = storyText.replace(/\[([^\]]+)\]/g, (match, word) => {
+                return `<span class="pill" data-word="${word}">${word}</span>`;
+            });
+            document.getElementById('storyContent').innerHTML = replaced;
+            showScreen(storyScreen);
+        }
+
+        // Tap on a pill -> open modal
+        document.getElementById('storyContent').addEventListener('click', (e) => {
+            const pill = e.target.closest('.pill');
+            if (!pill) return;
+            const word = pill.dataset.word;
+            const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
+            const vocab = vocabMap.get(lookupKey);
+            if (!vocab) {
+                alert(`Definition not found for "${word}" in level ${currentLevel}. Please add it to the Vocabulary sheet.`);
+                return;
+            }
+            modalWord.textContent = word;
+            modalDefinition.textContent = vocab.definition;
+            modalExample.textContent = vocab.example;
+            // Store currently opened word in modal for "Got it" handler
+            wordModal.dataset.currentWord = word;
+            wordModal.classList.add('show');
+        });
+
+        // "Got it" button
+        document.getElementById('gotItBtn').addEventListener('click', () => {
+            const word = wordModal.dataset.currentWord;
+            if (!word) return;
+            const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
+            const vocab = vocabMap.get(lookupKey);
+            // Add to learnedWords if not already learned
+            if (!learnedWords[word.toLowerCase()]) {
+                learnedWords[word.toLowerCase()] = {
+                    word: word,
+                    definition: vocab ? vocab.definition : '',
+                    example: vocab ? vocab.example : ''
+                };
+                learntCount++;
+                updateCounter();
+            }
+            wordModal.classList.remove('show');
+        });
+
+        // Click outside modal to close it (optional)
+        wordModal.addEventListener('click', (e) => {
+            if (e.target === wordModal) wordModal.classList.remove('show');
+        });
+
+        // Finish story -> show summary
+        document.getElementById('finishStory').addEventListener('click', () => {
+            const summaryList = document.getElementById('summaryList');
+            summaryList.innerHTML = '';
+            if (Object.keys(learnedWords).length === 0) {
+                summaryList.innerHTML = '<li>You haven’t collected any words yet. Keep reading!</li>';
+            } else {
+                for (let key in learnedWords) {
+                    const lw = learnedWords[key];
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${lw.word}</strong> – ${lw.definition}<br><em>${lw.example}</em>`;
+                    summaryList.appendChild(li);
+                }
+            }
+            showScreen(summaryScreen);
+        });
+
+        // Back to menu from summary
+        document.getElementById('backToMenu').addEventListener('click', () => {
+            showScreen(levelScreen);
+        });
+
+        // Initialise
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadData();
+            // No stories? show message on level screen
+            if (allStories.length === 0) {
+                levelScreen.innerHTML = '<h1>🌟 Choose Your Level</h1><p>No stories loaded. Please check the Google Sheet links.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
