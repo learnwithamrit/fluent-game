@@ -14,15 +14,12 @@
             margin: auto;
             padding: 20px;
         }
+
+        /* The counter is now inside the header, so just a simple display control */
         .counter {
-            text-align: center;
-            font-size: 1.4em;
-            background: #ffecb3;
-            padding: 10px;
-            border-radius: 30px;
-            margin-bottom: 20px;
-            display: none; /* hidden until first word is learned */
+        display: none;   /* still hidden until first word */
         }
+        
         .screen {
             display: none;
         }
@@ -199,7 +196,10 @@ body.dark #themeToggle {
   background: #ffffff20;
   color: #f0f0f0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
+
 /* All-done modal buttons spacing */
 #allDoneModal .menu-btn {
     display: inline-block;
@@ -211,11 +211,13 @@ body.dark #themeToggle {
 
     <!-- Persistent counter -->
     <!-- Dark / Light mode toggle -->
-<div id="themeToggle" style="position: absolute; top: 20px; right: 20px; cursor: pointer; background: #ffffffcc; backdrop-filter: blur(10px); border-radius: 40px; padding: 10px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 1em; color: #333; user-select: none; transition: all 0.3s ease;">
-  <span id="themeIcon">🌙</span>
-  <span id="themeLabel">Dark Mode</span>
+    <div id="topBar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 10px 15px; background: #ffffffcc; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 0 0 20px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; margin-bottom: 20px;">
+  <div id="counter" class="counter" style="display: none; margin: 0; padding: 5px 15px; font-size: 1em; background: #ffecb3; border-radius: 20px;">Words Learnt: <span id="counterNum">0</span></div>
+  <div id="themeToggle" style="cursor: pointer; background: #ffffffcc; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 40px; padding: 8px 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.9em; color: #333; user-select: none; transition: all 0.3s ease;">
+    <span id="themeIcon">🌙</span>
+    <span id="themeLabel">Dark Mode</span>
+  </div>
 </div>
-    <div class="counter" id="counter">Words Learnt: <span id="counterNum">0</span></div>
 
     <!-- Screen: Level Selection -->
     <div id="levelScreen" class="screen active">
@@ -647,6 +649,14 @@ document.getElementById('megaBackToLevels').addEventListener('click', () => {
             levelScreen.innerHTML = '<h1>🌟 Choose Your Level</h1><p>No stories loaded. Please check the Google Sheet links.</p>';
         }
     });
+
+    try {
+        // all your existing code will go here
+    } catch (err) {
+        document.body.innerHTML = '<h1 style="color:red;padding:20px;">Oops! Something went wrong: ' + err.message + '</h1>';
+        console.error(err);
+    }
+       
 </script>
 </body>
 </html>
