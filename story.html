@@ -45,6 +45,24 @@
             color: #1e3d1e;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
+        /* Special Mega Stories button */
+.mega-btn {
+    background: linear-gradient(135deg, #ffd54f, #ffb300);
+    color: #3e2723;
+    font-weight: bold;
+    font-size: 1.8em;
+    border: 3px solid #ff8f00;
+    box-shadow: 0 6px 12px rgba(255, 160, 0, 0.4);
+    margin-top: 30px;
+}
+.mega-btn:hover {
+    transform: scale(1.03);
+}
+body.dark .mega-btn {
+    background: linear-gradient(135deg, #ffca28, #ff8f00);
+    color: #1e1e1e;
+    border-color: #ff6f00;
+}
         .story-btn {
             display: block;
             width: 90%;
@@ -205,6 +223,7 @@ body.dark #themeToggle {
         <button class="level-btn" data-level="Beginner">Beginner 🐣</button>
         <button class="level-btn" data-level="Intermediate">Intermediate 🐥</button>
         <button class="level-btn" data-level="Advanced">Advanced 🦉</button>
+        <button class="level-btn mega-btn" id="megaStoriesBtn">🚀 The Mega Stories</button>
     </div>
 
     <!-- Screen: Story List -->
@@ -231,6 +250,14 @@ body.dark #themeToggle {
         <ul id="summaryList" class="summary-list"></ul>
         <button class="menu-btn" id="backToMenu">🔙 Back to Menu</button>
     </div>
+
+    <!-- Screen: Mega Stories (placeholder) -->
+<div id="megaScreen" class="screen">
+    <h1>🚀 Mega Stories</h1>
+    <p style="font-size:1.2em; margin: 40px 0;">Novel‑length adventures are on their way!<br>We’re crafting multi‑part tales with rich vocabulary.</p>
+    <p style="font-size:1em; opacity:0.8;">✨ Check back soon for the first saga ✨</p>
+    <button class="menu-btn" id="megaBackToLevels">⬅ Back to Levels</button>
+</div>
 
     <!-- Modal for word definitions -->
     <div class="modal" id="wordModal">
@@ -449,6 +476,10 @@ body.dark #themeToggle {
             document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
             currentStories = allStories.filter(s => s.Level === currentLevel);
             shuffleArray(currentStories);
+            // Mega Stories button → show placeholder screen---------------------------------------------------------------------------------------------------------------------------------------------Added the Mega Button Function
+            document.getElementById('megaStoriesBtn').addEventListener('click', () => {
+            showScreen(document.getElementById('megaScreen'));
+            });
             const container = document.getElementById('storyButtons');
             container.innerHTML = '';
             if (currentStories.length === 0) {
@@ -470,7 +501,10 @@ body.dark #themeToggle {
     document.getElementById('backToLevels').addEventListener('click', () => {
         showScreen(levelScreen);
     });
-
+// Back to levels from mega screen-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+document.getElementById('megaBackToLevels').addEventListener('click', () => {
+    showScreen(levelScreen);
+});
     // ========== Start a Story ==========
     function startStory(index) {
         currentStoryIndex = index;
