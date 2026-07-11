@@ -182,7 +182,10 @@ body.dark #themeToggle {
   color: #f0f0f0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
-
+/* All-done modal buttons spacing */
+#allDoneModal .menu-btn {
+    display: inline-block;
+}
         
     </style>
 </head>
@@ -215,7 +218,10 @@ body.dark #themeToggle {
     <div id="storyScreen" class="screen">
         <h2 id="storyTitle"></h2>
         <div class="story-text" id="storyContent"></div>
-        <button class="menu-btn" id="finishStory">📚 I finished the story!</button>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
+  <button class="menu-btn" id="finishStory" style="flex: 1; min-width: 140px;">📖 Finish reading</button>
+  <button class="menu-btn" id="nextStory" style="flex: 1; min-width: 140px; background: #ffb74d; color: #333;">➡ Next story</button>
+</div>
     </div>
 
     <!-- Screen: Summary -->
@@ -236,6 +242,18 @@ body.dark #themeToggle {
         </div>
     </div>
 
+    <!-- Modal: All stories completed -->
+<div class="modal" id="allDoneModal">
+    <div class="modal-content" style="text-align: center;">
+        <h2>🎉 You’ve read them all!</h2>
+        <p id="allDoneMessage" style="margin: 20px 0; font-size: 1.1em;"></p>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
+            <button class="menu-btn" id="goNextLevel" style="flex: 1; min-width: 140px;">➡ Next Level</button>
+            <button class="menu-btn" id="reReadStories" style="flex: 1; min-width: 140px; background: #ffb74d; color: #333;">🔄 Re‑read</button>
+        </div>
+    </div>
+</div>
+    
     <script>
         // ========== CONFIGURATION ==========
         // Replace these with the two links you copied from Google Sheets.
@@ -534,27 +552,105 @@ wordModal.addEventListener('click', (e) => {
         });
 
         // Finish story -> show summary
-        document.getElementById('finishStory').addEventListener('click', () => {
-            const summaryList = document.getElementById('summaryList');
-            summaryList.innerHTML = '';
-            if (Object.keys(learnedWords).length === 0) {
-                summaryList.innerHTML = '<li>You haven’t collected any words yet. Keep reading!</li>';
-            } else {
-                for (let key in learnedWords) {
-                    const lw = learnedWords[key];
-                    const li = document.createElement('li');
-                    li.innerHTML = `<strong>${lw.word}</strong> – ${lw.definition}<br><em>${lw.example}</em>`;
-                    summaryList.appendChild(li);
-                }
-            }
-            showScreen(summaryScreen);
-        });
+        // ----- Next Story button -----
+document.getElementById('nextStory').addEventListener('click', () => {
+    if (currentStories.length === 0) return;
+    const nextIndex = currentStoryIndex + 1;
+    if (nextIndex < currentStories.length) {
+        // Move to the next story
+        startStory(nextIndex);
+        // Scroll back to the top of the story
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        // No more stories – auto-finish and show the summary
+        alert('🎉 You’ve read all the stories in this level! Showing your session words now.');
+        document.getElementById('finishStory').click(); // trigger summary
+    }
+});
 
         // Back to menu from summary
         document.getElementById('backToMenu').addEventListener('click', () => {
             showScreen(levelScreen);
         });
 
+
+// ==========================================
+//  NEXT STORY button + "all done" modal logic
+// ==========================================
+
+// Helper: show the "all stories completed" modal
+function showAllDoneModal() {
+    const levelNames = ['Beginner', 'Intermediate', 'Advanced'];
+    const currentIdx = levelNames.indexOf(currentLevel);
+    const nextLevel = (currentIdx >= 0 && currentIdx < levelNames.length - 1) ? levelNames[currentIdx + 1] : null;
+
+    document.getElementById('allDoneMessage').textContent =
+        `You’ve finished every story in the ${currentLevel} level. What would you like to do next?`;
+
+    const nextBtn = document.getElementById('goNextLevel');
+    if (nextLevel) {
+        nextBtn.style.display = 'inline-block';
+        nextBtn.textContent = `➡ Go to ${nextLevel}`;
+        nextBtn.onclick = () => {
+            document.getElementById('allDoneModal').classList.remove('show');
+            // Switch to the next level
+            currentLevel = nextLevel;
+            document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
+            currentStories = allStories.filter(s => s.Level === currentLevel);
+            shuffleArray(currentStories);
+            // Rebuild the story list and show it
+            const container = document.getElementById('storyButtons');
+            container.innerHTML = '';
+            if (currentStories.length === 0) {
+                container.innerHTML = '<p>No stories yet for this level.</p>';
+            } else {
+                currentStories.forEach((story, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'story-btn';
+                    btn.textContent = story.Title;
+                    btn.addEventListener('click', () => startStory(idx));
+                    container.appendChild(btn);
+                });
+            }
+            showScreen(listScreen);
+        };
+    } else {
+        // No next level (Advanced)
+        nextBtn.style.display = 'none';
+    }
+
+    document.getElementById('reReadStories').onclick = () => {
+        document.getElementById('allDoneModal').classList.remove('show');
+        // Shuffle the current level stories again and start from first
+        shuffleArray(currentStories);
+        startStory(0);
+    };
+
+    document.getElementById('allDoneModal').classList.add('show');
+}
+
+// Next Story button click
+document.getElementById('nextStory').addEventListener('click', () => {
+    if (currentStories.length === 0) return;
+    const nextIndex = currentStoryIndex + 1;
+    if (nextIndex < currentStories.length) {
+        // Move to the next story
+        startStory(nextIndex);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        // No more stories – show the special modal
+        showAllDoneModal();
+    }
+});
+
+// Close the "all done" modal when clicking outside the card
+document.getElementById('allDoneModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('allDoneModal')) {
+        document.getElementById('allDoneModal').classList.remove('show');
+    }
+});
+
+        
         // Initialise
         window.addEventListener('DOMContentLoaded', async () => {
             await loadData();
