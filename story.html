@@ -248,8 +248,9 @@ body.dark #themeToggle {
         <h2>🎉 You’ve read them all!</h2>
         <p id="allDoneMessage" style="margin: 20px 0; font-size: 1.1em;"></p>
         <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
-            <button class="menu-btn" id="goNextLevel" style="flex: 1; min-width: 140px;">➡ Next Level</button>
             <button class="menu-btn" id="reReadStories" style="flex: 1; min-width: 140px; background: #ffb74d; color: #333;">🔄 Re‑read</button>
+            <button class="menu-btn" id="goNextLevel" style="flex: 1; min-width: 140px;">➡ Next Level</button>
+            
         </div>
     </div>
 </div>
@@ -564,8 +565,24 @@ document.getElementById('nextStory').addEventListener('click', () => {
     } else {
         // No more stories – auto-finish and show the summary
         alert('🎉 You’ve read all the stories in this level! Showing your session words now.');
-        document.getElementById('finishStory').click(); // trigger summary
+        // Finish reading – summary (delegated, won't break if button is recreated)
+document.getElementById('storyScreen').addEventListener('click', (e) => {
+    const finishBtn = e.target.closest('#finishStory');
+    if (!finishBtn) return;
+
+    const summaryList = document.getElementById('summaryList');
+    summaryList.innerHTML = '';
+    if (Object.keys(learnedWords).length === 0) {
+        summaryList.innerHTML = '<li>You haven’t collected any words yet. Keep reading!</li>';
+    } else {
+        for (let key in learnedWords) {
+            const lw = learnedWords[key];
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${lw.word}</strong> – ${lw.definition}<br><em>${lw.example}</em>`;
+            summaryList.appendChild(li);
+        }
     }
+    showScreen(summaryScreen);
 });
 
         // Back to menu from summary
