@@ -176,13 +176,24 @@ body.dark .summary-list li {
 body.dark #themeToggle {
     filter: invert(1);
 }
+
+body.dark #themeToggle {
+  background: #ffffff20;
+  color: #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+        
     </style>
 </head>
 <body>
 
     <!-- Persistent counter -->
     <!-- Dark / Light mode toggle -->
-<button id="themeToggle" style="position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.8em; cursor: pointer;" title="Switch theme">🌙</button>
+<div id="themeToggle" style="position: absolute; top: 20px; right: 20px; cursor: pointer; background: #ffffffcc; backdrop-filter: blur(10px); border-radius: 40px; padding: 10px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 1em; color: #333; user-select: none; transition: all 0.3s ease;">
+  <span id="themeIcon">🌙</span>
+  <span id="themeLabel">Dark Mode</span>
+</div>
     <div class="counter" id="counter">Words Learnt: <span id="counterNum">0</span></div>
 
     <!-- Screen: Level Selection -->
@@ -553,26 +564,35 @@ wordModal.addEventListener('click', (e) => {
             }
         });
         // ---------- Dark / Light mode toggle ----------
+// ---------- Dark / Light mode toggle ----------
 const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const themeLabel = document.getElementById('themeLabel');
 const body = document.body;
 
-// Check saved preference
+function setTheme(isDark) {
+    if (isDark) {
+        body.classList.add('dark');
+        themeIcon.textContent = '☀️';
+        themeLabel.textContent = 'Light Mode';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        body.classList.remove('dark');
+        themeIcon.textContent = '🌙';
+        themeLabel.textContent = 'Dark Mode';
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+// Initialize from saved preference
 if (localStorage.getItem('theme') === 'dark') {
-    body.classList.add('dark');
-    themeToggle.textContent = '☀️';
+    setTheme(true);
 } else {
-    themeToggle.textContent = '🌙';
+    setTheme(false);
 }
 
 themeToggle.addEventListener('click', () => {
-    body.classList.toggle('dark');
-    if (body.classList.contains('dark')) {
-        localStorage.setItem('theme', 'dark');
-        themeToggle.textContent = '☀️';
-    } else {
-        localStorage.setItem('theme', 'light');
-        themeToggle.textContent = '🌙';
-    }
+    setTheme(!body.classList.contains('dark'));
 });
     </script>
 </body>
