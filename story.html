@@ -665,19 +665,40 @@ document.getElementById('megaBackToLevels').addEventListener('click', () => {
     });
 
     // ========== Initialise ==========
-    window.addEventListener('DOMContentLoaded', async () => {
-        await loadData();
-        if (allStories.length === 0) {
-            levelScreen.innerHTML = '<h1>🌟 Choose Your Level</h1><p>No stories loaded. Please check the Google Sheet links.</p>';
-        }
-    });
-
-    try {
-        // all your existing code will go here
-    } catch (err) {
-        document.body.innerHTML = '<h1 style="color:red;padding:20px;">Oops! Something went wrong: ' + err.message + '</h1>';
-        console.error(err);
+window.addEventListener('DOMContentLoaded', async () => {
+    await loadData();
+    if (allStories.length === 0) {
+        levelScreen.innerHTML = '<h1>🌟 Choose Your Level</h1><p>No stories loaded...</p>';
     }
+
+    // ----- Auto‑navigate to hub if requested -----
+    const section = getQueryParam('section');
+    const name = getQueryParam('name');
+    if (section === 'hub') {
+        // If name is missing, you can either show login first or go to hub without name.
+        // I'll assume the name is already in the URL (from quiz/story) or in session.
+        if (!name) {
+            // Option A: redirect to login with a return parameter (safer)
+            // window.location.href = 'index.html?section=hub'; // but that would loop.
+            // Option B: just show hub with a default? Let's store name in sessionStorage later.
+            // For simplicity, if you require a name, we'll check sessionStorage.
+            const storedName = sessionStorage.getItem('playerName');
+            if (storedName) {
+                // Use the stored name, optionally update the URL for consistency
+                window.history.replaceState({}, '', `?name=${storedName}&section=hub`);
+                showScreen(levelScreen); // or the function that shows the hub
+            } else {
+                // No name at all - redirect to login with a return URL
+                window.location.href = 'index.html?section=hub&returnFrom=hub';
+            }
+        } else {
+            // Name is present, save it and go straight to hub
+            sessionStorage.setItem('playerName', name);
+            showScreen(levelScreen);  // <-- This directly shows the level selection
+        }
+    }
+    // -------------------------------------------------
+});
        
 </script>
 </body>
