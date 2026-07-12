@@ -454,6 +454,21 @@ let sessionLog     = [];
 let answeredInSet  = 0;
 let usedIds        = new Set();
 
+
+//_______________ Experiment-----------------
+
+  // Auto‑login if we already know the player
+(function() {
+  const saved = sessionStorage.getItem('playerName');
+  if (saved) {
+    playerName = saved;
+    // Hide the name screen and go to hub immediately
+    document.getElementById('nameScreen').style.display = 'none';
+    showHub();
+  }
+})();
+
+  
 // ═══════════════════════════════════════════
 //  INIT — read name from URL param
 // ═══════════════════════════════════════════
