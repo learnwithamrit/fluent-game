@@ -754,76 +754,60 @@ function glowBg(colour){
 //  SWIPE
 // ═══════════════════════════════════════════
 
-// ________________New Swipe Function______________
-
+//___________________________________
+//___________________________________ Setup Swipe Function (Experiment)_________________________
 function setupSwipe(){
   const card = document.getElementById('qCard');
-  let startX=0, startY=0, isDragging=false, lastDirection='right';
+  let startX=0, startY=0, isDragging=false;
 
-  card.onpointerdown = e=>{
-    if(e.target.closest('.opt-btn')) return;
-    startX = e.clientX; startY = e.clientY;
+  const onStart = e => {
+    startX = e.touches ? e.touches[0].clientX : e.clientX;
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
     isDragging = true;
-    card.setPointerCapture(e.pointerId);
-    card.style.transition = 'none';
+    card.classList.add('swiping');
   };
-
-  card.onpointermove = e=>{
+  const onMove = e => {
     if(!isDragging) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    if(Math.abs(dy) > Math.abs(dx) + 10) return;
-    card.style.transform = `translateX(${dx}px) rotate(${dx*0.05}deg)`;
-    card.style.opacity = String(Math.max(0, 1 - Math.abs(dx)/200));
-    lastDirection = dx < 0 ? 'left' : 'right';
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
+    if(Math.abs(y) > Math.abs(x)+10) return;
+    e.preventDefault();
+    card.style.transform = `translateX(${x}px) rotate(${x*0.04}deg)`;
+    card.style.opacity = String(1 - Math.abs(x)/300);
   };
-
-  card.onpointerup = e=>{
+  const onEnd = e => {
     if(!isDragging) return;
     isDragging = false;
-    card.style.transition = '';
-    const dx = e.clientX - startX;
-    if(dx < -80){
-      animateCardOut('left', ()=>{ loadNextQuestion('right'); });
-    } else if(dx > 80){
-      animateCardOut('right', ()=>{ goToPrevious(); });
+    card.classList.remove('swiping');
+    const x = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX) - startX;
+
+    if(x < -80){
+      // Swipe left — skip
+      card.classList.add('slide-left');
+      skipQuestion();
+    } else if(x > 80){
+      // Swipe right — previous unanswered
+      card.style.transform=''; card.style.opacity='';
+      goToPrevious();
     } else {
-      card.style.transform = '';
-      card.style.opacity = '';
+      card.style.transform=''; card.style.opacity='';
     }
   };
 
-  card.onpointercancel = ()=>{
-    isDragging = false;
-    card.style.transform = '';
-    card.style.opacity = '';
-  };
+  card.removeEventListener('touchstart', card._ts);
+  card.removeEventListener('touchmove',  card._tm);
+  card.removeEventListener('touchend',   card._te);
+  card.removeEventListener('mousedown',  card._md);
+
+  card._ts = onStart; card._tm = onMove; card._te = onEnd; card._md = onStart;
+  card.addEventListener('touchstart', onStart, {passive:false});
+  card.addEventListener('touchmove',  onMove,  {passive:false});
+  card.addEventListener('touchend',   onEnd);
+  card.addEventListener('mousedown',  onStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup',   onEnd);
 }
 
-function animateCardOut(direction, callback){
-  const card = document.getElementById('qCard');
-  card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-  card.style.transform = direction === 'left'
-    ? 'translateX(-120%) rotate(-12deg)'
-    : 'translateX(120%) rotate(12deg)';
-  card.style.opacity = '0';
-  setTimeout(callback, 320);
-}
-
-function animateCardIn(direction){
-  const card = document.getElementById('qCard');
-  // Start from the opposite side
-  const startPos = direction === 'right' ? '120%' : '-120%';
-  const startRot = direction === 'right' ? '12deg' : '-12deg';
-  card.style.transition = 'none';
-  card.style.transform = `translateX(${startPos}) rotate(${startRot})`;
-  card.style.opacity = '0';
-  // Force reflow so the starting position takes effect before animation
-  card.getBoundingClientRect();
-  card.style.transition = 'transform 0.35s cubic-bezier(0.34,1.2,0.64,1), opacity 0.3s ease';
-  card.style.transform = 'translateX(0) rotate(0deg)';
-  card.style.opacity = '1';
-}
 //____________New Swipe Finction Ends Here____________________________________________
 
 function skipQuestion(){
