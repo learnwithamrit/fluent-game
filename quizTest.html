@@ -966,11 +966,10 @@ function resetQuiz(){
 
   // If came from hub (has name), go back to hub
   if(playerName){
-    window.location.href='index.html';
-  } else {
-    // Direct URL access — go back to category screen
-    document.getElementById('categoryScreen').style.display='flex';
-  }
+  window.location.href='index.html?screen=hub&name='+encodeURIComponent(playerName);
+} else {
+  document.getElementById('categoryScreen').style.display='flex';
+}
 }
 </script>
 </body>
