@@ -577,6 +577,21 @@ function stagePuzzles(){
   return PUZZLES.slice(start,end);
 }
 
+
+// Auto‑login if we already know the player
+(function() {
+  const saved = sessionStorage.getItem('playerName');
+  if (saved) {
+    playerName = saved;
+    // Hide the name screen and go to hub immediately
+    document.getElementById('nameScreen').style.display = 'none';
+    showHub();
+  }
+})();
+
+
+
+  
 function stageComplete(){
   const sp = stagePuzzles();
   if(!sp.length) return false;
@@ -716,11 +731,13 @@ if(!n){document.getElementById('nameInput').focus();return;}
 // Secret admin access
 if(n.toLowerCase()==='amhead'){
   playerName='Amrit (Admin)';
+  sessionStorage.setItem('playerName', 'Amrit (Admin)'); 
   showAdminPanel();
   return;
 }
 
 playerName=n;
+  sessionStorage.setItem('playerName', n);
   sessionStart=Date.now();
  document.getElementById('nameScreen').style.display='none';
   showHub();
