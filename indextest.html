@@ -1692,6 +1692,16 @@ window.addEventListener('load', async()=>{
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('nameScreen').style.display='flex';
 });
+  // Check if redirected from another game
+const urlParams = new URLSearchParams(window.location.search);
+const targetScreen = urlParams.get('screen');
+const incomingName = urlParams.get('name');
+if(targetScreen === 'hub' && incomingName){
+  playerName = incomingName;
+  document.getElementById('nameScreen').style.display = 'none';
+  document.getElementById('loadingScreen').style.display = 'none';
+  showHub();
+}
   window.addEventListener('resize',()=>{
   const sp=stagePuzzles();
   if(!sp[pi]) return;
