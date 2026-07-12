@@ -786,6 +786,63 @@ function beginStage(stage){
   initPuzzle();
 }
 
+//___________________________________
+//___________________________________ Setup Swipe Function (Experiment)_________________________
+function setupSwipe(){
+  const card = document.getElementById('qCard');
+  let startX=0, startY=0, isDragging=false;
+
+  const onStart = e => {
+    startX = e.touches ? e.touches[0].clientX : e.clientX;
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    isDragging = true;
+    card.classList.add('swiping');
+  };
+  const onMove = e => {
+    if(!isDragging) return;
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
+    if(Math.abs(y) > Math.abs(x)+10) return;
+    e.preventDefault();
+    card.style.transform = `translateX(${x}px) rotate(${x*0.04}deg)`;
+    card.style.opacity = String(1 - Math.abs(x)/300);
+  };
+  const onEnd = e => {
+    if(!isDragging) return;
+    isDragging = false;
+    card.classList.remove('swiping');
+    const x = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX) - startX;
+
+    if(x < -80){
+      // Swipe left — skip
+      card.classList.add('slide-left');
+      skipQuestion();
+    } else if(x > 80){
+      // Swipe right — previous unanswered
+      card.style.transform=''; card.style.opacity='';
+      goToPrevious();
+    } else {
+      card.style.transform=''; card.style.opacity='';
+    }
+  };
+
+  card.removeEventListener('touchstart', card._ts);
+  card.removeEventListener('touchmove',  card._tm);
+  card.removeEventListener('touchend',   card._te);
+  card.removeEventListener('mousedown',  card._md);
+
+  card._ts = onStart; card._tm = onMove; card._te = onEnd; card._md = onStart;
+  card.addEventListener('touchstart', onStart, {passive:false});
+  card.addEventListener('touchmove',  onMove,  {passive:false});
+  card.addEventListener('touchend',   onEnd);
+  card.addEventListener('mousedown',  onStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup',   onEnd);
+}
+
+
+
+  
 //___________________________________________
 // Secret Admin function
 //____________________________________________
