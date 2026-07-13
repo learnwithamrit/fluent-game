@@ -919,28 +919,51 @@ async function loadProverbData() {
         document.getElementById('playerNameInput')?.addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('btnStartSession').click(); });
       }
 
-      function renderLearning() {
-        state.phase='learning'; state.isFlipped=false; updateHeaderScore(); updateHeaderCardIndex(); startTimer();
-        const proverb=state.sessionProverbs[state.currentCardIndex];
-        mainContent.innerHTML=`
-          <div class="card-stage" id="cardStage"><div class="card-inner" id="cardInner">
-            <div class="card-face card-front"><div class="card-bengali">${escapeHTML(proverb[0])}</div><div class="card-hint">Tap to Reveal English</div></div>
-            <div class="card-face card-back"><div class="card-english">${escapeHTML(proverb[1])}</div></div>
-          </div></div>
-          <div class="swipe-indicator"><span>◀</span> Swipe <span>▶</span></div>
-          <div class="nav-buttons">
-            <button class="btn btn-outline" id="btnPrev" ${state.currentCardIndex===0?'disabled style="opacity:0.4;"':''}>← Previous</button>
-            <button class="btn btn-outline" id="btnNext">Next →</button>
-          </div>`;
-        state.cardFrontEl = document.getElementById('cardFront');
-        state.cardBackEl = document.getElementById('cardBack');
-        bottomNav.innerHTML=`<button class="btn btn-danger-zone btn-full" id="btnFinishSession">🏁 Finish Session</button><button class="btn btn-ghost btn-full" id="btnBackToHubLearning">← Back to Hub</button>`;
-        attachCardListeners();
-        document.getElementById('btnPrev').addEventListener('click', ()=>navigateCard(-1));
-        document.getElementById('btnNext').addEventListener('click', ()=>navigateCard(1));
-        document.getElementById('btnFinishSession').addEventListener('click', finishSessionAndStartQuiz);
-        document.getElementById('btnBackToHubLearning').addEventListener('click', ()=>{ if(confirm('Leave learning?')){ stopTimer(); renderHub(); } });
-      }
+function renderLearning() {
+  state.phase = 'learning';
+  state.isFlipped = false;
+  updateHeaderScore();
+  updateHeaderCardIndex();
+  startTimer();
+
+  const proverb = state.sessionProverbs[state.currentCardIndex];
+  mainContent.innerHTML = `
+    <div class="card-stage" id="cardStage">
+      <div class="card-inner" id="cardInner">
+        <div class="card-face card-front" id="cardFront">
+          <div class="card-bengali">${escapeHTML(proverb[0])}</div>
+          <div class="card-hint">Tap to Reveal English</div>
+        </div>
+        <div class="card-face card-back" id="cardBack">
+          <div class="card-english">${escapeHTML(proverb[1])}</div>
+        </div>
+      </div>
+    </div>
+    <div class="swipe-indicator"><span>◀</span> Swipe <span>▶</span></div>
+    <div class="nav-buttons">
+      <button class="btn btn-outline" id="btnPrev" ${state.currentCardIndex === 0 ? 'disabled style="opacity:0.4;"' : ''}>← Previous</button>
+      <button class="btn btn-outline" id="btnNext">Next →</button>
+    </div>
+  `;
+
+  // ✅ Cache the elements immediately
+  state.cardFrontEl = document.getElementById('cardFront');
+  state.cardBackEl = document.getElementById('cardBack');
+
+  // Bottom nav
+  bottomNav.innerHTML = `
+    <button class="btn btn-danger-zone btn-full" id="btnFinishSession">🏁 Finish Session</button>
+    <button class="btn btn-ghost btn-full" id="btnBackToHubLearning">← Back to Hub</button>
+  `;
+
+  attachCardListeners();
+  document.getElementById('btnPrev').addEventListener('click', () => navigateCard(-1));
+  document.getElementById('btnNext').addEventListener('click', () => navigateCard(1));
+  document.getElementById('btnFinishSession').addEventListener('click', finishSessionAndStartQuiz);
+  document.getElementById('btnBackToHubLearning').addEventListener('click', () => {
+    if (confirm('Leave learning?')) { stopTimer(); renderHub(); }
+  });
+}
       function attachCardListeners(){
         const card=document.getElementById('cardStage'); if(!card) return;
         card.addEventListener('pointerdown', onPointerDown); card.addEventListener('pointermove', onPointerMove);
@@ -959,11 +982,56 @@ async function loadProverbData() {
       }
       function onPointerCancel(e){ state.isSwiping=false; state.swipeDistanceX=0; state.swipeMoved=false; try{e.target.releasePointerCapture(e.pointerId);}catch(ex){} }
       function flipCard(){ if(state.phase!=='learning') return; const inner=document.getElementById('cardInner'); if(!inner) return; state.isFlipped=!state.isFlipped; inner.classList.toggle('flipped', state.isFlipped); }
-      function navigateCard(dir){
-        if(state.phase!=='learning') return; const newIdx=state.currentCardIndex+dir;
-        if(newIdx<0) return; if(newIdx>=state.totalInSession){ finishSessionAndStartQuiz(); return; }
-        state.currentCardIndex=newIdx; state.isFlipped=false; updateHeaderCardIndex(); updateCardContent(); 
-      }
+      function navigateCard(direction) {
+  if (state.phase !== 'learning') return;
+  const newIndex = state.currentCardIndex + direction;
+  if (newIndex < 0) return;
+  if (newIndex >= state.totalInSession) {
+    finishSessionAndStartQuiz();
+    return;
+  }
+  state.currentCardIndex = newIndex;
+  state.isFlipped = false;
+  updateHeaderCardIndex();
+  updateCardContent();   // ← this now actually changes the proverb
+}
+
+
+ function updateCardContent() {
+  const proverb = state.sessionProverbs[state.currentCardIndex];
+  // Update the Bengali text inside the cached front element
+  if (state.cardFrontEl) {
+    const bengaliEl = state.cardFrontEl.querySelector('.card-bengali');
+    if (bengaliEl) bengaliEl.textContent = proverb[0];
+  }
+  // Update the English text inside the cached back element
+  if (state.cardBackEl) {
+    const englishEl = state.cardBackEl.querySelector('.card-english');
+    if (englishEl) englishEl.textContent = proverb[1];
+  }
+  // Always flip back to front
+  const cardInner = document.getElementById('cardInner');
+  if (cardInner) cardInner.classList.remove('flipped');
+  state.isFlipped = false;
+
+  // Update Previous/Next button states
+  const prevBtn = document.getElementById('btnPrev');
+  const nextBtn = document.getElementById('btnNext');
+  if (prevBtn) {
+    if (state.currentCardIndex === 0) {
+      prevBtn.disabled = true;
+      prevBtn.style.opacity = '0.4';
+    } else {
+      prevBtn.disabled = false;
+      prevBtn.style.opacity = '1';
+    }
+  }
+  if (nextBtn) {
+    nextBtn.textContent = state.currentCardIndex >= state.totalInSession - 1 ? 'Finish →' : 'Next →';
+  }
+}     
+
+      
 function updateCardContent() {
     if (!state.cardFrontEl || !state.cardBackEl) return;
     const proverb = state.sessionProverbs[state.currentCardIndex];
