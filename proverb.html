@@ -790,28 +790,87 @@
 
   <script>
     (function() {
-      const CONFIG = {
-        cardsPerSession: 10,
-        googleSheetCSVUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRG7RMIIi7errGd4H44Q36QRzycfvM783pNP8pE6DI5LsNAjczO8klWjiS8Eh6h1szLJqU2XWMW7XZD/pub?gid=0&single=true&output=csv',
-        fallbackData: [
-          ['চোর পালালে বুদ্ধি বাড়ে', 'Locking the stable door after the horse has bolted', 'Early to bed, early to rise', 'A stitch in time saves nine', 'Actions speak louder than words'],
-          ['অভাবে স্বভাব নষ্ট', 'Poverty corrupts character', 'Money makes the world go round', 'Time and tide wait for none', 'Knowledge is power'],
-          ['যত গর্জে তত বর্ষে না', 'All bark and no bite', 'The early bird catches the worm', 'Every cloud has a silver lining', 'Practice makes perfect'],
-          ['নাচতে না জানলে উঠান বাঁকা', 'A bad workman blames his tools', 'Rome wasn\'t built in a day', 'Honesty is the best policy', 'Laughter is the best medicine'],
-          ['চোরে চোরে মাসতুতো ভাই', 'Birds of a feather flock together', 'Absence makes the heart grow fonder', 'Beauty is in the eye of the beholder', 'Curiosity killed the cat'],
-          ['কাঁচায় না নোয়ালে বাঁশ, পাকলে করে ঠাস ঠাস', 'Strike while the iron is hot', 'Don\'t judge a book by its cover', 'Easy come, easy go', 'Fortune favors the bold'],
-          ['ধান ভানতে শিবের গীত', 'To talk beside the point', 'Better late than never', 'Cleanliness is next to godliness', 'Every dog has its day'],
-          ['যার জ্বালা সেই জানে', 'Only the wearer knows where the shoe pinches', 'A picture is worth a thousand words', 'Blood is thicker than water', 'Don\'t put all your eggs in one basket'],
-          ['খালি কলসি বাজে বেশি', 'Empty vessels make the most noise', 'A watched pot never boils', 'Beggars can\'t be choosers', 'Count your blessings'],
-          ['এক মিথ্যা ঢাকতে আরেক মিথ্যা লাগে', 'One lie leads to another', 'A rolling stone gathers no moss', 'Charity begins at home', 'Discretion is the better part of valor'],
-          ['উলুবনে মুক্তা ছড়ানো', 'Casting pearls before swine', 'A friend in need is a friend indeed', 'Distance makes the heart grow fonder', 'Every rose has its thorn'],
-          ['ভিক্ষার চাল কাঁড়া আর আঁকড়া', 'Beggars can\'t be choosers', 'A leopard cannot change its spots', 'Cowards die many times', 'Silence is golden'],
-          ['যেখানে বাঘের ভয় সেখানে রাত হয়', 'Danger lurks where fear resides', 'A chain is only as strong as its weakest link', 'Familiarity breeds contempt', 'Half a loaf is better than none'],
-          ['গাইতে গাইতে গায়েন', 'Practice makes perfect', 'He who hesitates is lost', 'It takes two to tango', 'The pen is mightier than the sword'],
-          ['শাক দিয়ে মাছ ঢাকা', 'To hide the truth with deception', 'A house divided cannot stand', 'Ignorance is bliss', 'When in Rome, do as the Romans do']
-        ]
-      };
-
+     const CONFIG = {
+  cardsPerSession: 10,
+  googleSheetCSVUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRG7RMIIi7errGd4H44Q36QRzycfvM783pNP8pE6DI5LsNAjczO8klWjiS8Eh6h1szLJqU2XWMW7XZD/pub?gid=0&single=true&output=csv',
+  fallbackData: [
+    {
+      bengali: ['চোর পালালে বুদ্ধি বাড়ে'],
+      english: ['Locking the stable door after the horse has bolted'],
+      distractors: ['Early to bed, early to rise', 'A stitch in time saves nine', 'Actions speak louder than words']
+    },
+    {
+      bengali: ['অভাবে স্বভাব নষ্ট'],
+      english: ['Poverty corrupts character'],
+      distractors: ['Money makes the world go round', 'Time and tide wait for none', 'Knowledge is power']
+    },
+    {
+      bengali: ['যত গর্জে তত বর্ষে না'],
+      english: ['All bark and no bite'],
+      distractors: ['The early bird catches the worm', 'Every cloud has a silver lining', 'Practice makes perfect']
+    },
+    {
+      bengali: ['নাচতে না জানলে উঠান বাঁকা'],
+      english: ['A bad workman blames his tools'],
+      distractors: ['Rome wasn\'t built in a day', 'Honesty is the best policy', 'Laughter is the best medicine']
+    },
+    {
+      bengali: ['চোরে চোরে মাসতুতো ভাই'],
+      english: ['Birds of a feather flock together'],
+      distractors: ['Absence makes the heart grow fonder', 'Beauty is in the eye of the beholder', 'Curiosity killed the cat']
+    },
+    {
+      bengali: ['কাঁচায় না নোয়ালে বাঁশ, পাকলে করে ঠাস ঠাস'],
+      english: ['Strike while the iron is hot'],
+      distractors: ['Don\'t judge a book by its cover', 'Easy come, easy go', 'Fortune favors the bold']
+    },
+    {
+      bengali: ['ধান ভানতে শিবের গীত'],
+      english: ['To talk beside the point'],
+      distractors: ['Better late than never', 'Cleanliness is next to godliness', 'Every dog has its day']
+    },
+    {
+      bengali: ['যার জ্বালা সেই জানে'],
+      english: ['Only the wearer knows where the shoe pinches'],
+      distractors: ['A picture is worth a thousand words', 'Blood is thicker than water', 'Don\'t put all your eggs in one basket']
+    },
+    {
+      bengali: ['খালি কলসি বাজে বেশি'],
+      english: ['Empty vessels make the most noise'],
+      distractors: ['A watched pot never boils', 'Beggars can\'t be choosers', 'Count your blessings']
+    },
+    {
+      bengali: ['এক মিথ্যা ঢাকতে আরেক মিথ্যা লাগে'],
+      english: ['One lie leads to another'],
+      distractors: ['A rolling stone gathers no moss', 'Charity begins at home', 'Discretion is the better part of valor']
+    },
+    {
+      bengali: ['উলুবনে মুক্তা ছড়ানো'],
+      english: ['Casting pearls before swine'],
+      distractors: ['A friend in need is a friend indeed', 'Distance makes the heart grow fonder', 'Every rose has its thorn']
+    },
+    {
+      bengali: ['ভিক্ষার চাল কাঁড়া আর আঁকড়া'],
+      english: ['Beggars can\'t be choosers'],
+      distractors: ['A leopard cannot change its spots', 'Cowards die many times', 'Silence is golden']
+    },
+    {
+      bengali: ['যেখানে বাঘের ভয় সেখানে রাত হয়'],
+      english: ['Danger lurks where fear resides'],
+      distractors: ['A chain is only as strong as its weakest link', 'Familiarity breeds contempt', 'Half a loaf is better than none']
+    },
+    {
+      bengali: ['গাইতে গাইতে গায়েন'],
+      english: ['Practice makes perfect'],
+      distractors: ['He who hesitates is lost', 'It takes two to tango', 'The pen is mightier than the sword']
+    },
+    {
+      bengali: ['শাক দিয়ে মাছ ঢাকা'],
+      english: ['To hide the truth with deception'],
+      distractors: ['A house divided cannot stand', 'Ignorance is bliss', 'When in Rome, do as the Romans do']
+    }
+  ]
+};
       const appContainer = document.getElementById('appContainer');
       const mainContent = document.getElementById('mainContent');
       const bottomNav = document.getElementById('bottomNav');
@@ -888,22 +947,33 @@ async function loadProverbData() {
   // Fallback – no header row, so no shift needed
   state.allProverbs = CONFIG.fallbackData.map(r => [...r]);
 }
-      function parseCSV(txt) {
-        const rows = [];
-        txt.trim().split(/\r?\n/).forEach(line => {
-          if(!line.trim()) return;
-          const cols=[]; let cur='', inQ=false;
-          for(let i=0;i<line.length;i++){
-            const ch=line[i];
-            if(ch==='"'){ if(inQ && i+1<line.length && line[i+1]==='"'){ cur+='"'; i++; } else inQ=!inQ; }
-            else if(ch===',' && !inQ){ cols.push(cur.trim()); cur=''; }
-            else cur+=ch;
-          }
-          cols.push(cur.trim());
-          if(cols.length>=5) rows.push([cols[0],cols[1],cols[2],cols[3],cols[4]]);
-        });
-        return rows;
-      }
+function parseCSV(txt) {
+  const rows = [];
+  txt.trim().split(/\r?\n/).forEach(line => {
+    if (!line.trim()) return;
+    const cols = []; let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQ && i + 1 < line.length && line[i + 1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else cur += ch;
+    }
+    cols.push(cur.trim());
+    if (cols.length >= 5) {
+      // ✅ Split Bengali (col 0) and English (col 1) by ";"
+      const bengali = cols[0].split(';').map(s => s.trim()).filter(Boolean);
+      const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
+      rows.push({
+        bengali: bengali.length ? bengali : [cols[0]],   // fallback if no delimiter
+        english: english.length ? english : [cols[1]],
+        distractors: [cols[2], cols[3], cols[4]]
+      });
+    }
+  });
+  return rows;
+}
       function selectSessionProverbs() {
         const pool = [...state.allProverbs];
         for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
@@ -955,11 +1025,11 @@ function renderLearning() {
       <div class="card-stage" id="cardStage">
         <div class="card-inner" id="cardInner">
           <div class="card-face card-front" id="cardFront">
-            <div class="card-bengali">${escapeHTML(proverb[0])}</div>
+            <div class="card-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
             <div class="card-hint">Tap to Reveal English</div>
           </div>
           <div class="card-face card-back" id="cardBack">
-            <div class="card-english">${escapeHTML(proverb[1])}</div>
+            <div class="card-english">${escapeHTML(proverb.english.join(' • '))}</div>
           </div>
         </div>
       </div>
@@ -1072,20 +1142,25 @@ function navigateCard(direction) {
 
 function updateCardContent() {
   const proverb = state.sessionProverbs[state.currentCardIndex];
+  
+  // Update Bengali side
   if (state.cardFrontEl) {
     const bengaliEl = state.cardFrontEl.querySelector('.card-bengali');
-    if (bengaliEl) bengaliEl.textContent = proverb[0];
+    if (bengaliEl) bengaliEl.textContent = proverb.bengali.join(' • ');
   }
+  
+  // Update English side
   if (state.cardBackEl) {
     const englishEl = state.cardBackEl.querySelector('.card-english');
-    if (englishEl) englishEl.textContent = proverb[1];
+    if (englishEl) englishEl.textContent = proverb.english.join(' • ');
   }
+  
   // Always flip back to front
   const cardInner = document.getElementById('cardInner');
   if (cardInner) cardInner.classList.remove('flipped');
   state.isFlipped = false;
 
-  // Update Previous/Next button states (only after the animation)
+  // Previous/Next button state
   const prevBtn = document.getElementById('btnPrev');
   const nextBtn = document.getElementById('btnNext');
   if (prevBtn) {
@@ -1109,39 +1184,133 @@ function updateCardContent() {
         for(let i=state.quizOrder.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [state.quizOrder[i],state.quizOrder[j]]=[state.quizOrder[j],state.quizOrder[i]]; }
         state.currentQuizIndex=0; state.score=0; state.phase='quiz'; updateHeaderScore(); updateHeaderCardIndex(); startTimer(); renderQuizQuestion();
       }
-      function renderQuizQuestion(){
-        if(state.currentQuizIndex>=state.totalInSession){ finishQuiz(); return; }
-        state.phase='quiz'; updateHeaderScore(); updateHeaderCardIndex();
-        const sessionIdx=state.quizOrder[state.currentQuizIndex], p=state.sessionProverbs[sessionIdx];
-        const options=[{text:p[1],correct:true},{text:p[2],correct:false},{text:p[3],correct:false},{text:p[4],correct:false}];
-        for(let i=options.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [options[i],options[j]]=[options[j],options[i]]; }
-        const labels=['A','B','C','D'];
-        mainContent.innerHTML=`
-          <div class="quiz-question-card"><div class="quiz-bengali">${escapeHTML(p[0])}</div></div>
-          <div class="options-list" id="optionsList">${options.map((o,i)=>`<button class="option-btn" data-index="${i}" data-correct="${o.correct}"><span class="opt-label">(${labels[i]})</span><span>${escapeHTML(o.text)}</span></button>`).join('')}</div>`;
-        bottomNav.innerHTML=`<button class="btn btn-ghost btn-full" id="btnBackToHubQuiz">← Back to Hub</button>`;
-        document.querySelectorAll('.option-btn').forEach(b=>b.addEventListener('click',function(){ handleQuizAnswer(this); }));
-        document.getElementById('btnBackToHubQuiz').addEventListener('click',()=>{ if(confirm('Leave quiz?')){ stopTimer(); renderHub(); } });
+
+
+
+
+function renderQuizQuestion() {
+  if (state.currentQuizIndex >= state.totalInSession) {
+    finishQuiz();
+    return;
+  }
+  state.phase = 'quiz';
+  updateHeaderScore();
+  updateHeaderCardIndex();
+
+  const sessionIdx = state.quizOrder[state.currentQuizIndex];
+  const proverb = state.sessionProverbs[sessionIdx];
+
+  // Pick one random correct English variant to display as the option
+  const randomCorrect = proverb.english[Math.floor(Math.random() * proverb.english.length)];
+
+  // Build options: 1 correct (random variant) + 3 distractors
+  const options = [
+    { text: randomCorrect, isCorrect: true },
+    { text: proverb.distractors[0], isCorrect: false },
+    { text: proverb.distractors[1], isCorrect: false },
+    { text: proverb.distractors[2], isCorrect: false }
+  ];
+
+  // Shuffle options
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+
+  const labels = ['A', 'B', 'C', 'D'];
+
+  mainContent.innerHTML = `
+    <div class="quiz-question-card">
+      <div class="quiz-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
+    </div>
+    <div class="options-list" id="optionsList">
+      ${options.map((opt, i) => `
+        <button class="option-btn" data-index="${i}" data-correct="${opt.isCorrect}">
+          <span class="opt-label">(${labels[i]})</span>
+          <span>${escapeHTML(opt.text)}</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+
+  bottomNav.innerHTML = `
+    <button class="btn btn-ghost btn-full" id="btnBackToHubQuiz">← Back to Hub</button>
+  `;
+
+  document.querySelectorAll('.option-btn').forEach(b => {
+    b.addEventListener('click', function() { handleQuizAnswer(this); });
+  });
+
+  document.getElementById('btnBackToHubQuiz').addEventListener('click', () => {
+    if (confirm('Leave quiz?')) { stopTimer(); renderHub(); }
+  });
+}
+
+
+      
+function handleQuizAnswer(btn) {
+  const allBtns = document.querySelectorAll('.option-btn');
+  allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+  // Get the visible text of the clicked button
+  const selectedText = btn.querySelector('span:last-child').textContent.trim();
+
+  // Get the current proverb's English array
+  const proverb = state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
+
+  // Check if selected text matches any of the correct English variants
+  const isCorrect = proverb.english.includes(selectedText);
+
+  if (isCorrect) {
+    btn.classList.add('correct-flash');
+    state.score++;
+    updateHeaderScore();
+    setTimeout(() => {
+      state.currentQuizIndex++;
+      if (state.currentQuizIndex >= state.totalInSession) {
+        finishQuiz();
+      } else {
+        renderQuizQuestion();
       }
-      function handleQuizAnswer(btn){
-        document.querySelectorAll('.option-btn').forEach(b=>b.style.pointerEvents='none');
-        const correct=btn.getAttribute('data-correct')==='true';
-        if(correct){
-          btn.classList.add('correct-flash'); state.score++; updateHeaderScore();
-          setTimeout(()=>{ state.currentQuizIndex++; if(state.currentQuizIndex>=state.totalInSession) finishQuiz(); else renderQuizQuestion(); },600);
-        } else {
-          btn.classList.add('wrong-flash'); pauseTimer(); showErrorModal();
-        }
-      }
-      function showErrorModal(){
-        const p=state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
-        modalOverlay.innerHTML=`<div class="modal-panel"><div class="modal-icon">❌</div><div class="modal-label">Correct Answer</div><div class="modal-bengali">${escapeHTML(p[0])}</div><div class="modal-correct">→ ${escapeHTML(p[1])}</div><button class="btn btn-primary btn-full" id="btnGotIt">👍 Got It</button></div>`;
-        modalOverlay.classList.remove('hidden');
-        document.getElementById('btnGotIt').addEventListener('click',()=>{
-          modalOverlay.classList.add('hidden'); modalOverlay.innerHTML=''; resumeTimer();
-          state.currentQuizIndex++; if(state.currentQuizIndex>=state.totalInSession) finishQuiz(); else renderQuizQuestion();
-        });
-      }
+    }, 600);
+  } else {
+    btn.classList.add('wrong-flash');
+    pauseTimer();
+    showErrorModal();
+  }
+}
+
+
+      
+
+function showErrorModal() {
+  const proverb = state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
+
+  modalOverlay.innerHTML = `
+    <div class="modal-panel">
+      <div class="modal-icon">❌</div>
+      <div class="modal-label">Correct Answer(s)</div>
+      <div class="modal-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
+      <div class="modal-correct">→ ${escapeHTML(proverb.english.join(' • '))}</div>
+      <button class="btn btn-primary btn-full" id="btnGotIt">👍 Got It</button>
+    </div>
+  `;
+  modalOverlay.classList.remove('hidden');
+
+  document.getElementById('btnGotIt').addEventListener('click', () => {
+    modalOverlay.classList.add('hidden');
+    modalOverlay.innerHTML = '';
+    resumeTimer();
+    state.currentQuizIndex++;
+    if (state.currentQuizIndex >= state.totalInSession) {
+      finishQuiz();
+    } else {
+      renderQuizQuestion();
+    }
+  });
+}
+
+      
       function finishQuiz(){
         state.phase='results'; stopTimer(); updateHeaderScore(); updateHeaderCardIndex(); headerCardIndex.textContent='Complete';
         const total=state.totalInSession, score=state.score, time=formatTime(state.timerSeconds), perc=Math.round((score/total)*100);
