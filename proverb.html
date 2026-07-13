@@ -817,8 +817,12 @@
         isTimerPaused: false,
         totalInSession: CONFIG.cardsPerSession,
         swipeStartX: 0, swipeStartY: 0, swipeMoved: false, swipeDistanceX: 0, isSwiping: false,
+            // … existing properties …
+        cardFrontEl: null,   // will hold the front face DIV
+        cardBackEl: null,    // will hold the back face DIV
       };
 
+   
       function startTimer() {
         stopTimer();
         state.timerSeconds = 0;
@@ -928,6 +932,8 @@ async function loadProverbData() {
             <button class="btn btn-outline" id="btnPrev" ${state.currentCardIndex===0?'disabled style="opacity:0.4;"':''}>← Previous</button>
             <button class="btn btn-outline" id="btnNext">Next →</button>
           </div>`;
+        state.cardFrontEl = document.getElementById('cardFront');
+        state.cardBackEl = document.getElementById('cardBack');
         bottomNav.innerHTML=`<button class="btn btn-danger-zone btn-full" id="btnFinishSession">🏁 Finish Session</button><button class="btn btn-ghost btn-full" id="btnBackToHubLearning">← Back to Hub</button>`;
         attachCardListeners();
         document.getElementById('btnPrev').addEventListener('click', ()=>navigateCard(-1));
@@ -956,16 +962,33 @@ async function loadProverbData() {
       function navigateCard(dir){
         if(state.phase!=='learning') return; const newIdx=state.currentCardIndex+dir;
         if(newIdx<0) return; if(newIdx>=state.totalInSession){ finishSessionAndStartQuiz(); return; }
-        state.currentCardIndex=newIdx; state.isFlipped=false; updateHeaderCardIndex(); refreshLearningCard();
+        state.currentCardIndex=newIdx; state.isFlipped=false; updateHeaderCardIndex(); updateCardContent(); 
       }
-      function refreshLearningCard(){
-        const p=state.sessionProverbs[state.currentCardIndex]; document.getElementById('cardFront').querySelector('.card-bengali').textContent=p[0];
-        document.getElementById('cardBack').querySelector('.card-english').textContent=p[1];
-        document.getElementById('cardInner').classList.remove('flipped'); state.isFlipped=false;
-        const prev=document.getElementById('btnPrev'), next=document.getElementById('btnNext');
-        if(prev){ if(state.currentCardIndex===0){ prev.disabled=true; prev.style.opacity='0.4'; } else { prev.disabled=false; prev.style.opacity='1'; } }
-        if(next) next.textContent = state.currentCardIndex>=state.totalInSession-1 ? 'Finish →' : 'Next →';
-      }
+function updateCardContent() {
+    if (!state.cardFrontEl || !state.cardBackEl) return;
+    const proverb = state.sessionProverbs[state.currentCardIndex];
+    // Update the Bengali & English text
+    state.cardFrontEl.querySelector('.card-bengali').textContent = proverb[0];
+    state.cardBackEl.querySelector('.card-english').textContent = proverb[1];
+    // Always reset to front face
+    document.getElementById('cardInner').classList.remove('flipped');
+    state.isFlipped = false;
+    // Update the Previous button state
+    const prevBtn = document.getElementById('btnPrev');
+    const nextBtn = document.getElementById('btnNext');
+    if (prevBtn) {
+        if (state.currentCardIndex === 0) {
+            prevBtn.disabled = true;
+            prevBtn.style.opacity = '0.4';
+        } else {
+            prevBtn.disabled = false;
+            prevBtn.style.opacity = '1';
+        }
+    }
+    if (nextBtn) {
+        nextBtn.textContent = state.currentCardIndex >= state.totalInSession - 1 ? 'Finish →' : 'Next →';
+    }
+}
       function finishSessionAndStartQuiz(){
         if(state.phase!=='learning') return;
         state.quizOrder = [...Array(state.totalInSession).keys()];
