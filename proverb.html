@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Proverb Game — by Amrit</title>
 <!-- Search Engine Optimisation -->
 <meta name="description" content="Fluent by Amrit — an interactive English sentence-building game for students. Build sentences level by level, from beginner to advanced. Play free online.">
@@ -34,1387 +36,983 @@
 
 <!-- Theme colour (browser chrome on mobile) -->
 <meta name="theme-color" content="#ff8906">
-    <style>
-        :root {
-            --bg-deep: #121212;
-            --card-bg: #1e1e1e;
-            --accent: #6366f1;
-            --success: #10b981;
-            --error: #ef4444;
-            --text-primary: #f9fafb;
-            --text-secondary: #9ca3af;
-            --card-radius: 20px;
-            --btn-radius: 14px;
-            --transition-speed: 0.3s;
-            --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
-            --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
+  <style>
+    :root {
+      --bg-deep: #121212;
+      --card-bg: #1e1e1e;
+      --accent: #6366f1;
+      --success: #10b981;
+      --error: #ef4444;
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --card-radius: 20px;
+      --btn-radius: 14px;
+      --transition-speed: 0.3s;
+      --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+      --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            background: #0a0a0a;
-            font-family: var(--font-sans);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 12px;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none;
-            user-select: none;
-            touch-action: manipulation;
-        }
+    html, body {
+      height: 100%;
+      width: 100%;
+      background: #0a0a0a;
+      font-family: var(--font-sans);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      margin: 0;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
+      overflow: hidden;
+    }
 
-        .app-container {
-            width: 100%;
-            max-width: 480px;
-            min-height: 85vh;
-            max-height: 95vh;
-            background: var(--bg-deep);
-            border-radius: 24px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
-            position: relative;
-        }
+    /* App container – full screen on mobile, centered card on larger screens */
+    .app-container {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-deep);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: none;
+      border-radius: 0;
+      position: relative;
+      transition: all 0.3s ease;
+    }
 
-        /* ============ HEADER ============ */
-        .global-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 18px;
-            background: #1a1a1a;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            gap: 8px;
-            flex-shrink: 0;
-            flex-wrap: nowrap;
-            min-height: 56px;
-        }
-        .header-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            letter-spacing: 0.01em;
-        }
-        .header-item .icon {
-            font-size: 1rem;
-            line-height: 1;
-        }
-        .header-item .value {
-            color: var(--text-primary);
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
-            font-family: var(--font-mono);
-            font-size: 0.82rem;
-        }
-        .header-item.score-item {
-            transition: opacity 0.4s;
-        }
-        .header-item.score-item.muted {
-            opacity: 0.35;
-        }
-        .header-divider {
-            width: 1px;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            flex-shrink: 0;
-            border-radius: 1px;
-        }
-        @media (max-width: 380px) {
-            .global-header {
-                padding: 10px 10px;
-                gap: 4px;
-            }
-            .header-item {
-                font-size: 0.68rem;
-                gap: 3px;
-            }
-            .header-item .value {
-                font-size: 0.7rem;
-            }
-            .header-item .icon {
-                font-size: 0.85rem;
-            }
-            .header-divider {
-                height: 16px;
-            }
-        }
+    /* Tablet and larger */
+    @media (min-width: 500px) {
+      body {
+        padding: 16px;
+      }
+      .app-container {
+        max-width: 540px;
+        height: auto;
+        min-height: 85vh;
+        max-height: 95vh;
+        border-radius: 32px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      }
+    }
 
-        /* ============ MAIN CONTENT ============ */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px 16px;
-            overflow-y: auto;
-            gap: 20px;
-            position: relative;
-            min-height: 0;
-        }
+    @media (min-width: 768px) {
+      .app-container {
+        max-width: 620px;
+        min-height: 80vh;
+        max-height: 92vh;
+        border-radius: 36px;
+      }
+    }
 
-        /* ============ HUB SCREEN ============ */
-        .hub-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 28px;
-            width: 100%;
-            text-align: center;
-        }
-        .hub-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.02em;
-        }
-        .hub-title .accent {
-            color: var(--accent);
-        }
-        .hub-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-top: -16px;
-        }
-        .hub-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: 100%;
-            max-width: 300px;
-        }
-        .hub-input-group label {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            text-align: left;
-            font-weight: 500;
-        }
-        .hub-input {
-            background: var(--card-bg);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--btn-radius);
-            padding: 14px 16px;
-            color: var(--text-primary);
-            font-size: 1rem;
-            font-family: var(--font-sans);
-            outline: none;
-            transition: border-color var(--transition-speed);
-            width: 100%;
-        }
-        .hub-input:focus {
-            border-color: var(--accent);
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 14px 28px;
-            border-radius: var(--btn-radius);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all var(--transition-speed);
-            font-family: var(--font-sans);
-            letter-spacing: 0.01em;
-            position: relative;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        .btn:active {
-            transform: scale(0.96);
-        }
-        .btn-primary {
-            background: var(--accent);
-            color: #fff;
-            box-shadow: 0 6px 24px rgba(99, 102, 241, 0.35);
-        }
-        .btn-primary:hover {
-            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5);
-            filter: brightness(1.08);
-        }
-        .btn-outline {
-            background: transparent;
-            color: var(--text-primary);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-        .btn-outline:hover {
-            border-color: rgba(255, 255, 255, 0.45);
-            background: rgba(255, 255, 255, 0.04);
-        }
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-secondary);
-            padding: 10px 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        .btn-ghost:hover {
-            color: var(--text-primary);
-        }
-        .btn-danger-zone {
-            background: transparent;
-            border: 2px solid var(--error);
-            color: var(--error);
-            font-weight: 600;
-        }
-        .btn-danger-zone:hover {
-            background: rgba(239, 68, 68, 0.1);
-            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.25);
-        }
-        .btn-full {
-            width: 100%;
-            max-width: 340px;
-        }
-        .btn-lg {
-            padding: 16px 32px;
-            font-size: 1.1rem;
-            border-radius: 18px;
-        }
+    @media (min-width: 1024px) {
+      body {
+        padding: 24px;
+      }
+      .app-container {
+        max-width: 720px;
+        min-height: 75vh;
+        max-height: 90vh;
+        border-radius: 40px;
+      }
+    }
 
-        /* ============ CARD ============ */
-        .card-stage {
-            perspective: 1000px;
-            width: 100%;
-            max-width: 380px;
-            aspect-ratio: 1.6 / 1;
-            cursor: pointer;
-            position: relative;
-        }
-        .card-inner {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: transform;
-        }
-        .card-inner.flipped {
-            transform: rotateY(180deg);
-        }
-        .card-face {
-            position: absolute;
-            inset: 0;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            border-radius: var(--card-radius);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            text-align: center;
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-        .card-front {
-            z-index: 2;
-        }
-        .card-back {
-            transform: rotateY(180deg);
-            z-index: 1;
-            border-color: rgba(99, 102, 241, 0.3);
-            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
-        }
-        .card-bengali {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            line-height: 1.5;
-            letter-spacing: 0.01em;
-        }
-        .card-english {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--accent);
-            line-height: 1.5;
-        }
-        .card-hint {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 12px;
-            letter-spacing: 0.03em;
-            opacity: 0.7;
-        }
-        .swipe-indicator {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            color: var(--text-secondary);
-            font-size: 0.78rem;
-            letter-spacing: 0.04em;
-            opacity: 0.6;
-            pointer-events: none;
-        }
-        .swipe-indicator span {
-            font-size: 1.2rem;
-        }
-        .nav-buttons {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+    /* ============ HEADER ============ */
+    .global-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: #1a1a1a;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      gap: 6px;
+      flex-shrink: 0;
+      flex-wrap: nowrap;
+      min-height: 54px;
+    }
+    .header-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+    }
+    .header-item .icon {
+      font-size: 0.9rem;
+      line-height: 1;
+    }
+    .header-item .value {
+      color: var(--text-primary);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+    }
+    .header-item.score-item {
+      transition: opacity 0.4s;
+    }
+    .header-item.score-item.muted {
+      opacity: 0.35;
+    }
+    .header-divider {
+      width: 1px;
+      height: 18px;
+      background: rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
+      border-radius: 1px;
+    }
 
-        /* ============ QUIZ OPTIONS ============ */
-        .quiz-question-card {
-            background: var(--card-bg);
-            border-radius: var(--card-radius);
-            padding: 20px 24px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            width: 100%;
-            max-width: 380px;
-        }
-        .quiz-bengali {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            line-height: 1.5;
-        }
-        .options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            max-width: 380px;
-        }
-        .option-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 100%;
-            padding: 15px 18px;
-            background: var(--card-bg);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--btn-radius);
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
-            font-family: var(--font-sans);
-            letter-spacing: 0.01em;
-        }
-        .option-btn:hover {
-            border-color: rgba(255, 255, 255, 0.3);
-            background: #252525;
-        }
-        .option-btn:active {
-            transform: scale(0.97);
-        }
-        .option-btn .opt-label {
-            font-weight: 700;
-            color: var(--accent);
-            font-size: 0.85rem;
-            min-width: 24px;
-            text-align: center;
-        }
-        .option-btn.correct-flash {
-            border-color: var(--success) !important;
-            background: rgba(16, 185, 129, 0.15) !important;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-            animation: pulse-success 0.5s ease-out;
-        }
-        .option-btn.wrong-flash {
-            border-color: var(--error) !important;
-            background: rgba(239, 68, 68, 0.15) !important;
-            animation: shake 0.4s ease;
-        }
-        @keyframes pulse-success {
-            0%,
-            100% {
-                box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 28px rgba(16, 185, 129, 0.7);
-            }
-        }
-        @keyframes shake {
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-            20% {
-                transform: translateX(-6px);
-            }
-            40% {
-                transform: translateX(6px);
-            }
-            60% {
-                transform: translateX(-4px);
-            }
-            80% {
-                transform: translateX(4px);
-            }
-        }
+    @media (max-width: 380px) {
+      .global-header {
+        padding: 8px 10px;
+        gap: 4px;
+        min-height: 50px;
+      }
+      .header-item {
+        font-size: 0.66rem;
+        gap: 3px;
+      }
+      .header-item .value {
+        font-size: 0.7rem;
+      }
+      .header-item .icon {
+        font-size: 0.8rem;
+      }
+      .header-divider {
+        height: 16px;
+      }
+    }
 
-        /* ============ MODAL OVERLAY ============ */
-        .modal-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-            animation: fadeIn 0.25s ease;
-            border-radius: 24px;
-        }
-        .modal-panel {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 28px 24px;
-            text-align: center;
-            max-width: 340px;
-            width: 90%;
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
-            animation: slideUp 0.3s ease;
-        }
-        .modal-icon {
-            font-size: 3rem;
-            margin-bottom: 12px;
-        }
-        .modal-bengali {
-            font-size: 1.2rem;
-            color: var(--text-primary);
-            font-weight: 600;
-            margin-bottom: 6px;
-            line-height: 1.4;
-        }
-        .modal-correct {
-            font-size: 1.05rem;
-            color: var(--success);
-            font-weight: 700;
-            margin-bottom: 18px;
-            line-height: 1.4;
-        }
-        .modal-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin-bottom: 4px;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
+    @media (min-width: 500px) {
+      .global-header {
+        padding: 14px 18px;
+        gap: 8px;
+      }
+      .header-item {
+        font-size: 0.82rem;
+        gap: 6px;
+      }
+      .header-item .value {
+        font-size: 0.85rem;
+      }
+      .header-item .icon {
+        font-size: 1rem;
+      }
+    }
 
-        /* ============ RESULTS ============ */
-        .results-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            text-align: center;
-        }
-        .results-score {
-            font-size: 4rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            letter-spacing: -0.03em;
-        }
-        .results-score .slash {
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-        .results-detail {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-        .results-badge {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            letter-spacing: 0.02em;
-        }
-        .badge-gold {
-            background: rgba(251, 191, 36, 0.2);
-            color: #fbbf24;
-            border: 1px solid rgba(251, 191, 36, 0.4);
-        }
-        .badge-silver {
-            background: rgba(156, 163, 175, 0.2);
-            color: #d1d5db;
-            border: 1px solid rgba(156, 163, 175, 0.4);
-        }
-        .badge-bronze {
-            background: rgba(180, 130, 90, 0.2);
-            color: #d4a574;
-            border: 1px solid rgba(180, 130, 90, 0.4);
-        }
+    /* ============ MAIN CONTENT ============ */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 16px;
+      overflow-y: auto;
+      gap: 20px;
+      position: relative;
+      min-height: 0;
+      -webkit-overflow-scrolling: touch;
+    }
 
-        /* ============ UTILITY ============ */
-        .hidden {
-            display: none !important;
-        }
-        .fade-out {
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .text-muted {
-            color: var(--text-secondary);
-        }
-        .text-center {
-            text-align: center;
-        }
-        .mt-2 {
-            margin-top: 8px;
-        }
-        .mt-4 {
-            margin-top: 16px;
-        }
-        .gap-3 {
-            gap: 12px;
-        }
-        .flex-col {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-    </style>
+    @media (min-width: 500px) {
+      .main-content {
+        padding: 24px 20px;
+        gap: 24px;
+      }
+    }
+
+    /* ============ HUB SCREEN ============ */
+    .hub-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      width: 100%;
+      text-align: center;
+    }
+    .hub-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .hub-title .accent {
+      color: var(--accent);
+    }
+    .hub-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: -12px;
+      font-weight: 500;
+    }
+    .hub-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      max-width: 300px;
+    }
+    .hub-input-group label {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      text-align: left;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .hub-input {
+      background: var(--card-bg);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--btn-radius);
+      padding: 14px 16px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .hub-input:focus {
+      border-color: var(--accent);
+    }
+
+    @media (min-width: 500px) {
+      .hub-title {
+        font-size: 2.2rem;
+      }
+      .hub-subtitle {
+        font-size: 1rem;
+      }
+      .hub-input-group {
+        max-width: 360px;
+      }
+    }
+
+    /* ============ BUTTONS ============ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 24px;
+      border-radius: var(--btn-radius);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      font-family: var(--font-sans);
+      letter-spacing: 0.01em;
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(99, 102, 241, 0.35);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5);
+      filter: brightness(1.08);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text-primary);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    .btn-outline:hover {
+      border-color: rgba(255, 255, 255, 0.45);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      padding: 12px 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .btn-ghost:hover {
+      color: var(--text-primary);
+    }
+    .btn-danger-zone {
+      background: transparent;
+      border: 2px solid var(--error);
+      color: var(--error);
+      font-weight: 600;
+    }
+    .btn-danger-zone:hover {
+      background: rgba(239, 68, 68, 0.1);
+      box-shadow: 0 4px 16px rgba(239, 68, 68, 0.25);
+    }
+    .btn-full {
+      width: 100%;
+      max-width: 360px;
+    }
+    .btn-lg {
+      padding: 16px 32px;
+      font-size: 1.1rem;
+      border-radius: 18px;
+    }
+
+    @media (max-width: 380px) {
+      .btn {
+        padding: 12px 18px;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (min-width: 500px) {
+      .btn {
+        padding: 15px 28px;
+        font-size: 1rem;
+      }
+      .btn-lg {
+        padding: 18px 36px;
+        font-size: 1.2rem;
+      }
+    }
+
+    /* ============ CARD ============ */
+    .card-stage {
+      perspective: 1000px;
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 1.6 / 1;
+      cursor: pointer;
+      position: relative;
+    }
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+    .card-inner.flipped {
+      transform: rotateY(180deg);
+    }
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: var(--card-radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    .card-front {
+      z-index: 2;
+    }
+    .card-back {
+      transform: rotateY(180deg);
+      z-index: 1;
+      border-color: rgba(99, 102, 241, 0.3);
+      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+    }
+    .card-bengali {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.5;
+      letter-spacing: 0.01em;
+    }
+    .card-english {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent);
+      line-height: 1.5;
+    }
+    .card-hint {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 12px;
+      letter-spacing: 0.04em;
+      opacity: 0.7;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 380px) {
+      .card-stage {
+        max-width: 320px;
+      }
+      .card-bengali {
+        font-size: 1.1rem;
+      }
+      .card-english {
+        font-size: 0.95rem;
+      }
+      .card-face {
+        padding: 16px;
+      }
+    }
+
+    @media (min-width: 500px) {
+      .card-stage {
+        max-width: 440px;
+        aspect-ratio: 1.7 / 1;
+      }
+      .card-bengali {
+        font-size: 1.6rem;
+      }
+      .card-english {
+        font-size: 1.3rem;
+      }
+      .card-hint {
+        font-size: 0.8rem;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .card-stage {
+        max-width: 480px;
+      }
+      .card-bengali {
+        font-size: 1.8rem;
+      }
+      .card-english {
+        font-size: 1.45rem;
+      }
+    }
+
+    .swipe-indicator {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: var(--text-secondary);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      opacity: 0.55;
+      pointer-events: none;
+      text-transform: uppercase;
+    }
+    .swipe-indicator span {
+      font-size: 1.1rem;
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ============ QUIZ OPTIONS ============ */
+    .quiz-question-card {
+      background: var(--card-bg);
+      border-radius: var(--card-radius);
+      padding: 18px 22px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      width: 100%;
+      max-width: 420px;
+    }
+    .quiz-bengali {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 420px;
+    }
+    .option-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--card-bg);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--btn-radius);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      font-family: var(--font-sans);
+      letter-spacing: 0.01em;
+      min-height: 54px;
+    }
+    .option-btn .opt-label {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 0.85rem;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    @media (max-width: 380px) {
+      .quiz-bengali {
+        font-size: 1.1rem;
+      }
+      .option-btn {
+        padding: 12px 14px;
+        font-size: 0.85rem;
+        min-height: 50px;
+      }
+    }
+
+    @media (min-width: 500px) {
+      .quiz-bengali {
+        font-size: 1.5rem;
+      }
+      .option-btn {
+        font-size: 1rem;
+        padding: 16px 20px;
+        min-height: 58px;
+      }
+      .options-list {
+        gap: 12px;
+      }
+    }
+
+    .option-btn.correct-flash {
+      border-color: var(--success) !important;
+      background: rgba(16, 185, 129, 0.15) !important;
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.4);
+      animation: pulse-success 0.5s ease-out;
+    }
+    .option-btn.wrong-flash {
+      border-color: var(--error) !important;
+      background: rgba(239, 68, 68, 0.15) !important;
+      animation: shake 0.4s ease;
+    }
+    @keyframes pulse-success {
+      0%, 100% { box-shadow: 0 0 8px rgba(16,185,129,0.3); }
+      50% { box-shadow: 0 0 28px rgba(16,185,129,0.7); }
+    }
+    @keyframes shake {
+      0%,100%{transform:translateX(0);}
+      20%{transform:translateX(-6px);}
+      40%{transform:translateX(6px);}
+      60%{transform:translateX(-4px);}
+      80%{transform:translateX(4px);}
+    }
+
+    /* ============ MODAL ============ */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      animation: fadeIn 0.25s ease;
+      border-radius: inherit;
+    }
+    .modal-panel {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 340px;
+      width: 90%;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8);
+      animation: slideUp 0.3s ease;
+    }
+    .modal-icon {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+    }
+    .modal-bengali {
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+    .modal-correct {
+      font-size: 1rem;
+      color: var(--success);
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    .modal-label {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    @media (min-width: 500px) {
+      .modal-panel {
+        max-width: 400px;
+        padding: 32px 28px;
+      }
+      .modal-bengali {
+        font-size: 1.3rem;
+      }
+      .modal-correct {
+        font-size: 1.15rem;
+      }
+    }
+
+    /* ============ RESULTS SCREEN ============ */
+    .results-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      text-align: center;
+      width: 100%;
+      padding: 12px;
+    }
+    .results-score {
+      font-size: 3.2rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+    }
+    .results-score .slash {
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+    .results-detail {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .results-badge {
+      display: inline-block;
+      padding: 8px 22px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+    }
+    .badge-gold { background: rgba(251,191,36,0.2); color:#fbbf24; border:1px solid rgba(251,191,36,0.4);}
+    .badge-silver { background: rgba(156,163,175,0.2); color:#d1d5db; border:1px solid rgba(156,163,175,0.4);}
+    .badge-bronze { background: rgba(180,130,90,0.2); color:#d4a574; border:1px solid rgba(180,130,90,0.4);}
+
+    @media (min-width: 500px) {
+      .results-score {
+        font-size: 4.2rem;
+      }
+      .results-detail {
+        font-size: 1rem;
+      }
+    }
+
+    /* ============ BOTTOM NAV ============ */
+    #bottomNav {
+      padding: 10px 16px calc(12px + var(--safe-bottom));
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      background: rgba(0,0,0,0.2);
+    }
+
+    @media (min-width: 500px) {
+      #bottomNav {
+        padding: 14px 20px calc(16px + var(--safe-bottom));
+      }
+    }
+
+    /* Utility */
+    .hidden { display: none !important; }
+    .text-muted { color: var(--text-secondary); }
+    .text-center { text-align: center; }
+  </style>
 </head>
 <body>
-
-    <div class="app-container" id="appContainer">
-        <!-- ============ GLOBAL HEADER ============ -->
-        <header class="global-header" id="globalHeader">
-            <div class="header-item">
-                <span class="icon">👤</span>
-                <span class="value" id="headerPlayerName">Player</span>
-            </div>
-            <div class="header-divider"></div>
-            <div class="header-item">
-                <span class="icon">📄</span>
-                <span class="value" id="headerCardIndex">1/10</span>
-            </div>
-            <div class="header-divider"></div>
-            <div class="header-item score-item muted" id="headerScoreItem">
-                <span class="icon">🏆</span>
-                <span class="value" id="headerScore">--/10</span>
-            </div>
-            <div class="header-divider"></div>
-            <div class="header-item">
-                <span class="icon">⏱️</span>
-                <span class="value" id="headerTimer">00:00</span>
-            </div>
-        </header>
-
-        <!-- ============ MAIN CONTENT AREA ============ -->
-        <div class="main-content" id="mainContent">
-            <!-- Dynamically populated -->
-        </div>
-
-        <!-- ============ BOTTOM NAV ============ -->
-        <div style="padding: 10px 16px 16px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; border-top: 1px solid rgba(255,255,255,0.04);" id="bottomNav">
-            <!-- Dynamically populated -->
-        </div>
-
-        <!-- ============ MODAL OVERLAY (injected dynamically) ============ -->
-        <div class="modal-overlay hidden" id="modalOverlay"></div>
-    </div>
-
-    <script>
-        (function() {
-            // ──────────────────────────────────────
-            // CONFIGURATION
-            // ──────────────────────────────────────
-            const CONFIG = {
-                cardsPerSession: 10,
-                // Google Sheet published CSV URL – replace with your own
-                googleSheetCSVUrl: '',
-                // Fallback sample data (used when no Google Sheet URL is provided or fetch fails)
-                fallbackData: [
-                    ['চোর পালালে বুদ্ধি বাড়ে', 'Hindsight is always twenty-twenty',
-                        'Early to bed, early to rise', 'A stitch in time saves nine',
-                        'Actions speak louder than words'
-                    ],
-                    ['অভাবে স্বভাব নষ্ট', 'Poverty corrupts character', 'Money makes the world go round',
-                        'Time and tide wait for none', 'Knowledge is power'
-                    ],
-                    ['যত গর্জে তত বর্ষে না', 'All bark and no bite', 'The early bird catches the worm',
-                        'Every cloud has a silver lining', 'Practice makes perfect'
-                    ],
-                    ['নাচতে না জানলে উঠান বাঁকা', 'A bad workman blames his tools',
-                        'Rome wasn\'t built in a day', 'Honesty is the best policy',
-                        'Laughter is the best medicine'
-                    ],
-                    ['চোরে চোরে মাসতুতো ভাই', 'Birds of a feather flock together',
-                        'Absence makes the heart grow fonder', 'Beauty is in the eye of the beholder',
-                        'Curiosity killed the cat'
-                    ],
-                    ['কাঁচায় না নোয়ালে বাঁশ, পাকলে করে ঠাস ঠাস', 'Strike while the iron is hot',
-                        'Don\'t judge a book by its cover', 'Easy come, easy go', 'Fortune favors the bold'
-                    ],
-                    ['ধান ভানতে শিবের গীত', 'To talk beside the point', 'Better late than never',
-                        'Cleanliness is next to godliness', 'Every dog has its day'
-                    ],
-                    ['যার জ্বালা সেই জানে', 'Only the wearer knows where the shoe pinches',
-                        'A picture is worth a thousand words', 'Blood is thicker than water',
-                        'Don\'t put all your eggs in one basket'
-                    ],
-                    ['খালি কলসি বাজে বেশি', 'Empty vessels make the most noise', 'A watched pot never boils',
-                        'Beggars can\'t be choosers', 'Count your blessings'
-                    ],
-                    ['এক মিথ্যা ঢাকতে আরেক মিথ্যা লাগে', 'One lie leads to another',
-                        'A rolling stone gathers no moss', 'Charity begins at home',
-                        'Discretion is the better part of valor'
-                    ],
-                    ['উলুবনে মুক্তা ছড়ানো', 'Casting pearls before swine',
-                        'A friend in need is a friend indeed', 'Distance makes the heart grow fonder',
-                        'Every rose has its thorn'
-                    ],
-                    ['ভিক্ষার চাল কাঁড়া আর আঁকড়া', 'Beggars can\'t be choosers',
-                        'A leopard cannot change its spots', 'Cowards die many times', 'Silence is golden'
-                    ],
-                    ['যেখানে বাঘের ভয় সেখানে রাত হয়', 'Danger lurks where fear resides',
-                        'A chain is only as strong as its weakest link', 'Familiarity breeds contempt',
-                        'Half a loaf is better than none'
-                    ],
-                    ['গাইতে গাইতে গায়েন', 'Practice makes perfect', 'He who hesitates is lost',
-                        'It takes two to tango', 'The pen is mightier than the sword'
-                    ],
-                    ['শাক দিয়ে মাছ ঢাকা', 'To hide the truth with deception', 'A house divided cannot stand',
-                        'Ignorance is bliss', 'When in Rome, do as the Romans do'
-                    ],
-                ],
-            };
-
-            // ──────────────────────────────────────
-            // DOM REFERENCES
-            // ──────────────────────────────────────
-            const appContainer = document.getElementById('appContainer');
-            const mainContent = document.getElementById('mainContent');
-            const bottomNav = document.getElementById('bottomNav');
-            const modalOverlay = document.getElementById('modalOverlay');
-            const headerPlayerName = document.getElementById('headerPlayerName');
-            const headerCardIndex = document.getElementById('headerCardIndex');
-            const headerScore = document.getElementById('headerScore');
-            const headerScoreItem = document.getElementById('headerScoreItem');
-            const headerTimer = document.getElementById('headerTimer');
-
-            // ──────────────────────────────────────
-            // APPLICATION STATE
-            // ──────────────────────────────────────
-            const state = {
-                playerName: 'Player 1',
-                phase: 'hub', // 'hub' | 'learning' | 'quiz' | 'results'
-                allProverbs: [], // Raw rows from sheet: [bengali, english, distractor1, distractor2, distractor3]
-                sessionProverbs: [], // 10 selected rows for current session
-                currentCardIndex: 0, // For learning phase
-                isFlipped: false,
-                quizOrder: [], // Shuffled indices for quiz
-                currentQuizIndex: 0,
-                score: 0,
-                timerSeconds: 0,
-                timerIntervalId: null,
-                isTimerPaused: false,
-                totalInSession: CONFIG.cardsPerSession,
-                swipeStartX: 0,
-                swipeStartY: 0,
-                swipeMoved: false,
-                swipeDistanceX: 0,
-                isSwiping: false,
-            };
-
-            // ──────────────────────────────────────
-            // TIMER LOGIC
-            // ──────────────────────────────────────
-            function startTimer() {
-                stopTimer();
-                state.timerSeconds = 0;
-                state.isTimerPaused = false;
-                updateTimerDisplay();
-                state.timerIntervalId = setInterval(() => {
-                    if (!state.isTimerPaused) {
-                        state.timerSeconds++;
-                        updateTimerDisplay();
-                    }
-                }, 1000);
-            }
-
-            function stopTimer() {
-                if (state.timerIntervalId) {
-                    clearInterval(state.timerIntervalId);
-                    state.timerIntervalId = null;
-                }
-            }
-
-            function pauseTimer() {
-                state.isTimerPaused = true;
-            }
-
-            function resumeTimer() {
-                state.isTimerPaused = false;
-            }
-
-            function updateTimerDisplay() {
-                const mins = Math.floor(state.timerSeconds / 60);
-                const secs = state.timerSeconds % 60;
-                headerTimer.textContent =
-                    String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
-            }
-
-            function formatTime(seconds) {
-                const mins = Math.floor(seconds / 60);
-                const secs = seconds % 60;
-                return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
-            }
-
-            // ──────────────────────────────────────
-            // DATA LOADING (Google Sheets CSV or Fallback)
-            // ──────────────────────────────────────
-            async function loadProverbData() {
-                if (CONFIG.googleSheetCSVUrl && CONFIG.googleSheetCSVUrl.trim() !== '') {
-                    try {
-                        const response = await fetch(CONFIG.googleSheetCSVUrl);
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        const csvText = await response.text();
-                        const parsed = parseCSV(csvText);
-                        if (parsed.length >= CONFIG.cardsPerSession) {
-                            state.allProverbs = parsed;
-                            console.log(
-                                `✅ Loaded ${parsed.length} proverbs from Google Sheets`);
-                            return;
-                        }
-                    } catch (err) {
-                        console.warn(
-                            '⚠️ Could not fetch Google Sheet, using fallback data. Error:',
-                            err.message);
-                    }
-                }
-                // Use fallback data
-                state.allProverbs = CONFIG.fallbackData.map(row => [...row]);
-                console.log(
-                    `📋 Using fallback data: ${state.allProverbs.length} proverbs loaded`);
-            }
-
-            function parseCSV(csvText) {
-                const rows = [];
-                const lines = csvText.trim().split(/\r?\n/);
-                for (const line of lines) {
-                    if (!line.trim()) continue;
-                    const cols = [];
-                    let current = '';
-                    let inQuotes = false;
-                    for (let i = 0; i < line.length; i++) {
-                        const ch = line[i];
-                        if (ch === '"') {
-                            if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
-                                current += '"';
-                                i++;
-                            } else {
-                                inQuotes = !inQuotes;
-                            }
-                        } else if (ch === ',' && !inQuotes) {
-                            cols.push(current.trim());
-                            current = '';
-                        } else {
-                            current += ch;
-                        }
-                    }
-                    cols.push(current.trim());
-                    if (cols.length >= 5) {
-                        rows.push([cols[0], cols[1], cols[2], cols[3], cols[4]]);
-                    }
-                }
-                return rows;
-            }
-
-            function selectSessionProverbs() {
-                const pool = [...state.allProverbs];
-                // Shuffle pool
-                for (let i = pool.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [pool[i], pool[j]] = [pool[j], pool[i]];
-                }
-                state.sessionProverbs = pool.slice(0, CONFIG.cardsPerSession);
-                state.currentCardIndex = 0;
-                state.isFlipped = false;
-                state.score = 0;
-                state.currentQuizIndex = 0;
-                state.quizOrder = [];
-                state.timerSeconds = 0;
-                updateTimerDisplay();
-                updateHeaderScore();
-                updateHeaderCardIndex();
-            }
-
-            // ──────────────────────────────────────
-            // HEADER UPDATES
-            // ──────────────────────────────────────
-            function updateHeaderPlayerName() {
-                headerPlayerName.textContent = state.playerName;
-            }
-
-            function updateHeaderCardIndex() {
-                if (state.phase === 'learning') {
-                    headerCardIndex.textContent =
-                        `Card: ${state.currentCardIndex + 1}/${state.totalInSession}`;
-                } else if (state.phase === 'quiz') {
-                    headerCardIndex.textContent =
-                        `Ques: ${state.currentQuizIndex + 1}/${state.totalInSession}`;
-                } else {
-                    headerCardIndex.textContent = `--/${state.totalInSession}`;
-                }
-            }
-
-            function updateHeaderScore() {
-                if (state.phase === 'quiz' || state.phase === 'results') {
-                    headerScoreItem.classList.remove('muted');
-                    headerScore.textContent =
-                        `${String(state.score).padStart(2, '0')}/${state.totalInSession}`;
-                } else {
-                    headerScoreItem.classList.add('muted');
-                    headerScore.textContent = `--/${state.totalInSession}`;
-                }
-            }
-
-            // ──────────────────────────────────────
-            // RENDER: HUB SCREEN
-            // ──────────────────────────────────────
-            function renderHub() {
-                state.phase = 'hub';
-                stopTimer();
-                state.timerSeconds = 0;
-                updateTimerDisplay();
-                updateHeaderScore();
-                updateHeaderCardIndex();
-                headerCardIndex.textContent = `--/${state.totalInSession}`;
-                headerScoreItem.classList.add('muted');
-                headerScore.textContent = `--/${state.totalInSession}`;
-
-                mainContent.innerHTML = `
-                <div class="hub-screen">
-                  <div>
-                    <div class="hub-title">Proverb<span class="accent">Game</span></div>
-                    <div class="hub-subtitle">Bengali → English Learning & Quiz</div>
-                  </div>
-                  <div class="hub-input-group">
-                    <label for="playerNameInput">Player Name</label>
-                    <input
-                      type="text"
-                      id="playerNameInput"
-                      class="hub-input"
-                      value="${escapeHTML(state.playerName)}"
-                      placeholder="Enter your name"
-                      maxlength="30"
-                    />
-                  </div>
-                  <button class="btn btn-primary btn-lg btn-full" id="btnStartSession">
-                    🚀 Start Session
-                  </button>
-                  <p class="text-muted text-center" style="font-size:0.78rem; max-width:280px;">
-                    Learn 10 proverbs with flashcards, then test your memory in the quiz zone.
-                  </p>
-                </div>
-              `;
-                bottomNav.innerHTML = '';
-
-                document.getElementById('btnStartSession').addEventListener('click', () => {
-                    const input = document.getElementById('playerNameInput');
-                    if (input && input.value.trim()) {
-                        state.playerName = input.value.trim();
-                    }
-                    updateHeaderPlayerName();
-                    selectSessionProverbs();
-                    renderLearning();
-                });
-
-                // Allow Enter key to start
-                const nameInput = document.getElementById('playerNameInput');
-                if (nameInput) {
-                    nameInput.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter') {
-                            document.getElementById('btnStartSession').click();
-                        }
-                    });
-                    nameInput.focus();
-                }
-            }
-
-            function escapeHTML(str) {
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
-            }
-
-            // ──────────────────────────────────────
-            // RENDER: LEARNING PHASE
-            // ──────────────────────────────────────
-            function renderLearning() {
-                state.phase = 'learning';
-                state.isFlipped = false;
-                updateHeaderScore();
-                updateHeaderCardIndex();
-                startTimer();
-
-                const proverb = state.sessionProverbs[state.currentCardIndex];
-                const bengali = proverb[0];
-                const english = proverb[1];
-
-                mainContent.innerHTML = `
-                <div class="card-stage" id="cardStage">
-                  <div class="card-inner" id="cardInner">
-                    <div class="card-face card-front" id="cardFront">
-                      <div class="card-bengali">${escapeHTML(bengali)}</div>
-                      <div class="card-hint">Tap Card to Reveal English</div>
-                    </div>
-                    <div class="card-face card-back" id="cardBack">
-                      <div class="card-english">${escapeHTML(english)}</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swipe-indicator">
-                  <span>◀</span> Swipe Gesture <span>▶</span>
-                </div>
-                <div class="nav-buttons">
-                  <button class="btn btn-outline" id="btnPrev" ${state.currentCardIndex === 0 ? 'disabled style="opacity:0.4;"' : ''}>← Previous</button>
-                  <button class="btn btn-outline" id="btnNext">Next →</button>
-                </div>
-              `;
-
-                bottomNav.innerHTML = `
-                <button class="btn btn-danger-zone btn-full" id="btnFinishSession">🏁 Finish Session</button>
-                <button class="btn btn-ghost btn-full" id="btnBackToHubLearning">← Back to Hub</button>
-              `;
-
-                // Attach event listeners
-                attachCardListeners();
-                document.getElementById('btnPrev').addEventListener('click', () => navigateCard(-1));
-                document.getElementById('btnNext').addEventListener('click', () => navigateCard(1));
-                document.getElementById('btnFinishSession').addEventListener('click', finishSessionAndStartQuiz);
-                document.getElementById('btnBackToHubLearning').addEventListener('click', confirmBackToHub);
-            }
-
-            function attachCardListeners() {
-                const cardStage = document.getElementById('cardStage');
-                if (!cardStage) return;
-
-                // Pointer events for swipe + tap
-                cardStage.addEventListener('pointerdown', onPointerDown);
-                cardStage.addEventListener('pointermove', onPointerMove);
-                cardStage.addEventListener('pointerup', onPointerUp);
-                cardStage.addEventListener('pointercancel', onPointerCancel);
-                cardStage.addEventListener('pointerleave', onPointerCancel);
-
-                // Prevent default touch behaviors on the card
-                cardStage.addEventListener('touchstart', (e) => {
-                    if (e.target.closest('.card-stage')) {
-                        e.preventDefault();
-                    }
-                }, { passive: false });
-            }
-
-            function onPointerDown(e) {
-                state.swipeStartX = e.clientX;
-                state.swipeStartY = e.clientY;
-                state.swipeMoved = false;
-                state.swipeDistanceX = 0;
-                state.isSwiping = true;
-                e.target.setPointerCapture(e.pointerId);
-            }
-
-            function onPointerMove(e) {
-                if (!state.isSwiping) return;
-                const dx = e.clientX - state.swipeStartX;
-                const dy = e.clientY - state.swipeStartY;
-                state.swipeDistanceX = dx;
-                if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
-                    state.swipeMoved = true;
-                }
-            }
-
-            function onPointerUp(e) {
-                if (!state.isSwiping) return;
-                state.isSwiping = false;
-                const absDx = Math.abs(state.swipeDistanceX);
-                const absDy = Math.abs(e.clientY - state.swipeStartY);
-
-                if (state.swipeMoved && absDx > 50 && absDx > absDy * 1.5) {
-                    // Swipe detected
-                    if (state.swipeDistanceX < -40) {
-                        navigateCard(1); // Swipe left → next
-                    } else if (state.swipeDistanceX > 40) {
-                        navigateCard(-1); // Swipe right → previous
-                    }
-                } else if (!state.swipeMoved || (absDx < 15 && absDy < 15)) {
-                    // Tap detected → flip card
-                    flipCard();
-                }
-                state.swipeDistanceX = 0;
-                state.swipeMoved = false;
-                try { e.target.releasePointerCapture(e.pointerId); } catch (ex) { /* ok */ }
-            }
-
-            function onPointerCancel(e) {
-                state.isSwiping = false;
-                state.swipeDistanceX = 0;
-                state.swipeMoved = false;
-                try { e.target.releasePointerCapture(e.pointerId); } catch (ex) { /* ok */ }
-            }
-
-            function flipCard() {
-                if (state.phase !== 'learning') return;
-                const cardInner = document.getElementById('cardInner');
-                if (!cardInner) return;
-                state.isFlipped = !state.isFlipped;
-                if (state.isFlipped) {
-                    cardInner.classList.add('flipped');
-                } else {
-                    cardInner.classList.remove('flipped');
-                }
-            }
-
-            function navigateCard(direction) {
-                if (state.phase !== 'learning') return;
-                const newIndex = state.currentCardIndex + direction;
-                if (newIndex < 0) return; // Already at first card
-                if (newIndex >= state.totalInSession) {
-                    // Advanced past the 10th card → auto-trigger quiz
-                    finishSessionAndStartQuiz();
-                    return;
-                }
-                state.currentCardIndex = newIndex;
-                state.isFlipped = false;
-                updateHeaderCardIndex();
-                refreshLearningCard();
-            }
-
-            function refreshLearningCard() {
-                const proverb = state.sessionProverbs[state.currentCardIndex];
-                const bengali = proverb[0];
-                const english = proverb[1];
-                const cardInner = document.getElementById('cardInner');
-                const cardFront = document.getElementById('cardFront');
-                const cardBack = document.getElementById('cardBack');
-                const btnPrev = document.getElementById('btnPrev');
-                const btnNext = document.getElementById('btnNext');
-
-                if (cardInner) {
-                    cardInner.classList.remove('flipped');
-                    state.isFlipped = false;
-                }
-                if (cardFront) {
-                    cardFront.querySelector('.card-bengali').textContent = bengali;
-                }
-                if (cardBack) {
-                    cardBack.querySelector('.card-english').textContent = english;
-                }
-                if (btnPrev) {
-                    if (state.currentCardIndex === 0) {
-                        btnPrev.disabled = true;
-                        btnPrev.style.opacity = '0.4';
-                    } else {
-                        btnPrev.disabled = false;
-                        btnPrev.style.opacity = '1';
-                    }
-                }
-                if (btnNext) {
-                    btnNext.textContent = state.currentCardIndex >= state.totalInSession - 1 ?
-                        'Finish →' : 'Next →';
-                }
-                updateHeaderCardIndex();
-            }
-
-            function finishSessionAndStartQuiz() {
-                if (state.phase !== 'learning') return;
-                // Cache the 10 proverbs (already in sessionProverbs), shuffle for quiz
-                state.quizOrder = [...Array(state.totalInSession).keys()]; // [0,1,2,...,9]
-                // Shuffle quiz order
-                for (let i = state.quizOrder.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [state.quizOrder[i], state.quizOrder[j]] = [state.quizOrder[j], state.quizOrder[i]];
-                }
-                state.currentQuizIndex = 0;
-                state.score = 0;
-                state.phase = 'quiz';
-                state.isFlipped = false;
-                updateHeaderScore();
-                updateHeaderCardIndex();
-                startTimer(); // Reset timer for quiz
-                renderQuizQuestion();
-            }
-
-            // ──────────────────────────────────────
-            // RENDER: QUIZ PHASE
-            // ──────────────────────────────────────
-            function renderQuizQuestion() {
-                if (state.currentQuizIndex >= state.totalInSession) {
-                    finishQuiz();
-                    return;
-                }
-                state.phase = 'quiz';
-                updateHeaderScore();
-                updateHeaderCardIndex();
-
-                const sessionIndex = state.quizOrder[state.currentQuizIndex];
-                const proverb = state.sessionProverbs[sessionIndex];
-                const bengali = proverb[0];
-                const correctEnglish = proverb[1];
-                const distractors = [proverb[2], proverb[3], proverb[4]];
-
-                // Build options array: 1 correct + 3 distractors
-                const options = [
-                    { text: correctEnglish, isCorrect: true },
-                    { text: distractors[0], isCorrect: false },
-                    { text: distractors[1], isCorrect: false },
-                    { text: distractors[2], isCorrect: false },
-                ];
-                // Shuffle options
-                for (let i = options.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [options[i], options[j]] = [options[j], options[i]];
-                }
-
-                const labels = ['A', 'B', 'C', 'D'];
-
-                mainContent.innerHTML = `
-                <div class="quiz-question-card">
-                  <div class="quiz-bengali">${escapeHTML(bengali)}</div>
-                </div>
-                <div class="options-list" id="optionsList">
-                  ${options.map((opt, i) => `
-                    <button class="option-btn" data-index="${i}" data-correct="${opt.isCorrect}">
-                      <span class="opt-label">(${labels[i]})</span>
-                      <span>${escapeHTML(opt.text)}</span>
-                    </button>
-                  `).join('')}
-                </div>
-              `;
-
-                bottomNav.innerHTML = `
-                <button class="btn btn-ghost btn-full" id="btnBackToHubQuiz">← Back to Hub</button>
-              `;
-
-                // Attach option listeners
-                const optionBtns = document.querySelectorAll('.option-btn');
-                optionBtns.forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        handleQuizAnswer(this);
-                    });
-                });
-
-                document.getElementById('btnBackToHubQuiz').addEventListener('click', confirmBackToHub);
-            }
-
-            function handleQuizAnswer(btnElement) {
-                // Prevent double-clicks
-                const allBtns = document.querySelectorAll('.option-btn');
-                allBtns.forEach(b => b.style.pointerEvents = 'none');
-
-                const isCorrect = btnElement.getAttribute('data-correct') === 'true';
-
-                if (isCorrect) {
-                    // Success flash
-                    btnElement.classList.add('correct-flash');
-                    state.score++;
-                    updateHeaderScore();
-
-                    // Auto-advance after brief delay
-                    setTimeout(() => {
-                        state.currentQuizIndex++;
-                        if (state.currentQuizIndex >= state.totalInSession) {
-                            finishQuiz();
-                        } else {
-                            renderQuizQuestion();
-                        }
-                    }, 650);
-                } else {
-                    // Wrong answer
-                    btnElement.classList.add('wrong-flash');
-                    pauseTimer();
-                    showErrorModal();
-                }
-            }
-
-            function showErrorModal() {
-                const sessionIndex = state.quizOrder[state.currentQuizIndex];
-                const proverb = state.sessionProverbs[sessionIndex];
-                const bengali = proverb[0];
-                const correctEnglish = proverb[1];
-
-                modalOverlay.innerHTML = `
-                <div class="modal-panel">
-                  <div class="modal-icon">❌</div>
-                  <div class="modal-label">Correct Answer</div>
-                  <div class="modal-bengali">${escapeHTML(bengali)}</div>
-                  <div class="modal-correct">→ ${escapeHTML(correctEnglish)}</div>
-                  <button class="btn btn-primary btn-full mt-2" id="btnGotIt">👍 Got It</button>
-                </div>
-              `;
-                modalOverlay.classList.remove('hidden');
-
-                document.getElementById('btnGotIt').addEventListener('click', () => {
-                    modalOverlay.classList.add('hidden');
-                    modalOverlay.innerHTML = '';
-                    resumeTimer();
-                    state.currentQuizIndex++;
-                    if (state.currentQuizIndex >= state.totalInSession) {
-                        finishQuiz();
-                    } else {
-                        renderQuizQuestion();
-                    }
-                });
-            }
-
-            function finishQuiz() {
-                state.phase = 'results';
-                stopTimer();
-                updateHeaderScore();
-                updateHeaderCardIndex();
-                headerCardIndex.textContent = `Complete`;
-                renderResults();
-            }
-
-            // ──────────────────────────────────────
-            // RENDER: RESULTS SCREEN
-            // ──────────────────────────────────────
-            function renderResults() {
-                const total = state.totalInSession;
-                const score = state.score;
-                const timeTaken = formatTime(state.timerSeconds);
-                const percentage = Math.round((score / total) * 100);
-
-                let badgeClass = 'badge-bronze';
-                let badgeText = '🥉 Keep Practicing!';
-                let emoji = '📚';
-                if (percentage >= 90) {
-                    badgeClass = 'badge-gold';
-                    badgeText = '🥇 Excellent!';
-                    emoji = '🏆';
-                } else if (percentage >= 70) {
-                    badgeClass = 'badge-silver';
-                    badgeText = '🥈 Great Job!';
-                    emoji = '🌟';
-                } else if (percentage >= 50) {
-                    badgeClass = 'badge-bronze';
-                    badgeText = '🥉 Good Effort!';
-                    emoji = '💪';
-                }
-
-                mainContent.innerHTML = `
-                <div class="results-screen">
-                  <div style="font-size:3rem;">${emoji}</div>
-                  <div class="results-score">
-                    ${score}<span class="slash">/</span>${total}
-                  </div>
-                  <span class="results-badge ${badgeClass}">${badgeText}</span>
-                  <div class="results-detail">
-                    <p>⏱️ Time: <strong>${timeTaken}</strong></p>
-                    <p>📊 Accuracy: <strong>${percentage}%</strong></p>
-                  </div>
-                </div>
-              `;
-
-                bottomNav.innerHTML = `
-                <button class="btn btn-primary btn-full btn-lg" id="btnNewSession">🔄 New Session</button>
-                <button class="btn btn-ghost btn-full" id="btnBackToHubResults">← Back to Hub</button>
-              `;
-
-                document.getElementById('btnNewSession').addEventListener('click', () => {
-                    selectSessionProverbs();
-                    renderLearning();
-                });
-                document.getElementById('btnBackToHubResults').addEventListener('click', renderHub);
-            }
-
-            // ──────────────────────────────────────
-            // BACK TO HUB CONFIRMATION
-            // ──────────────────────────────────────
-            function confirmBackToHub() {
-                // Simple confirmation
-                if (state.phase === 'quiz' && state.currentQuizIndex > 0 && state.currentQuizIndex < state
-                    .totalInSession) {
-                    if (!confirm(
-                            'Are you sure you want to leave? Your quiz progress will be lost.'
-                            )) {
-                        return;
-                    }
-                } else if (state.phase === 'learning' && state.currentCardIndex > 0) {
-                    if (!confirm(
-                            'Are you sure you want to leave? Your learning progress will be lost.'
-                            )) {
-                        return;
-                    }
-                }
-                stopTimer();
-                renderHub();
-            }
-
-            // ──────────────────────────────────────
-            // INITIALIZATION
-            // ──────────────────────────────────────
-            async function initApp() {
-                updateHeaderPlayerName();
-                updateHeaderScore();
-                updateHeaderCardIndex();
-                headerCardIndex.textContent = `--/${state.totalInSession}`;
-                headerScoreItem.classList.add('muted');
-                headerScore.textContent = `--/${state.totalInSession}`;
-                updateTimerDisplay();
-
-                // Show loading state
-                mainContent.innerHTML = `
-                <div class="hub-screen">
-                  <p style="color: var(--text-secondary); font-size: 1.1rem;">⏳ Loading proverbs...</p>
-                </div>
-              `;
-                bottomNav.innerHTML = '';
-
-                await loadProverbData();
-
-                if (state.allProverbs.length < CONFIG.cardsPerSession) {
-                    mainContent.innerHTML = `
-                    <div class="hub-screen">
-                      <p style="color: var(--error);">❌ Not enough proverbs loaded. Need at least ${CONFIG.cardsPerSession}, found ${state.allProverbs.length}.</p>
-                      <p class="text-muted">Please check your Google Sheet or fallback data.</p>
-                    </div>
-                  `;
-                    return;
-                }
-
-                renderHub();
-            }
-
-            // ──────────────────────────────────────
-            // START THE APP
-            // ──────────────────────────────────────
-            initApp();
-        })();
-    </script>
+  <div class="app-container" id="appContainer">
+    <!-- Global Header -->
+    <header class="global-header" id="globalHeader">
+      <div class="header-item"><span class="icon">👤</span><span class="value" id="headerPlayerName">Player</span></div>
+      <div class="header-divider"></div>
+      <div class="header-item"><span class="icon">📄</span><span class="value" id="headerCardIndex">1/10</span></div>
+      <div class="header-divider"></div>
+      <div class="header-item score-item muted" id="headerScoreItem"><span class="icon">🏆</span><span class="value" id="headerScore">--/10</span></div>
+      <div class="header-divider"></div>
+      <div class="header-item"><span class="icon">⏱️</span><span class="value" id="headerTimer">00:00</span></div>
+    </header>
+
+    <div class="main-content" id="mainContent"></div>
+
+    <div id="bottomNav"></div>
+
+    <div class="modal-overlay hidden" id="modalOverlay"></div>
+  </div>
+
+  <script>
+    (function() {
+      const CONFIG = {
+        cardsPerSession: 10,
+        googleSheetCSVUrl: '',
+        fallbackData: [
+          ['চোর পালালে বুদ্ধি বাড়ে', 'Hindsight is always twenty-twenty', 'Early to bed, early to rise', 'A stitch in time saves nine', 'Actions speak louder than words'],
+          ['অভাবে স্বভাব নষ্ট', 'Poverty corrupts character', 'Money makes the world go round', 'Time and tide wait for none', 'Knowledge is power'],
+          ['যত গর্জে তত বর্ষে না', 'All bark and no bite', 'The early bird catches the worm', 'Every cloud has a silver lining', 'Practice makes perfect'],
+          ['নাচতে না জানলে উঠান বাঁকা', 'A bad workman blames his tools', 'Rome wasn\'t built in a day', 'Honesty is the best policy', 'Laughter is the best medicine'],
+          ['চোরে চোরে মাসতুতো ভাই', 'Birds of a feather flock together', 'Absence makes the heart grow fonder', 'Beauty is in the eye of the beholder', 'Curiosity killed the cat'],
+          ['কাঁচায় না নোয়ালে বাঁশ, পাকলে করে ঠাস ঠাস', 'Strike while the iron is hot', 'Don\'t judge a book by its cover', 'Easy come, easy go', 'Fortune favors the bold'],
+          ['ধান ভানতে শিবের গীত', 'To talk beside the point', 'Better late than never', 'Cleanliness is next to godliness', 'Every dog has its day'],
+          ['যার জ্বালা সেই জানে', 'Only the wearer knows where the shoe pinches', 'A picture is worth a thousand words', 'Blood is thicker than water', 'Don\'t put all your eggs in one basket'],
+          ['খালি কলসি বাজে বেশি', 'Empty vessels make the most noise', 'A watched pot never boils', 'Beggars can\'t be choosers', 'Count your blessings'],
+          ['এক মিথ্যা ঢাকতে আরেক মিথ্যা লাগে', 'One lie leads to another', 'A rolling stone gathers no moss', 'Charity begins at home', 'Discretion is the better part of valor'],
+          ['উলুবনে মুক্তা ছড়ানো', 'Casting pearls before swine', 'A friend in need is a friend indeed', 'Distance makes the heart grow fonder', 'Every rose has its thorn'],
+          ['ভিক্ষার চাল কাঁড়া আর আঁকড়া', 'Beggars can\'t be choosers', 'A leopard cannot change its spots', 'Cowards die many times', 'Silence is golden'],
+          ['যেখানে বাঘের ভয় সেখানে রাত হয়', 'Danger lurks where fear resides', 'A chain is only as strong as its weakest link', 'Familiarity breeds contempt', 'Half a loaf is better than none'],
+          ['গাইতে গাইতে গায়েন', 'Practice makes perfect', 'He who hesitates is lost', 'It takes two to tango', 'The pen is mightier than the sword'],
+          ['শাক দিয়ে মাছ ঢাকা', 'To hide the truth with deception', 'A house divided cannot stand', 'Ignorance is bliss', 'When in Rome, do as the Romans do']
+        ]
+      };
+
+      const appContainer = document.getElementById('appContainer');
+      const mainContent = document.getElementById('mainContent');
+      const bottomNav = document.getElementById('bottomNav');
+      const modalOverlay = document.getElementById('modalOverlay');
+      const headerPlayerName = document.getElementById('headerPlayerName');
+      const headerCardIndex = document.getElementById('headerCardIndex');
+      const headerScore = document.getElementById('headerScore');
+      const headerScoreItem = document.getElementById('headerScoreItem');
+      const headerTimer = document.getElementById('headerTimer');
+
+      const state = {
+        playerName: 'Player 1',
+        phase: 'hub',
+        allProverbs: [],
+        sessionProverbs: [],
+        currentCardIndex: 0,
+        isFlipped: false,
+        quizOrder: [],
+        currentQuizIndex: 0,
+        score: 0,
+        timerSeconds: 0,
+        timerIntervalId: null,
+        isTimerPaused: false,
+        totalInSession: CONFIG.cardsPerSession,
+        swipeStartX: 0, swipeStartY: 0, swipeMoved: false, swipeDistanceX: 0, isSwiping: false,
+      };
+
+      function startTimer() {
+        stopTimer();
+        state.timerSeconds = 0;
+        state.isTimerPaused = false;
+        updateTimerDisplay();
+        state.timerIntervalId = setInterval(() => {
+          if (!state.isTimerPaused) { state.timerSeconds++; updateTimerDisplay(); }
+        }, 1000);
+      }
+      function stopTimer() { if (state.timerIntervalId) { clearInterval(state.timerIntervalId); state.timerIntervalId = null; } }
+      function pauseTimer() { state.isTimerPaused = true; }
+      function resumeTimer() { state.isTimerPaused = false; }
+      function updateTimerDisplay() {
+        const m = Math.floor(state.timerSeconds/60), s = state.timerSeconds%60;
+        headerTimer.textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+      }
+      function formatTime(sec) { const m=Math.floor(sec/60), s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
+
+      async function loadProverbData() {
+        if (CONFIG.googleSheetCSVUrl.trim()) {
+          try {
+            const res = await fetch(CONFIG.googleSheetCSVUrl);
+            if (!res.ok) throw new Error('Network error');
+            const csv = await res.text();
+            const parsed = parseCSV(csv);
+            if (parsed.length >= CONFIG.cardsPerSession) { state.allProverbs = parsed; return; }
+          } catch(e) { console.warn('Google Sheet fetch failed, using fallback.', e); }
+        }
+        state.allProverbs = CONFIG.fallbackData.map(r=>[...r]);
+      }
+      function parseCSV(txt) {
+        const rows = [];
+        txt.trim().split(/\r?\n/).forEach(line => {
+          if(!line.trim()) return;
+          const cols=[]; let cur='', inQ=false;
+          for(let i=0;i<line.length;i++){
+            const ch=line[i];
+            if(ch==='"'){ if(inQ && i+1<line.length && line[i+1]==='"'){ cur+='"'; i++; } else inQ=!inQ; }
+            else if(ch===',' && !inQ){ cols.push(cur.trim()); cur=''; }
+            else cur+=ch;
+          }
+          cols.push(cur.trim());
+          if(cols.length>=5) rows.push([cols[0],cols[1],cols[2],cols[3],cols[4]]);
+        });
+        return rows;
+      }
+      function selectSessionProverbs() {
+        const pool = [...state.allProverbs];
+        for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+        state.sessionProverbs = pool.slice(0, CONFIG.cardsPerSession);
+        state.currentCardIndex=0; state.isFlipped=false; state.score=0; state.currentQuizIndex=0; state.quizOrder=[];
+        state.timerSeconds=0; updateTimerDisplay(); updateHeaderScore(); updateHeaderCardIndex();
+      }
+      function updateHeaderPlayerName() { headerPlayerName.textContent = state.playerName; }
+      function updateHeaderCardIndex() {
+        if(state.phase==='learning') headerCardIndex.textContent = `Card: ${state.currentCardIndex+1}/${state.totalInSession}`;
+        else if(state.phase==='quiz') headerCardIndex.textContent = `Ques: ${state.currentQuizIndex+1}/${state.totalInSession}`;
+        else headerCardIndex.textContent = `--/${state.totalInSession}`;
+      }
+      function updateHeaderScore() {
+        if(state.phase==='quiz'||state.phase==='results'){ headerScoreItem.classList.remove('muted'); headerScore.textContent = `${String(state.score).padStart(2,'0')}/${state.totalInSession}`; }
+        else { headerScoreItem.classList.add('muted'); headerScore.textContent = `--/${state.totalInSession}`; }
+      }
+      function escapeHTML(str){ const d=document.createElement('div'); d.textContent=str; return d.innerHTML; }
+
+      function renderHub() {
+        state.phase='hub'; stopTimer(); state.timerSeconds=0; updateTimerDisplay(); updateHeaderScore(); updateHeaderCardIndex();
+        headerCardIndex.textContent=`--/${state.totalInSession}`; headerScoreItem.classList.add('muted'); headerScore.textContent=`--/${state.totalInSession}`;
+        mainContent.innerHTML=`
+          <div class="hub-screen">
+            <div><div class="hub-title">Proverb<span class="accent">Game</span></div><div class="hub-subtitle">Bengali → English</div></div>
+            <div class="hub-input-group"><label for="playerNameInput">Player Name</label><input type="text" id="playerNameInput" class="hub-input" value="${escapeHTML(state.playerName)}" placeholder="Your name" maxlength="30"/></div>
+            <button class="btn btn-primary btn-lg btn-full" id="btnStartSession">🚀 Start Session</button>
+            <p class="text-muted" style="font-size:0.78rem; max-width:280px;">Learn 10 proverbs, then test your memory.</p>
+          </div>`;
+        bottomNav.innerHTML='';
+        document.getElementById('btnStartSession').addEventListener('click',()=>{
+          const inp=document.getElementById('playerNameInput'); if(inp?.value.trim()) state.playerName=inp.value.trim();
+          updateHeaderPlayerName(); selectSessionProverbs(); renderLearning();
+        });
+        document.getElementById('playerNameInput')?.addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('btnStartSession').click(); });
+      }
+
+      function renderLearning() {
+        state.phase='learning'; state.isFlipped=false; updateHeaderScore(); updateHeaderCardIndex(); startTimer();
+        const proverb=state.sessionProverbs[state.currentCardIndex];
+        mainContent.innerHTML=`
+          <div class="card-stage" id="cardStage"><div class="card-inner" id="cardInner">
+            <div class="card-face card-front"><div class="card-bengali">${escapeHTML(proverb[0])}</div><div class="card-hint">Tap to Reveal English</div></div>
+            <div class="card-face card-back"><div class="card-english">${escapeHTML(proverb[1])}</div></div>
+          </div></div>
+          <div class="swipe-indicator"><span>◀</span> Swipe <span>▶</span></div>
+          <div class="nav-buttons">
+            <button class="btn btn-outline" id="btnPrev" ${state.currentCardIndex===0?'disabled style="opacity:0.4;"':''}>← Previous</button>
+            <button class="btn btn-outline" id="btnNext">Next →</button>
+          </div>`;
+        bottomNav.innerHTML=`<button class="btn btn-danger-zone btn-full" id="btnFinishSession">🏁 Finish Session</button><button class="btn btn-ghost btn-full" id="btnBackToHubLearning">← Back to Hub</button>`;
+        attachCardListeners();
+        document.getElementById('btnPrev').addEventListener('click', ()=>navigateCard(-1));
+        document.getElementById('btnNext').addEventListener('click', ()=>navigateCard(1));
+        document.getElementById('btnFinishSession').addEventListener('click', finishSessionAndStartQuiz);
+        document.getElementById('btnBackToHubLearning').addEventListener('click', ()=>{ if(confirm('Leave learning?')){ stopTimer(); renderHub(); } });
+      }
+      function attachCardListeners(){
+        const card=document.getElementById('cardStage'); if(!card) return;
+        card.addEventListener('pointerdown', onPointerDown); card.addEventListener('pointermove', onPointerMove);
+        card.addEventListener('pointerup', onPointerUp); card.addEventListener('pointercancel', onPointerCancel);
+        card.addEventListener('pointerleave', onPointerCancel);
+        card.addEventListener('touchstart',e=>{ if(e.target.closest('.card-stage')) e.preventDefault(); },{passive:false});
+      }
+      function onPointerDown(e){ state.swipeStartX=e.clientX; state.swipeStartY=e.clientY; state.swipeMoved=false; state.swipeDistanceX=0; state.isSwiping=true; e.target.setPointerCapture(e.pointerId); }
+      function onPointerMove(e){ if(!state.isSwiping) return; const dx=e.clientX-state.swipeStartX, dy=e.clientY-state.swipeStartY; state.swipeDistanceX=dx; if(Math.abs(dx)>8||Math.abs(dy)>8) state.swipeMoved=true; }
+      function onPointerUp(e){
+        if(!state.isSwiping) return; state.isSwiping=false;
+        const absDx=Math.abs(state.swipeDistanceX), absDy=Math.abs(e.clientY-state.swipeStartY);
+        if(state.swipeMoved && absDx>50 && absDx>absDy*1.5){ if(state.swipeDistanceX<-40) navigateCard(1); else if(state.swipeDistanceX>40) navigateCard(-1); }
+        else if(!state.swipeMoved || (absDx<15 && absDy<15)) flipCard();
+        state.swipeDistanceX=0; state.swipeMoved=false; try{e.target.releasePointerCapture(e.pointerId);}catch(ex){}
+      }
+      function onPointerCancel(e){ state.isSwiping=false; state.swipeDistanceX=0; state.swipeMoved=false; try{e.target.releasePointerCapture(e.pointerId);}catch(ex){} }
+      function flipCard(){ if(state.phase!=='learning') return; const inner=document.getElementById('cardInner'); if(!inner) return; state.isFlipped=!state.isFlipped; inner.classList.toggle('flipped', state.isFlipped); }
+      function navigateCard(dir){
+        if(state.phase!=='learning') return; const newIdx=state.currentCardIndex+dir;
+        if(newIdx<0) return; if(newIdx>=state.totalInSession){ finishSessionAndStartQuiz(); return; }
+        state.currentCardIndex=newIdx; state.isFlipped=false; updateHeaderCardIndex(); refreshLearningCard();
+      }
+      function refreshLearningCard(){
+        const p=state.sessionProverbs[state.currentCardIndex]; document.getElementById('cardFront').querySelector('.card-bengali').textContent=p[0];
+        document.getElementById('cardBack').querySelector('.card-english').textContent=p[1];
+        document.getElementById('cardInner').classList.remove('flipped'); state.isFlipped=false;
+        const prev=document.getElementById('btnPrev'), next=document.getElementById('btnNext');
+        if(prev){ if(state.currentCardIndex===0){ prev.disabled=true; prev.style.opacity='0.4'; } else { prev.disabled=false; prev.style.opacity='1'; } }
+        if(next) next.textContent = state.currentCardIndex>=state.totalInSession-1 ? 'Finish →' : 'Next →';
+      }
+      function finishSessionAndStartQuiz(){
+        if(state.phase!=='learning') return;
+        state.quizOrder = [...Array(state.totalInSession).keys()];
+        for(let i=state.quizOrder.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [state.quizOrder[i],state.quizOrder[j]]=[state.quizOrder[j],state.quizOrder[i]]; }
+        state.currentQuizIndex=0; state.score=0; state.phase='quiz'; updateHeaderScore(); updateHeaderCardIndex(); startTimer(); renderQuizQuestion();
+      }
+      function renderQuizQuestion(){
+        if(state.currentQuizIndex>=state.totalInSession){ finishQuiz(); return; }
+        state.phase='quiz'; updateHeaderScore(); updateHeaderCardIndex();
+        const sessionIdx=state.quizOrder[state.currentQuizIndex], p=state.sessionProverbs[sessionIdx];
+        const options=[{text:p[1],correct:true},{text:p[2],correct:false},{text:p[3],correct:false},{text:p[4],correct:false}];
+        for(let i=options.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [options[i],options[j]]=[options[j],options[i]]; }
+        const labels=['A','B','C','D'];
+        mainContent.innerHTML=`
+          <div class="quiz-question-card"><div class="quiz-bengali">${escapeHTML(p[0])}</div></div>
+          <div class="options-list" id="optionsList">${options.map((o,i)=>`<button class="option-btn" data-index="${i}" data-correct="${o.correct}"><span class="opt-label">(${labels[i]})</span><span>${escapeHTML(o.text)}</span></button>`).join('')}</div>`;
+        bottomNav.innerHTML=`<button class="btn btn-ghost btn-full" id="btnBackToHubQuiz">← Back to Hub</button>`;
+        document.querySelectorAll('.option-btn').forEach(b=>b.addEventListener('click',function(){ handleQuizAnswer(this); }));
+        document.getElementById('btnBackToHubQuiz').addEventListener('click',()=>{ if(confirm('Leave quiz?')){ stopTimer(); renderHub(); } });
+      }
+      function handleQuizAnswer(btn){
+        document.querySelectorAll('.option-btn').forEach(b=>b.style.pointerEvents='none');
+        const correct=btn.getAttribute('data-correct')==='true';
+        if(correct){
+          btn.classList.add('correct-flash'); state.score++; updateHeaderScore();
+          setTimeout(()=>{ state.currentQuizIndex++; if(state.currentQuizIndex>=state.totalInSession) finishQuiz(); else renderQuizQuestion(); },600);
+        } else {
+          btn.classList.add('wrong-flash'); pauseTimer(); showErrorModal();
+        }
+      }
+      function showErrorModal(){
+        const p=state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
+        modalOverlay.innerHTML=`<div class="modal-panel"><div class="modal-icon">❌</div><div class="modal-label">Correct Answer</div><div class="modal-bengali">${escapeHTML(p[0])}</div><div class="modal-correct">→ ${escapeHTML(p[1])}</div><button class="btn btn-primary btn-full" id="btnGotIt">👍 Got It</button></div>`;
+        modalOverlay.classList.remove('hidden');
+        document.getElementById('btnGotIt').addEventListener('click',()=>{
+          modalOverlay.classList.add('hidden'); modalOverlay.innerHTML=''; resumeTimer();
+          state.currentQuizIndex++; if(state.currentQuizIndex>=state.totalInSession) finishQuiz(); else renderQuizQuestion();
+        });
+      }
+      function finishQuiz(){
+        state.phase='results'; stopTimer(); updateHeaderScore(); updateHeaderCardIndex(); headerCardIndex.textContent='Complete';
+        const total=state.totalInSession, score=state.score, time=formatTime(state.timerSeconds), perc=Math.round((score/total)*100);
+        let badge='badge-bronze', badgeText='🥉 Keep Practicing', emoji='📚';
+        if(perc>=90){ badge='badge-gold'; badgeText='🥇 Excellent!'; emoji='🏆'; } else if(perc>=70){ badge='badge-silver'; badgeText='🥈 Great Job!'; emoji='🌟'; }
+        mainContent.innerHTML=`<div class="results-screen"><div style="font-size:3rem;">${emoji}</div><div class="results-score">${score}<span class="slash">/</span>${total}</div><span class="results-badge ${badge}">${badgeText}</span><div class="results-detail"><p>⏱️ Time: <strong>${time}</strong></p><p>📊 Accuracy: <strong>${perc}%</strong></p></div></div>`;
+        bottomNav.innerHTML=`<button class="btn btn-primary btn-full btn-lg" id="btnNewSession">🔄 New Session</button><button class="btn btn-ghost btn-full" id="btnBackToHubResults">← Back to Hub</button>`;
+        document.getElementById('btnNewSession').addEventListener('click',()=>{ selectSessionProverbs(); renderLearning(); });
+        document.getElementById('btnBackToHubResults').addEventListener('click', renderHub);
+      }
+
+      async function initApp(){
+        updateHeaderPlayerName(); updateHeaderScore(); updateHeaderCardIndex();
+        headerCardIndex.textContent=`--/${state.totalInSession}`; headerScoreItem.classList.add('muted'); headerScore.textContent=`--/${state.totalInSession}`; updateTimerDisplay();
+        mainContent.innerHTML='<div class="hub-screen"><p style="color:var(--text-secondary);">⏳ Loading proverbs...</p></div>'; bottomNav.innerHTML='';
+        await loadProverbData();
+        if(state.allProverbs.length<CONFIG.cardsPerSession){ mainContent.innerHTML=`<div class="hub-screen"><p style="color:var(--error);">❌ Need at least ${CONFIG.cardsPerSession} proverbs.</p></div>`; return; }
+        renderHub();
+      }
+      initApp();
+    })();
+  </script>
 </body>
 </html>
