@@ -397,6 +397,29 @@
       cursor: pointer;
       position: relative;
     }
+    .card-wrapper {
+  overflow: hidden;
+  width: 100%;
+  max-width: 380px;   /* same as card-stage max-width */
+  position: relative;
+}
+
+.card-stage {
+  /* add this line to the existing .card-stage rule */
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+/* Responsive max-width for wrapper */
+@media (max-width: 380px) {
+  .card-wrapper { max-width: 320px; }
+}
+@media (min-width: 500px) {
+  .card-wrapper { max-width: 440px; }
+}
+@media (min-width: 768px) {
+  .card-wrapper { max-width: 480px; }
+}
     .card-inner {
       width: 100%;
       height: 100%;
@@ -820,6 +843,8 @@
             // … existing properties …
         cardFrontEl: null,   // will hold the front face DIV
         cardBackEl: null,    // will hold the back face DIV
+        isAnimating: false,      // lock during swipe animation
+        cardWrapperEl: null,     // will hold the wrapper element
       };
 
    
@@ -922,20 +947,23 @@ async function loadProverbData() {
 function renderLearning() {
   state.phase = 'learning';
   state.isFlipped = false;
+  state.isAnimating = false;
   updateHeaderScore();
   updateHeaderCardIndex();
   startTimer();
 
   const proverb = state.sessionProverbs[state.currentCardIndex];
   mainContent.innerHTML = `
-    <div class="card-stage" id="cardStage">
-      <div class="card-inner" id="cardInner">
-        <div class="card-face card-front" id="cardFront">
-          <div class="card-bengali">${escapeHTML(proverb[0])}</div>
-          <div class="card-hint">Tap to Reveal English</div>
-        </div>
-        <div class="card-face card-back" id="cardBack">
-          <div class="card-english">${escapeHTML(proverb[1])}</div>
+    <div class="card-wrapper" id="cardWrapper">
+      <div class="card-stage" id="cardStage">
+        <div class="card-inner" id="cardInner">
+          <div class="card-face card-front" id="cardFront">
+            <div class="card-bengali">${escapeHTML(proverb[0])}</div>
+            <div class="card-hint">Tap to Reveal English</div>
+          </div>
+          <div class="card-face card-back" id="cardBack">
+            <div class="card-english">${escapeHTML(proverb[1])}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -946,11 +974,10 @@ function renderLearning() {
     </div>
   `;
 
-  // ✅ Cache the elements immediately
   state.cardFrontEl = document.getElementById('cardFront');
   state.cardBackEl = document.getElementById('cardBack');
+  state.cardWrapperEl = document.getElementById('cardWrapper');
 
-  // Bottom nav
   bottomNav.innerHTML = `
     <button class="btn btn-danger-zone btn-full" id="btnFinishSession">🏁 Finish Session</button>
     <button class="btn btn-ghost btn-full" id="btnBackToHubLearning">← Back to Hub</button>
@@ -981,30 +1008,16 @@ function renderLearning() {
         state.swipeDistanceX=0; state.swipeMoved=false; try{e.target.releasePointerCapture(e.pointerId);}catch(ex){}
       }
       function onPointerCancel(e){ state.isSwiping=false; state.swipeDistanceX=0; state.swipeMoved=false; try{e.target.releasePointerCapture(e.pointerId);}catch(ex){} }
-      function flipCard(){ if(state.phase!=='learning') return; const inner=document.getElementById('cardInner'); if(!inner) return; state.isFlipped=!state.isFlipped; inner.classList.toggle('flipped', state.isFlipped); }
-      function navigateCard(direction) {
-  if (state.phase !== 'learning') return;
-  const newIndex = state.currentCardIndex + direction;
-  if (newIndex < 0) return;
-  if (newIndex >= state.totalInSession) {
-    finishSessionAndStartQuiz();
-    return;
-  }
-  state.currentCardIndex = newIndex;
-  state.isFlipped = false;
-  updateHeaderCardIndex();
-  updateCardContent();   // ← this now actually changes the proverb
-}
+      function flipCard(){  if (state.phase !== 'learning' || state.isAnimating) return;  const inner=document.getElementById('cardInner'); if(!inner) return; state.isFlipped=!state.isFlipped; inner.classList.toggle('flipped', state.isFlipped); }
 
+      
 
- function updateCardContent() {
+function updateCardContent() {
   const proverb = state.sessionProverbs[state.currentCardIndex];
-  // Update the Bengali text inside the cached front element
   if (state.cardFrontEl) {
     const bengaliEl = state.cardFrontEl.querySelector('.card-bengali');
     if (bengaliEl) bengaliEl.textContent = proverb[0];
   }
-  // Update the English text inside the cached back element
   if (state.cardBackEl) {
     const englishEl = state.cardBackEl.querySelector('.card-english');
     if (englishEl) englishEl.textContent = proverb[1];
@@ -1014,7 +1027,7 @@ function renderLearning() {
   if (cardInner) cardInner.classList.remove('flipped');
   state.isFlipped = false;
 
-  // Update Previous/Next button states
+  // Update Previous/Next button states (only after the animation)
   const prevBtn = document.getElementById('btnPrev');
   const nextBtn = document.getElementById('btnNext');
   if (prevBtn) {
@@ -1029,34 +1042,9 @@ function renderLearning() {
   if (nextBtn) {
     nextBtn.textContent = state.currentCardIndex >= state.totalInSession - 1 ? 'Finish →' : 'Next →';
   }
-}     
+}
 
       
-function updateCardContent() {
-    if (!state.cardFrontEl || !state.cardBackEl) return;
-    const proverb = state.sessionProverbs[state.currentCardIndex];
-    // Update the Bengali & English text
-    state.cardFrontEl.querySelector('.card-bengali').textContent = proverb[0];
-    state.cardBackEl.querySelector('.card-english').textContent = proverb[1];
-    // Always reset to front face
-    document.getElementById('cardInner').classList.remove('flipped');
-    state.isFlipped = false;
-    // Update the Previous button state
-    const prevBtn = document.getElementById('btnPrev');
-    const nextBtn = document.getElementById('btnNext');
-    if (prevBtn) {
-        if (state.currentCardIndex === 0) {
-            prevBtn.disabled = true;
-            prevBtn.style.opacity = '0.4';
-        } else {
-            prevBtn.disabled = false;
-            prevBtn.style.opacity = '1';
-        }
-    }
-    if (nextBtn) {
-        nextBtn.textContent = state.currentCardIndex >= state.totalInSession - 1 ? 'Finish →' : 'Next →';
-    }
-}
       function finishSessionAndStartQuiz(){
         if(state.phase!=='learning') return;
         state.quizOrder = [...Array(state.totalInSession).keys()];
