@@ -396,6 +396,8 @@
       aspect-ratio: 1.6 / 1;
       cursor: pointer;
       position: relative;
+      transition: transform 0.3s ease;
+       will-change: transform;
     }
     .card-wrapper {
   overflow: hidden;
@@ -404,11 +406,6 @@
   position: relative;
 }
 
-.card-stage {
-  /* add this line to the existing .card-stage rule */
-  transition: transform 0.3s ease;
-  will-change: transform;
-}
 
 /* Responsive max-width for wrapper */
 @media (max-width: 380px) {
@@ -1009,6 +1006,67 @@ function renderLearning() {
       }
       function onPointerCancel(e){ state.isSwiping=false; state.swipeDistanceX=0; state.swipeMoved=false; try{e.target.releasePointerCapture(e.pointerId);}catch(ex){} }
       function flipCard(){  if (state.phase !== 'learning' || state.isAnimating) return;  const inner=document.getElementById('cardInner'); if(!inner) return; state.isFlipped=!state.isFlipped; inner.classList.toggle('flipped', state.isFlipped); }
+
+
+function navigateCard(direction) {
+  if (state.phase !== 'learning' || state.isAnimating) return;
+  const newIndex = state.currentCardIndex + direction;
+  if (newIndex < 0) return;
+  if (newIndex >= state.totalInSession) {
+    finishSessionAndStartQuiz();
+    return;
+  }
+
+  state.isAnimating = true;
+  const cardStage = document.getElementById('cardStage');
+  if (!cardStage) {
+    state.isAnimating = false;
+    return;
+  }
+
+  // Determine slide-out direction: next (1) → left, previous (-1) → right
+  const exitTranslate = direction > 0 ? '-120%' : '120%';
+  const enterTranslate = direction > 0 ? '120%' : '-120%';
+
+  // Slide current card out
+  cardStage.style.transition = 'transform 0.3s ease';
+  cardStage.style.transform = `translateX(${exitTranslate})`;
+
+  let animating = true;
+
+  const finishAnimation = () => {
+    if (!animating) return;
+    animating = false;
+
+    // Update the proverb index and header
+    state.currentCardIndex = newIndex;
+    updateHeaderCardIndex();
+
+    // Update the card content (text)
+    updateCardContent();
+
+    // Jump the card to the opposite side instantly
+    cardStage.style.transition = 'none';
+    cardStage.style.transform = `translateX(${enterTranslate})`;
+    cardStage.offsetHeight; // force reflow
+
+    // Animate back to center
+    cardStage.style.transition = 'transform 0.3s ease';
+    cardStage.style.transform = 'translateX(0)';
+
+    // Unlock after enter animation completes (with timeout fallback)
+    const unlock = () => {
+      state.isAnimating = false;
+    };
+    cardStage.addEventListener('transitionend', unlock, { once: true });
+    setTimeout(unlock, 350);
+  };
+
+  // Wait for exit slide to finish
+  cardStage.addEventListener('transitionend', finishAnimation, { once: true });
+  setTimeout(finishAnimation, 350); // safety net
+}
+
 
       
 
