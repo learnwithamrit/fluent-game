@@ -772,9 +772,9 @@
     (function() {
       const CONFIG = {
         cardsPerSession: 10,
-        googleSheetCSVUrl: '',
+        googleSheetCSVUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRG7RMIIi7errGd4H44Q36QRzycfvM783pNP8pE6DI5LsNAjczO8klWjiS8Eh6h1szLJqU2XWMW7XZD/pub?gid=0&single=true&output=csv',
         fallbackData: [
-          ['চোর পালালে বুদ্ধি বাড়ে', 'Hindsight is always twenty-twenty', 'Early to bed, early to rise', 'A stitch in time saves nine', 'Actions speak louder than words'],
+          ['চোর পালালে বুদ্ধি বাড়ে', 'Locking the stable door after the horse has bolted', 'Early to bed, early to rise', 'A stitch in time saves nine', 'Actions speak louder than words'],
           ['অভাবে স্বভাব নষ্ট', 'Poverty corrupts character', 'Money makes the world go round', 'Time and tide wait for none', 'Knowledge is power'],
           ['যত গর্জে তত বর্ষে না', 'All bark and no bite', 'The early bird catches the worm', 'Every cloud has a silver lining', 'Practice makes perfect'],
           ['নাচতে না জানলে উঠান বাঁকা', 'A bad workman blames his tools', 'Rome wasn\'t built in a day', 'Honesty is the best policy', 'Laughter is the best medicine'],
@@ -837,18 +837,31 @@
       }
       function formatTime(sec) { const m=Math.floor(sec/60), s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
 
-      async function loadProverbData() {
-        if (CONFIG.googleSheetCSVUrl.trim()) {
-          try {
-            const res = await fetch(CONFIG.googleSheetCSVUrl);
-            if (!res.ok) throw new Error('Network error');
-            const csv = await res.text();
-            const parsed = parseCSV(csv);
-            if (parsed.length >= CONFIG.cardsPerSession) { state.allProverbs = parsed; return; }
-          } catch(e) { console.warn('Google Sheet fetch failed, using fallback.', e); }
-        }
-        state.allProverbs = CONFIG.fallbackData.map(r=>[...r]);
+async function loadProverbData() {
+  if (CONFIG.googleSheetCSVUrl && CONFIG.googleSheetCSVUrl.trim() !== '') {
+    try {
+      const res = await fetch(CONFIG.googleSheetCSVUrl);
+      if (!res.ok) throw new Error('Network error');
+      const csv = await res.text();
+      const parsed = parseCSV(csv);
+
+      // ✅ Skip header row if the first cell equals "Bengali" (case-insensitive)
+      if (parsed.length > 0 && parsed[0][0].toLowerCase() === 'bengali') {
+        parsed.shift(); // remove the header row
       }
+
+      if (parsed.length >= CONFIG.cardsPerSession) {
+        state.allProverbs = parsed;
+        console.log(`✅ Loaded ${parsed.length} proverbs from Google Sheets`);
+        return;
+      }
+    } catch (e) {
+      console.warn('Google Sheet fetch failed, using fallback.', e);
+    }
+  }
+  // Fallback – no header row, so no shift needed
+  state.allProverbs = CONFIG.fallbackData.map(r => [...r]);
+}
       function parseCSV(txt) {
         const rows = [];
         txt.trim().split(/\r?\n/).forEach(line => {
