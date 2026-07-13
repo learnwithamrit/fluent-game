@@ -945,7 +945,11 @@ async function loadProverbData() {
     }
   }
   // Fallback – no header row, so no shift needed
-  state.allProverbs = CONFIG.fallbackData.map(r => [...r]);
+  state.allProverbs = CONFIG.fallbackData.map(item => ({
+  bengali: [...item.bengali],
+  english: [...item.english],
+  distractors: [...item.distractors]
+}));
 }
 function parseCSV(txt) {
   const rows = [];
