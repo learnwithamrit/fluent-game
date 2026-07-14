@@ -1019,6 +1019,8 @@ function parseCSV(txt) {
         else { headerScoreItem.classList.add('muted'); headerScore.textContent = `--/${state.totalInSession}`; }
       }
       function escapeHTML(str){ const d=document.createElement('div'); d.textContent=str; return d.innerHTML; }
+      function formatVariantList(variants) {
+      return variants.map(v => '• ' + escapeHTML(v)).join('<br>');}
 
       function renderHub() {
         state.phase='hub'; stopTimer(); state.timerSeconds=0; updateTimerDisplay(); updateHeaderScore(); updateHeaderCardIndex();
@@ -1052,11 +1054,11 @@ function renderLearning() {
       <div class="card-stage" id="cardStage">
         <div class="card-inner" id="cardInner">
           <div class="card-face card-front" id="cardFront">
-            <div class="card-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
+            <div class="card-bengali">${formatVariantList(proverb.bengali)}</div>
             <div class="card-hint">Tap to Reveal English</div>
           </div>
           <div class="card-face card-back" id="cardBack">
-            <div class="card-english">${escapeHTML(proverb.english.join(' • '))}</div>
+            <div class="card-english">${formatVariantList(proverb.english)}</div>
           </div>
         </div>
       </div>
@@ -1173,13 +1175,13 @@ function updateCardContent() {
   // Update Bengali side
   if (state.cardFrontEl) {
     const bengaliEl = state.cardFrontEl.querySelector('.card-bengali');
-    if (bengaliEl) bengaliEl.textContent = proverb.bengali.join(' • ');
+    if (bengaliEl) bengaliEl.innerHTML = formatVariantList(proverb.bengali);
   }
   
   // Update English side
   if (state.cardBackEl) {
     const englishEl = state.cardBackEl.querySelector('.card-english');
-    if (englishEl) englishEl.textContent = proverb.english.join(' • ');
+    if (englishEl) englishEl.innerHTML = formatVariantList(proverb.english);
   }
   
   // Always flip back to front
@@ -1248,7 +1250,7 @@ function renderQuizQuestion() {
 
   mainContent.innerHTML = `
     <div class="quiz-question-card">
-      <div class="quiz-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
+      <div class="quiz-bengali">${formatVariantList(proverb.bengali)}</div>
     </div>
     <div class="options-list" id="optionsList">
       ${options.map((opt, i) => `
@@ -1317,8 +1319,8 @@ function showErrorModal() {
     <div class="modal-panel">
       <div class="modal-icon">❌</div>
       <div class="modal-label">Correct Answer(s)</div>
-      <div class="modal-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
-      <div class="modal-correct">→ ${escapeHTML(proverb.english.join(' • '))}</div>
+         <div class="modal-bengali">${formatVariantList(proverb.bengali)}</div>
+          <div class="modal-correct">→ ${formatVariantList(proverb.english)}</div>
       <button class="btn btn-primary btn-full" id="btnGotIt">👍 Got It</button>
     </div>
   `;
