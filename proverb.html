@@ -1374,7 +1374,7 @@ function showErrorModal() {
         let badge='badge-bronze', badgeText='🥉 Keep Practicing', emoji='📚';
         if(perc>=90){ badge='badge-gold'; badgeText='🥇 Excellent!'; emoji='🏆'; } else if(perc>=70){ badge='badge-silver'; badgeText='🥈 Great Job!'; emoji='🌟'; }
         mainContent.innerHTML=`<div class="results-screen"><div style="font-size:3rem;">${emoji}</div><div class="results-score">${score}<span class="slash">/</span>${total}</div><span class="results-badge ${badge}">${badgeText}</span><div class="results-detail"><p>⏱️ Time: <strong>${time}</strong></p><p>📊 Accuracy: <strong>${perc}%</strong></p></div></div>`;
-        bottomNav.innerHTML=`<button class="btn btn-primary btn-full btn-lg" id="btnNewSession">🔄 New Session</button><button class="btn btn-ghost btn-full" id="btnBackToHubResults">← Back to Hub</button>`;
+        bottomNav.innerHTML=`<button class="btn btn-primary btn-full btn-lg" id="btnNewSession">📚 Learn a few more</button><button class="btn btn-ghost btn-full" id="btnBackToHubResults">← Back to Hub</button>`;
         document.getElementById('btnNewSession').addEventListener('click',()=>{ selectSessionProverbs(); renderLearning(); });
         document.getElementById('btnBackToHubResults').addEventListener('click', renderHub);
       }
