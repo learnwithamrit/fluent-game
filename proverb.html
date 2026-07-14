@@ -955,7 +955,8 @@ function parseCSV(txt) {
   const rows = [];
   txt.trim().split(/\r?\n/).forEach(line => {
     if (!line.trim()) return;
-    const cols = []; let cur = '', inQ = false;
+    const cols = [];
+    let cur = '', inQ = false;
     for (let i = 0; i < line.length; i++) {
       const ch = line[i];
       if (ch === '"') {
@@ -966,11 +967,11 @@ function parseCSV(txt) {
     }
     cols.push(cur.trim());
     if (cols.length >= 5) {
-      // ✅ Split Bengali (col 0) and English (col 1) by ";"
+      // Split Bengali (col 0) and English (col 1) by ";"
       const bengali = cols[0].split(';').map(s => s.trim()).filter(Boolean);
       const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
       rows.push({
-        bengali: bengali.length ? bengali : [cols[0]],   // fallback if no delimiter
+        bengali: bengali.length ? bengali : [cols[0]],   // fallback if empty
         english: english.length ? english : [cols[1]],
         distractors: [cols[2], cols[3], cols[4]]
       });
