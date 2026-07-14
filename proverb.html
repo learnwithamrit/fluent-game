@@ -925,36 +925,57 @@
 async function loadProverbData() {
   if (CONFIG.googleSheetCSVUrl && CONFIG.googleSheetCSVUrl.trim() !== '') {
     try {
+      console.log('📡 Fetching Google Sheet…');
       const res = await fetch(CONFIG.googleSheetCSVUrl);
-      if (!res.ok) throw new Error('Network error');
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       const csv = await res.text();
-      const parsed = parseCSV(csv);
+      console.log('📄 CSV received, first 150 chars:', csv.substring(0, 150));
 
-      // ✅ Skip header row if the first cell equals "Bengali" (case-insensitive)
-      if (parsed.length > 0 && parsed[0][0].toLowerCase() === 'bengali') {
-        parsed.shift(); // remove the header row
+      const parsed = parseCSV(csv);
+      console.log('🔢 Parsed rows:', parsed.length);
+
+      // Skip header row if present (robust check)
+      if (parsed.length > 0) {
+        const firstRow = parsed[0];
+        // Safely get the first Bengali value, whether object or array
+        let firstCell = undefined;
+        if (firstRow.bengali) {
+          firstCell = firstRow.bengali[0];
+        } else if (Array.isArray(firstRow)) {
+          firstCell = firstRow[0];
+        }
+        if (firstCell && firstCell.toLowerCase() === 'bengali') {
+          console.log('⚠️ Header row detected, removing.');
+          parsed.shift();
+          console.log('🔢 Rows after header removal:', parsed.length);
+        }
       }
 
       if (parsed.length >= CONFIG.cardsPerSession) {
         state.allProverbs = parsed;
         console.log(`✅ Loaded ${parsed.length} proverbs from Google Sheets`);
         return;
+      } else {
+        console.warn(`⚠️ Not enough proverbs (got ${parsed.length}, need ${CONFIG.cardsPerSession}). Falling back.`);
       }
     } catch (e) {
-      console.warn('Google Sheet fetch failed, using fallback.', e);
+      console.warn('❌ Google Sheet fetch failed:', e.message);
     }
   }
-  // Fallback – no header row, so no shift needed
+
+  // Fallback – use built‑in data (object format)
+  console.log('🔄 Using fallback data.');
   state.allProverbs = CONFIG.fallbackData.map(item => ({
-  bengali: [...item.bengali],
-  english: [...item.english],
-  distractors: [...item.distractors]
-}));
+    bengali: [...item.bengali],
+    english: [...item.english],
+    distractors: [...item.distractors]
+  }));
 }
 function parseCSV(txt) {
   const rows = [];
-  txt.trim().split(/\r?\n/).forEach(line => {
-    if (!line.trim()) return;
+  const lines = txt.trim().split(/\r?\n/);
+  for (const line of lines) {
+    if (!line.trim()) continue; // skip blank lines
     const cols = [];
     let cur = '', inQ = false;
     for (let i = 0; i < line.length; i++) {
@@ -966,17 +987,18 @@ function parseCSV(txt) {
       else cur += ch;
     }
     cols.push(cur.trim());
+
+    // Only process rows that have at least 5 columns
     if (cols.length >= 5) {
-      // Split Bengali (col 0) and English (col 1) by ";"
       const bengali = cols[0].split(';').map(s => s.trim()).filter(Boolean);
       const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
       rows.push({
-        bengali: bengali.length ? bengali : [cols[0]],   // fallback if empty
+        bengali: bengali.length ? bengali : [cols[0]],
         english: english.length ? english : [cols[1]],
         distractors: [cols[2], cols[3], cols[4]]
       });
     }
-  });
+  }
   return rows;
 }
       function selectSessionProverbs() {
