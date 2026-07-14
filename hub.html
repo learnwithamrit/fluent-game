@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fluent — by Amrit</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<meta name="theme-color" content="#ff8906">
+<meta name="description" content="Fluent by Amrit — interactive English learning games for students. Word puzzles, vocabulary quiz, story reading and proverbs.">
+<style>
+:root{
+  --bg:#0d0d1a;--sur:#161628;--sur2:#1e1e38;--brd:#2e2e52;
+  --txt:#e8e8f0;--mut:#7070a0;--acc:#ff8906;--ac2:#f9c74f;
+  --grn:#06d6a0;--red:#ef4565;--blu:#3da9fc;--pur:#9b72cf;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:'Segoe UI',system-ui,sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;overflow-x:hidden;
+}
+
+/* ── NAME SCREEN ── */
+#nameScreen{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:100vh;
+  padding:32px 24px;text-align:center;gap:0;
+}
+.ns-avatar{
+  width:110px;height:110px;border-radius:50%;
+  border:3px solid var(--acc);
+  box-shadow:0 0 24px #ff890644;
+  margin-bottom:14px;object-fit:cover;
+}
+.ns-title{
+  font-size:2rem;font-weight:900;color:var(--acc);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;
+}
+.ns-by{
+  font-size:1rem;color:var(--txt);font-weight:700;
+  letter-spacing:1px;margin-bottom:32px;opacity:.85;
+}
+.ns-label{
+  font-size:0.9rem;color:var(--mut);font-weight:700;
+  margin-bottom:10px;letter-spacing:.5px;
+}
+.ns-input{
+  background:var(--sur);border:2px solid var(--brd);
+  border-radius:14px;padding:14px 20px;font-size:1.05rem;
+  color:var(--txt);width:100%;max-width:320px;
+  outline:none;text-align:center;transition:border .2s;
+}
+.ns-input:focus{border-color:var(--acc);}
+.ns-input::placeholder{color:var(--mut);}
+.ns-btn{
+  margin-top:18px;background:var(--acc);color:#0d0d1a;
+  border:none;border-radius:14px;padding:14px 40px;
+  font-size:1.05rem;font-weight:900;cursor:pointer;
+  letter-spacing:.5px;transition:all .2s;
+  max-width:320px;width:100%;
+}
+.ns-btn:hover{background:#ffaa30;transform:translateY(-2px);}
+.ns-note{
+  font-size:0.72rem;color:var(--mut);
+  margin-top:16px;line-height:1.7;max-width:300px;
+}
+.feedback-link{
+  font-size:0.62rem;color:var(--mut);text-align:center;
+  text-decoration:none;max-width:280px;line-height:1.6;
+  display:block;margin-top:12px;transition:color .2s;
+}
+.feedback-link:hover{color:var(--acc);}
+
+/* ── HUB SCREEN ── */
+#hubScreen{
+  display:none;flex-direction:column;align-items:center;
+  min-height:100vh;padding:32px 20px 48px;
+  width:100%;max-width:480px;margin:0 auto;
+}
+.hub-header{text-align:center;margin-bottom:24px;}
+.hub-greeting{
+  font-size:0.85rem;color:var(--mut);
+  font-weight:700;letter-spacing:.5px;margin-bottom:4px;
+}
+.hub-title{
+  font-size:1.6rem;font-weight:900;
+  color:var(--acc);letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:3px;
+}
+.hub-sub{font-size:0.72rem;color:var(--mut);}
+
+.hub-section-label{
+  font-size:0.6rem;color:var(--mut);font-weight:800;
+  letter-spacing:1.5px;text-transform:uppercase;
+  align-self:flex-start;margin-bottom:10px;margin-top:4px;
+  width:100%;
+}
+.hub-cards{
+  display:flex;flex-direction:column;
+  gap:12px;width:100%;margin-bottom:24px;
+}
+.hub-card{
+  background:var(--sur);
+  border:2px solid var(--brd);
+  border-radius:18px;padding:18px 16px;
+  cursor:pointer;transition:all .22s;
+  display:flex;align-items:center;gap:16px;
+  text-align:left;
+  box-shadow:0 4px 16px #00000033;
+  position:relative;overflow:hidden;
+}
+.hub-card::before{
+  content:'';position:absolute;
+  inset:0;opacity:0;transition:opacity .22s;
+  border-radius:16px;
+}
+.hub-card:hover::before,.hub-card:active::before{opacity:1;}
+.hub-card:hover,.hub-card:active{
+  transform:translateY(-2px);
+  box-shadow:0 8px 28px #00000044;
+}
+/* individual card colours */
+.hub-card.puzzle{border-color:#ff890655;}
+.hub-card.puzzle:hover{border-color:var(--acc);}
+.hub-card.puzzle::before{background:linear-gradient(135deg,#ff890608,transparent);}
+
+.hub-card.quiz{border-color:#3da9fc55;}
+.hub-card.quiz:hover{border-color:var(--blu);}
+.hub-card.quiz::before{background:linear-gradient(135deg,#3da9fc08,transparent);}
+
+.hub-card.story{border-color:#06d6a055;}
+.hub-card.story:hover{border-color:var(--grn);}
+.hub-card.story::before{background:linear-gradient(135deg,#06d6a008,transparent);}
+
+.hub-card.proverb{border-color:#9b72cf55;}
+.hub-card.proverb:hover{border-color:var(--pur);}
+.hub-card.proverb::before{background:linear-gradient(135deg,#9b72cf08,transparent);}
+
+.hub-card-icon{width:48px;height:48px;flex-shrink:0;}
+.hub-card-info{flex:1;}
+.hub-card-label{
+  font-size:1rem;font-weight:900;
+  color:var(--txt);margin-bottom:3px;
+}
+.hub-card-desc{font-size:0.7rem;color:var(--mut);line-height:1.5;}
+.hub-card-arrow{
+  font-size:1.1rem;color:var(--brd);
+  flex-shrink:0;transition:color .22s,transform .22s;
+}
+.hub-card:hover .hub-card-arrow{
+  color:var(--mut);transform:translateX(3px);
+}
+
+/* badge on card */
+.hub-card-badge{
+  position:absolute;top:10px;right:12px;
+  font-size:0.5rem;font-weight:900;
+  letter-spacing:.8px;text-transform:uppercase;
+  background:var(--sur2);border:1px solid var(--brd);
+  border-radius:6px;padding:2px 6px;color:var(--mut);
+}
+
+/* ── FOOTER ── */
+.hub-footer{
+  margin-top:auto;text-align:center;
+  padding-top:16px;
+}
+.hub-footer-name{
+  font-size:0.65rem;color:var(--mut);
+  margin-bottom:6px;
+}
+
+/* ── RESPONSIVE ── */
+@media(min-width:768px){
+  #nameScreen{padding:48px 32px;}
+  .ns-avatar{width:130px;height:130px;}
+  .ns-title{font-size:2.4rem;}
+  .ns-by{font-size:1.2rem;}
+  .ns-input{font-size:1.15rem;max-width:380px;}
+  .ns-btn{font-size:1.1rem;max-width:380px;}
+
+  #hubScreen{max-width:560px;padding:40px 28px 56px;}
+  .hub-title{font-size:1.9rem;}
+  .hub-card{padding:20px 18px;gap:18px;}
+  .hub-card-icon{width:54px;height:54px;}
+  .hub-card-label{font-size:1.05rem;}
+  .hub-card-desc{font-size:0.75rem;}
+}
+@media(min-width:1024px){
+  body{padding-top:24px;}
+  #hubScreen{max-width:600px;padding:48px 32px 64px;}
+  .hub-title{font-size:2rem;letter-spacing:3px;}
+  .hub-greeting{font-size:0.9rem;}
+  .hub-card{padding:22px 20px;border-radius:20px;}
+  .hub-card-icon{width:58px;height:58px;}
+  .hub-card-label{font-size:1.1rem;}
+  .hub-card-desc{font-size:0.78rem;}
+  .hub-card-arrow{font-size:1.2rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAME SCREEN -->
+<div id="nameScreen">
+  <img class="ns-avatar" src="icon-180.png" alt="Amrit">
+  <div class="ns-title">Fluent</div>
+  <div class="ns-by">by Amrit</div>
+  <div class="ns-label">What is your name?</div>
+  <input class="ns-input" id="nameInput" type="text"
+    placeholder="Type your name here…"
+    maxlength="40" autocomplete="off">
+  <button class="ns-btn" onclick="startHub()">Let's Go →</button>
+  <div class="ns-note">
+    Interactive English learning games.<br>
+    Pick a game and start learning today!
+  </div>
+  <a href="mailto:ilearnwithamrit@gmail.com" class="feedback-link">
+    Have feedback? Write to ilearnwithamrit@gmail.com
+  </a>
+</div>
+
+<!-- HUB SCREEN -->
+<div id="hubScreen">
+  <div class="hub-header">
+    <div class="hub-greeting" id="hubGreeting">Welcome!</div>
+    <div class="hub-title">Fluent</div>
+    <div class="hub-sub">by Amrit · Choose a game to play</div>
+  </div>
+
+  <div class="hub-section-label">🎮 Games</div>
+
+  <div class="hub-cards">
+
+    <!-- Word Puzzle -->
+    <div class="hub-card puzzle" onclick="goTo('puzzle.html')">
+      <svg class="hub-card-icon" viewBox="0 0 52 52" fill="none">
+        <circle cx="26" cy="26" r="25" stroke="#ff8906" stroke-width="2" fill="#161628"/>
+        <circle cx="26" cy="10" r="3.5" fill="#ff8906"/>
+        <circle cx="40" cy="20" r="3.5" fill="#ff8906"/>
+        <circle cx="40" cy="36" r="3.5" fill="#ff8906"/>
+        <circle cx="26" cy="44" r="3.5" fill="#ff8906"/>
+        <circle cx="12" cy="36" r="3.5" fill="#ff8906"/>
+        <circle cx="12" cy="20" r="3.5" fill="#ff8906"/>
+        <circle cx="26" cy="26" r="5" fill="#ff8906" opacity="0.9"/>
+        <line x1="26" y1="13.5" x2="26" y2="21" stroke="#ff890688" stroke-width="1.5"/>
+        <line x1="38" y1="22.5" x2="31" y2="24" stroke="#ff890688" stroke-width="1.5"/>
+        <line x1="38" y1="33.5" x2="31" y2="28" stroke="#ff890688" stroke-width="1.5"/>
+        <line x1="26" y1="40.5" x2="26" y2="31" stroke="#ff890688" stroke-width="1.5"/>
+        <line x1="14" y1="33.5" x2="21" y2="28" stroke="#ff890688" stroke-width="1.5"/>
+        <line x1="14" y1="22.5" x2="21" y2="24" stroke="#ff890688" stroke-width="1.5"/>
+      </svg>
+      <div class="hub-card-info">
+        <div class="hub-card-label" style="color:var(--acc)">Word Puzzle</div>
+        <div class="hub-card-desc">Build sentences level by level.<br>Connect the dots, grow your fluency.</div>
+      </div>
+      <div class="hub-card-arrow">›</div>
+    </div>
+
+    <!-- Quiz -->
+    <div class="hub-card quiz" onclick="goTo('quiz.html')">
+      <svg class="hub-card-icon" viewBox="0 0 52 52" fill="none">
+        <rect x="2" y="2" width="48" height="48" rx="14" stroke="#3da9fc" stroke-width="2" fill="#161628"/>
+        <text x="26" y="20" text-anchor="middle" font-size="11" font-weight="900"
+          fill="#3da9fc" font-family="Segoe UI,sans-serif">MCQ</text>
+        <rect x="10" y="26" width="32" height="3.5" rx="1.75" fill="#3da9fc" opacity="0.3"/>
+        <rect x="10" y="32" width="24" height="3.5" rx="1.75" fill="#3da9fc" opacity="0.3"/>
+        <rect x="10" y="38" width="28" height="3.5" rx="1.75" fill="#3da9fc" opacity="0.3"/>
+        <circle cx="42" cy="10" r="7" fill="#ff8906"/>
+        <text x="42" y="14" text-anchor="middle" font-size="11" font-weight="900"
+          fill="#0d0d1a" font-family="Segoe UI,sans-serif">?</text>
+      </svg>
+      <div class="hub-card-info">
+        <div class="hub-card-label" style="color:var(--blu)">Quiz</div>
+        <div class="hub-card-desc">Test your vocabulary with MCQs.<br>10 pts for first try · 5 pts for second.</div>
+      </div>
+      <div class="hub-card-arrow">›</div>
+    </div>
+
+    <!-- Story Game -->
+    <div class="hub-card story" onclick="goTo('story.html')">
+      <svg class="hub-card-icon" viewBox="0 0 52 52" fill="none">
+        <rect x="2" y="2" width="48" height="48" rx="14" stroke="#06d6a0" stroke-width="2" fill="#161628"/>
+        <rect x="10" y="12" width="32" height="3.5" rx="1.75" fill="#06d6a0" opacity="0.9"/>
+        <rect x="10" y="19" width="28" height="3" rx="1.5" fill="#06d6a0" opacity="0.5"/>
+        <rect x="10" y="25" width="30" height="3" rx="1.5" fill="#06d6a0" opacity="0.5"/>
+        <rect x="10" y="31" width="20" height="3" rx="1.5" fill="#06d6a0" opacity="0.5"/>
+        <rect x="12" y="38" width="18" height="7" rx="3.5" fill="#06d6a0" opacity="0.9"/>
+        <text x="21" y="44" text-anchor="middle" font-size="6.5" font-weight="900"
+          fill="#0d0d1a" font-family="Segoe UI,sans-serif">WORD</text>
+      </svg>
+      <div class="hub-card-info">
+        <div class="hub-card-label" style="color:var(--grn)">Story Game</div>
+        <div class="hub-card-desc">Read stories with highlighted words.<br>Tap any pill to explore its meaning.</div>
+      </div>
+      <div class="hub-card-arrow">›</div>
+    </div>
+
+    <!-- Proverb Game -->
+    <div class="hub-card proverb" onclick="goTo('proverb.html')">
+      <svg class="hub-card-icon" viewBox="0 0 52 52" fill="none">
+        <rect x="2" y="2" width="48" height="48" rx="14" stroke="#9b72cf" stroke-width="2" fill="#161628"/>
+        <!-- Open quote mark -->
+        <text x="10" y="28" font-size="28" font-weight="900"
+          fill="#9b72cf" font-family="Georgia,serif" opacity="0.9">"</text>
+        <!-- Small lines suggesting text -->
+        <rect x="24" y="18" width="18" height="3" rx="1.5" fill="#9b72cf" opacity="0.4"/>
+        <rect x="24" y="24" width="14" height="3" rx="1.5" fill="#9b72cf" opacity="0.4"/>
+        <rect x="24" y="30" width="16" height="3" rx="1.5" fill="#9b72cf" opacity="0.4"/>
+        <!-- Small star/sparkle -->
+        <circle cx="40" cy="38" r="5" fill="#ff8906"/>
+        <text x="40" y="41.5" text-anchor="middle" font-size="8"
+          fill="#0d0d1a" font-family="Segoe UI,sans-serif">★</text>
+      </svg>
+      <div class="hub-card-info">
+        <div class="hub-card-label" style="color:var(--pur)">Proverb Game</div>
+        <div class="hub-card-desc">Learn English proverbs and their meanings.<br>Wisdom through play.</div>
+      </div>
+      <div class="hub-card-arrow">›</div>
+      <div class="hub-card-badge">Coming Soon</div>
+    </div>
+
+  </div>
+
+  <div class="hub-footer">
+    <div class="hub-footer-name">
+      Not you? <span onclick="switchUser()"
+        style="color:var(--acc);cursor:pointer;text-decoration:underline;">Switch user</span>
+    </div>
+    <a href="mailto:ilearnwithamrit@gmail.com" class="feedback-link">
+      Have feedback? Write to ilearnwithamrit@gmail.com
+    </a>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let playerName = '';
+
+// ═══════════════════════════════════════════
+//  BOOT — check if returning from a game
+// ═══════════════════════════════════════════
+window.addEventListener('load', ()=>{
+  const params = new URLSearchParams(window.location.search);
+  const incoming = params.get('name');
+
+  if(incoming){
+    // Returning from a game — go straight to hub
+    playerName = decodeURIComponent(incoming);
+    showHub();
+  } else {
+    // Fresh visit — show name entry
+    document.getElementById('nameScreen').style.display = 'flex';
+    document.getElementById('nameInput').addEventListener('keydown', e=>{
+      if(e.key === 'Enter') startHub();
+    });
+  }
+});
+
+// ═══════════════════════════════════════════
+//  NAME ENTRY → HUB
+// ═══════════════════════════════════════════
+function startHub(){
+  const n = document.getElementById('nameInput').value.trim();
+  if(!n){ document.getElementById('nameInput').focus(); return; }
+  playerName = n;
+  showHub();
+}
+
+function showHub(){
+  document.getElementById('nameScreen').style.display = 'none';
+  document.getElementById('hubScreen').style.display  = 'flex';
+  document.getElementById('hubGreeting').textContent  = 'Hi, ' + playerName + '!';
+  // Clean the URL so refreshing doesn't re-use the old param
+  window.history.replaceState({}, '', 'hub.html');
+}
+
+// ═══════════════════════════════════════════
+//  NAVIGATE TO GAME
+// ═══════════════════════════════════════════
+function goTo(page){
+  // Proverb game not built yet
+  if(page === 'proverb.html'){
+    alert('Proverb Game is coming soon! Stay tuned. 🌟');
+    return;
+  }
+  window.location.href = page + '?name=' + encodeURIComponent(playerName);
+}
+
+// ═══════════════════════════════════════════
+//  SWITCH USER
+// ═══════════════════════════════════════════
+function switchUser(){
+  playerName = '';
+  document.getElementById('hubScreen').style.display  = 'none';
+  document.getElementById('nameScreen').style.display = 'flex';
+  document.getElementById('nameInput').value = '';
+  document.getElementById('nameInput').focus();
+}
+</script>
+</body>
+</html>
