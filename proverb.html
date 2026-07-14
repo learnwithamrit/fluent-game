@@ -880,6 +880,7 @@
       const headerScore = document.getElementById('headerScore');
       const headerScoreItem = document.getElementById('headerScoreItem');
       const headerTimer = document.getElementById('headerTimer');
+      
 
       const state = {
         playerName: 'Player 1',
@@ -901,6 +902,7 @@
         cardBackEl: null,    // will hold the back face DIV
         isAnimating: false,      // lock during swipe animation
         cardWrapperEl: null,     // will hold the wrapper element
+        remainingPool: [],
       };
 
    
@@ -953,6 +955,7 @@ async function loadProverbData() {
 
       if (parsed.length >= CONFIG.cardsPerSession) {
         state.allProverbs = parsed;
+        state.remainingPool = [...parsed]; 
         console.log(`✅ Loaded ${parsed.length} proverbs from Google Sheets`);
         return;
       } else {
@@ -969,7 +972,7 @@ async function loadProverbData() {
     bengali: [...item.bengali],
     english: [...item.english],
     distractors: [...item.distractors]
-  }));
+  })); state.remainingPool = [...state.allProverbs]; 
 }
 function parseCSV(txt) {
   const rows = [];
@@ -1001,13 +1004,38 @@ function parseCSV(txt) {
   }
   return rows;
 }
-      function selectSessionProverbs() {
-        const pool = [...state.allProverbs];
-        for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
-        state.sessionProverbs = pool.slice(0, CONFIG.cardsPerSession);
-        state.currentCardIndex=0; state.isFlipped=false; state.score=0; state.currentQuizIndex=0; state.quizOrder=[];
-        state.timerSeconds=0; updateTimerDisplay(); updateHeaderScore(); updateHeaderCardIndex();
-      }
+
+
+function selectSessionProverbs() {
+  // If not enough left, refill the pool
+  if (state.remainingPool.length < CONFIG.cardsPerSession) {
+    state.remainingPool = [...state.allProverbs];
+  }
+
+  // Shuffle the remaining pool
+  const shuffled = [...state.remainingPool];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  // Take the first 10 and remove them from the pool
+  state.sessionProverbs = shuffled.slice(0, CONFIG.cardsPerSession);
+  state.remainingPool = shuffled.slice(CONFIG.cardsPerSession);
+
+  // Reset session state
+  state.currentCardIndex = 0;
+  state.isFlipped = false;
+  state.score = 0;
+  state.currentQuizIndex = 0;
+  state.quizOrder = [];
+  state.timerSeconds = 0;
+  updateTimerDisplay();
+  updateHeaderScore();
+  updateHeaderCardIndex();
+}
+
+      
       function updateHeaderPlayerName() { headerPlayerName.textContent = state.playerName; }
       function updateHeaderCardIndex() {
         if(state.phase==='learning') headerCardIndex.textContent = `Card: ${state.currentCardIndex+1}/${state.totalInSession}`;
