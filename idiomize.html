@@ -1347,21 +1347,30 @@ function showErrorModal(proverb) {
         document.getElementById('btnBackToHubResults').addEventListener('click', renderHub);
       }
 
-      async function initApp(){
-        updateHeaderPlayerName(); updateHeaderScore(); updateHeaderCardIndex();
-        headerCardIndex.textContent=`--/${state.totalInSession}`; headerScoreItem.classList.add('muted'); headerScore.textContent=`--/${state.totalInSession}`; updateTimerDisplay();
-        mainContent.innerHTML='<div class="hub-screen"><p style="color:var(--text-secondary);">⏳ Loading proverbs...</p></div>'; bottomNav.innerHTML='';
-        await loadProverbData();
-        if (parsed.length > 0) {
-  const first = parsed[0];
-  const firstCell = first.bengali?.[0] ?? first[0];
-  if (firstCell?.toLowerCase() === 'bengali') {
-    parsed.shift();
-    console.log('Header row removed');
+
+async function initApp() {
+  updateHeaderPlayerName();
+  updateHeaderScore();
+  updateHeaderCardIndex();
+  headerCardIndex.textContent = `--/${state.totalInSession}`;
+  headerScoreItem.classList.add('muted');
+  headerScore.textContent = `--/${state.totalInSession}`;
+  updateTimerDisplay();
+
+  mainContent.innerHTML = '<div class="hub-screen"><p style="color:var(--text-secondary);">⏳ Loading data…</p></div>';
+  bottomNav.innerHTML = '';
+
+  await loadProverbData();   // header skip and parsing already happen inside this function
+
+  if (state.allProverbs.length < CONFIG.cardsPerSession) {
+    mainContent.innerHTML = `<div class="hub-screen"><p style="color:var(--error);">❌ Need at least ${CONFIG.cardsPerSession} entries.</p></div>`;
+    return;
   }
+
+  renderHub();
 }
-      initApp();
-    })();
+
+      
   </script>
 </body>
 </html>
