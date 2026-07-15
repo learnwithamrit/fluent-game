@@ -321,7 +321,25 @@ body{
       <div class="hub-card-arrow">›</div>
       <div class="hub-card-badge">Coming Soon</div>
     </div>
-
+    <!-- Idiomize -->
+<div class="hub-card" style="border-color:#ef456555;" onclick="goTo('idiomize.html')">
+  <svg class="hub-card-icon" viewBox="0 0 52 52" fill="none">
+    <rect x="2" y="2" width="48" height="48" rx="14" stroke="#ef4565" stroke-width="2" fill="#161628"/>
+    <!-- Speech bubble shape -->
+    <path d="M10 14 Q10 10 14 10 L38 10 Q42 10 42 14 L42 30 Q42 34 38 34 L28 34 L22 42 L22 34 L14 34 Q10 34 10 30 Z"
+      fill="none" stroke="#ef4565" stroke-width="2" opacity="0.9"/>
+    <!-- Idiom dots suggesting expression -->
+    <circle cx="19" cy="22" r="2.5" fill="#ef4565" opacity="0.9"/>
+    <circle cx="26" cy="22" r="2.5" fill="#ef4565" opacity="0.9"/>
+    <circle cx="33" cy="22" r="2.5" fill="#ef4565" opacity="0.9"/>
+  </svg>
+  <div class="hub-card-info">
+    <div class="hub-card-label" style="color:#ef4565;">Idiomize</div>
+    <div class="hub-card-desc">Learn English idiomatic expressions.<br>Understand what native speakers really mean.</div>
+  </div>
+  <div class="hub-card-arrow">›</div>
+  <div class="hub-card-badge">Coming Soon</div>
+</div>
   </div>
 
   <div class="hub-footer">
@@ -384,10 +402,10 @@ function showHub(){
 // ═══════════════════════════════════════════
 function goTo(page){
   // Proverb game not built yet
-  if(page === 'proverb.html'){
-    alert('Proverb Game is coming soon! Stay tuned. 🌟');
-    return;
-  }
+ if(page === 'proverb.html' || page === 'idiomize.html'){
+  alert('This game is coming soon! Stay tuned. 🌟');
+  return;
+}
   window.location.href = page + '?name=' + encodeURIComponent(playerName);
 }
 
