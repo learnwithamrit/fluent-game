@@ -407,6 +407,18 @@
 }
 
 
+
+ .text-input-area {
+  margin-top: 8px;
+}
+#quizTextInput {
+  text-align: center;
+  font-size: 1rem;
+}   
+
+
+    
+
 /* Responsive max-width for wrapper */
 @media (max-width: 380px) {
   .card-wrapper { max-width: 320px; }
@@ -956,7 +968,7 @@ function parseCSV(txt) {
   const rows = [];
   const lines = txt.trim().split(/\r?\n/);
   for (const line of lines) {
-    if (!line.trim()) continue; // skip blank lines
+    if (!line.trim()) continue;
     const cols = [];
     let cur = '', inQ = false;
     for (let i = 0; i < line.length; i++) {
@@ -969,14 +981,16 @@ function parseCSV(txt) {
     }
     cols.push(cur.trim());
 
-    // Only process rows that have at least 5 columns
-    if (cols.length >= 5) {
+    if (cols.length >= 4) {   // we only need 4 columns
       const bengali = cols[0].split(';').map(s => s.trim()).filter(Boolean);
       const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
+      const quizQuestion = cols[2].trim();
+      const quizAnswers = cols[3].split(';').map(s => s.trim()).filter(Boolean);
       rows.push({
         bengali: bengali.length ? bengali : [cols[0]],
         english: english.length ? english : [cols[1]],
-        distractors: [cols[2], cols[3], cols[4]]
+        quizQuestion: quizQuestion || '',
+        quizAnswers: quizAnswers.length ? quizAnswers : [cols[3]]
       });
     }
   }
@@ -1054,21 +1068,22 @@ function renderLearning() {
   updateHeaderCardIndex();
   startTimer();
 
-  const proverb = state.sessionProverbs[state.currentCardIndex];
-  mainContent.innerHTML = `
-    <div class="card-wrapper" id="cardWrapper">
-      <div class="card-stage" id="cardStage">
-        <div class="card-inner" id="cardInner">
-          <div class="card-face card-front" id="cardFront">
-            <div class="card-bengali">${formatVariantList(proverb.bengali)}</div>
-            <div class="card-hint">Tap to Reveal English</div>
-          </div>
-          <div class="card-face card-back" id="cardBack">
-            <div class="card-english">${formatVariantList(proverb.english)}</div>
-          </div>
+  // Inside renderLearning:
+const proverb = state.sessionProverbs[state.currentCardIndex];
+mainContent.innerHTML = `
+  <div class="card-wrapper" id="cardWrapper">
+    <div class="card-stage" id="cardStage">
+      <div class="card-inner" id="cardInner">
+        <div class="card-face card-front" id="cardFront">
+          <div class="card-bengali">${formatVariantList(proverb.bengali)}</div>
+          <div class="card-hint">Tap to Reveal English</div>
+        </div>
+        <div class="card-face card-back" id="cardBack">
+          <div class="card-english">${formatVariantList(proverb.english)}</div>
         </div>
       </div>
     </div>
+  </div>
     <div class="swipe-indicator"><span>◀</span> Swipe <span>▶</span></div>
     <div class="nav-buttons">
       <button class="btn btn-outline" id="btnPrev" ${state.currentCardIndex === 0 ? 'disabled style="opacity:0.4;"' : ''}>← Previous</button>
@@ -1235,36 +1250,13 @@ function renderQuizQuestion() {
   const sessionIdx = state.quizOrder[state.currentQuizIndex];
   const proverb = state.sessionProverbs[sessionIdx];
 
-  // Pick one random correct English variant to display as the option
-  const randomCorrect = proverb.english[Math.floor(Math.random() * proverb.english.length)];
-
-  // Build options: 1 correct (random variant) + 3 distractors
-  const options = [
-    { text: randomCorrect, isCorrect: true },
-    { text: proverb.distractors[0], isCorrect: false },
-    { text: proverb.distractors[1], isCorrect: false },
-    { text: proverb.distractors[2], isCorrect: false }
-  ];
-
-  // Shuffle options
-  for (let i = options.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [options[i], options[j]] = [options[j], options[i]];
-  }
-
-  const labels = ['A', 'B', 'C', 'D'];
-
   mainContent.innerHTML = `
     <div class="quiz-question-card">
-      <div class="quiz-bengali">${formatVariantList(proverb.bengali)}</div>
+      <div class="quiz-bengali">${escapeHTML(proverb.quizQuestion)}</div>
     </div>
-    <div class="options-list" id="optionsList">
-      ${options.map((opt, i) => `
-        <button class="option-btn" data-index="${i}" data-correct="${opt.isCorrect}">
-          <span class="opt-label">(${labels[i]})</span>
-          <span>${escapeHTML(opt.text)}</span>
-        </button>
-      `).join('')}
+    <div class="text-input-area" style="width:100%; max-width:380px; display:flex; flex-direction:column; gap:12px;">
+      <input type="text" id="quizTextInput" class="hub-input" placeholder="Type the English expression…" autocomplete="off" />
+      <button class="btn btn-primary btn-full" id="btnSubmitAnswer">Submit</button>
     </div>
   `;
 
@@ -1272,61 +1264,62 @@ function renderQuizQuestion() {
     <button class="btn btn-ghost btn-full" id="btnBackToHubQuiz">← Back to Hub</button>
   `;
 
-  document.querySelectorAll('.option-btn').forEach(b => {
-    b.addEventListener('click', function() { handleQuizAnswer(this); });
+  // Focus the input
+  document.getElementById('quizTextInput').focus();
+  document.getElementById('btnSubmitAnswer').addEventListener('click', handleQuizSubmit);
+  document.getElementById('quizTextInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleQuizSubmit();
   });
 
   document.getElementById('btnBackToHubQuiz').addEventListener('click', () => {
     if (confirm('Leave quiz?')) { stopTimer(); renderHub(); }
   });
 }
-
-
       
-function handleQuizAnswer(btn) {
-  const allBtns = document.querySelectorAll('.option-btn');
-  allBtns.forEach(b => b.style.pointerEvents = 'none');
 
-  // Get the visible text of the clicked button
-  const selectedText = btn.querySelector('span:last-child').textContent.trim();
 
-  // Get the current proverb's English array
+function handleQuizSubmit() {
+  const inputField = document.getElementById('quizTextInput');
+  if (!inputField) return;
+  const userAnswer = inputField.value.trim();
+  if (userAnswer === '') return;   // ignore empty submissions
+
+  // Prevent multiple submissions
+  document.getElementById('btnSubmitAnswer').disabled = true;
+  inputField.disabled = true;
+
   const proverb = state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
+  const correctAnswers = proverb.quizAnswers.map(a => a.toLowerCase());
 
-  // Check if selected text matches any of the correct English variants
-  const isCorrect = proverb.english.includes(selectedText);
+  const isCorrect = correctAnswers.includes(userAnswer.toLowerCase());
 
   if (isCorrect) {
-    btn.classList.add('correct-flash');
     state.score++;
     updateHeaderScore();
+    // Show brief success
+    inputField.style.borderColor = 'var(--success)';
     setTimeout(() => {
       state.currentQuizIndex++;
-      if (state.currentQuizIndex >= state.totalInSession) {
-        finishQuiz();
-      } else {
-        renderQuizQuestion();
-      }
-    }, 600);
+      if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
+      else renderQuizQuestion();
+    }, 800);
   } else {
-    btn.classList.add('wrong-flash');
+    // Wrong answer – pause timer, show modal
     pauseTimer();
-    showErrorModal();
+    showErrorModal(proverb);
   }
 }
 
 
       
 
-function showErrorModal() {
-  const proverb = state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
-
+function showErrorModal(proverb) {
   modalOverlay.innerHTML = `
     <div class="modal-panel">
       <div class="modal-icon">❌</div>
       <div class="modal-label">Correct Answer(s)</div>
-         <div class="modal-bengali">${formatVariantList(proverb.bengali)}</div>
-          <div class="modal-correct">→ ${formatVariantList(proverb.english)}</div>
+      <div class="modal-bengali">${escapeHTML(proverb.quizQuestion)}</div>
+      <div class="modal-correct">→ ${formatVariantList(proverb.quizAnswers)}</div>
       <button class="btn btn-primary btn-full" id="btnGotIt">👍 Got It</button>
     </div>
   `;
@@ -1337,11 +1330,8 @@ function showErrorModal() {
     modalOverlay.innerHTML = '';
     resumeTimer();
     state.currentQuizIndex++;
-    if (state.currentQuizIndex >= state.totalInSession) {
-      finishQuiz();
-    } else {
-      renderQuizQuestion();
-    }
+    if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
+    else renderQuizQuestion();
   });
 }
 
@@ -1362,9 +1352,14 @@ function showErrorModal() {
         headerCardIndex.textContent=`--/${state.totalInSession}`; headerScoreItem.classList.add('muted'); headerScore.textContent=`--/${state.totalInSession}`; updateTimerDisplay();
         mainContent.innerHTML='<div class="hub-screen"><p style="color:var(--text-secondary);">⏳ Loading proverbs...</p></div>'; bottomNav.innerHTML='';
         await loadProverbData();
-        if(state.allProverbs.length<CONFIG.cardsPerSession){ mainContent.innerHTML=`<div class="hub-screen"><p style="color:var(--error);">❌ Need at least ${CONFIG.cardsPerSession} proverbs.</p></div>`; return; }
-        renderHub();
-      }
+        if (parsed.length > 0) {
+  const first = parsed[0];
+  const firstCell = first.bengali?.[0] ?? first[0];
+  if (firstCell?.toLowerCase() === 'bengali') {
+    parsed.shift();
+    console.log('Header row removed');
+  }
+}
       initApp();
     })();
   </script>
