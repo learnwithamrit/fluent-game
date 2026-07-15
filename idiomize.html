@@ -1053,6 +1053,7 @@ function selectSessionProverbs() {
             <p class="text-muted" style="font-size:0.78rem; max-width:280px;">Learn 10 proverbs, then test your memory.</p>
           </div>`;
         bottomNav.innerHTML='';
+        console.log('Hub rendered, mainContent innerHTML length:', mainContent.innerHTML.length);
         document.getElementById('btnStartSession').addEventListener('click',()=>{
           const inp=document.getElementById('playerNameInput'); if(inp?.value.trim()) state.playerName=inp.value.trim();
           updateHeaderPlayerName(); selectSessionProverbs(); renderLearning();
