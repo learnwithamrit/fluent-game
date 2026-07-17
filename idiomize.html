@@ -527,18 +527,6 @@ function parseCSV(txt) {
 }
 
 
-  const combinations = cartesian(groups);
-
-  // For each combination, replace the brackets with the chosen alternatives
-  const result = combinations.map(comb => {
-    let i = 0;
-    return str.replace(bracketRegex, () => comb[i++]);
-  }).map(s => s.trim());
-
-  return result;
-}
-
-
     
     async function loadProverbData() {
         if (CONFIG.googleSheetCSVUrl && CONFIG.googleSheetCSVUrl.trim() !== '') {
