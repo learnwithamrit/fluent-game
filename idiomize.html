@@ -324,6 +324,21 @@
         .text-muted { color: var(--text-secondary); }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+
+.quiz-input-correct {
+  border-color: var(--success) !important;
+  background: rgba(16, 185, 129, 0.08) !important;
+  animation: inputPulseGreen 0.5s ease-out;
+}
+
+@keyframes inputPulseGreen {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.2); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+        
     </style>
 </head>
 <body>
@@ -350,7 +365,7 @@
     // ---------- CONFIG ----------
     const CONFIG = {
         cardsPerSession: 10,
-        googleSheetCSVUrl: 'YOUR_GOOGLE_SHEET_CSV_URL_HERE', // Replace with your published CSV URL
+        googleSheetCSVUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR2u01P6IjAkA-dW-Cy9xZaPQBMGTWHk3EXvdGy7LFohFho36g2kNTxkNYzDC_SoXjtNTUYzpj28s_D/pub?gid=0&single=true&output=csv', // Replace with your published CSV URL
         fallbackData: [
             { bengali: ['বিরক্ত / ক্লান্ত'], english: ['Sick and tired', 'Fed up'], quizQuestion: 'আমি অপেক্ষা করতে করতে বিরক্ত হয়ে গেছি।', quizAnswers: ["I'm sick and tired of waiting", "I am fed up with waiting"] },
 
@@ -366,7 +381,7 @@
 
 { bengali: ['নিরাপদে'], english: ['Safe and sound', 'Safe and secure'], quizQuestion: 'শিশুটি নিরাপদে ফিরে এসেছে।', quizAnswers: ["The child returned safe and sound", "The child has returned safe and sound", "The child came back safe and sound", "The child returned safe and secure"] },
 
-{ bengali: ['ছোট ছোট অংশ'], english: ['Bits and pieces', 'Odds and ends'], quizQuestion: 'আমি পুরনো চিঠির ছোট ছোট অংশ পেলাম।', quizAnswers: ["I found bits and pieces of old letters", "I found odds and ends of old letters", "I discovered bits and pieces of old letters", "I managed to find bits and pieces of old letters"] },
+{ bengali: ['ছোট ছোট অংশ'], english: ['Bits and pieces', 'Odds and ends'], quizQuestion: 'আমি একটা পুরনো চিঠির ছোট ছোট অংশ খুঁজে পেলাম।', quizAnswers: ["I found the bits and pieces of an old letter", "I came across the bits and pieces of an old letter", "I discovered bits and pieces of old letters", "I managed to find bits and pieces of old letters"] },
 
 { bengali: ['কোলাহল'], english: ['Hustle and bustle', 'Hubbub'], quizQuestion: 'আমি শহরের কোলাহলটা মিস করি।', quizAnswers: ["I miss the hustle and bustle of the city", "I miss the city's hustle and bustle", "I miss the hubbub of the city", "I miss the hustle and bustle of city life"] },
 
@@ -474,6 +489,7 @@
                 const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
                 const quizQuestion = cols[2].trim();
                 const quizAnswers = cols[3].split(';').map(s => s.trim()).filter(Boolean);
+                const quizAnswers = rawAnswers.flatMap(ans => expandBrackets(ans)).filter(Boolean);
                 rows.push({
                     bengali: bengali.length ? bengali : [cols[0]],
                     english: english.length ? english : [cols[1]],
@@ -485,6 +501,40 @@
         return rows;
     }
 
+
+function expandBrackets(str) {
+  // Find all occurrences of [ ... ] and split the inside by "/"
+  const bracketRegex = /\[([^\]]+)\]/g;
+  const matches = [...str.matchAll(bracketRegex)];
+
+  if (matches.length === 0) {
+    return [str.trim()];   // no brackets → return original string
+  }
+
+  // Extract the alternatives for each bracket group
+  const groups = matches.map(m => m[1].split('/').map(s => s.trim()));
+
+  // Generate all combinations using cartesian product
+  function cartesian(arrays) {
+    return arrays.reduce((acc, curr) =>
+      acc.flatMap(a => curr.map(c => [...a, c])),
+      [[]]
+    );
+  }
+
+  const combinations = cartesian(groups);
+
+  // For each combination, replace the brackets with the chosen alternatives
+  const result = combinations.map(comb => {
+    let i = 0;
+    return str.replace(bracketRegex, () => comb[i++]);
+  }).map(s => s.trim());
+
+  return result;
+}
+
+
+    
     async function loadProverbData() {
         if (CONFIG.googleSheetCSVUrl && CONFIG.googleSheetCSVUrl.trim() !== '') {
             try {
@@ -764,31 +814,52 @@
     }
 
     function handleQuizSubmit() {
-        const inputField = document.getElementById('quizTextInput');
-        if (!inputField) return;
-        const userAnswer = inputField.value.trim();
-        if (userAnswer === '') return;
+  const inputField = document.getElementById('quizTextInput');
+  if (!inputField) return;
+  const rawAnswer = inputField.value;
+  if (rawAnswer.trim() === '') return;
 
-        document.getElementById('btnSubmitAnswer').disabled = true;
-        inputField.disabled = true;
+  // Prevent double-submit
+  document.getElementById('btnSubmitAnswer').disabled = true;
+  inputField.disabled = true;
 
-        const proverb = state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
-        const correctAnswers = proverb.quizAnswers.map(a => a.toLowerCase());
+  const proverb = state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
 
-        if (correctAnswers.includes(userAnswer.toLowerCase())) {
-            state.score++;
-            updateHeaderScore();
-            inputField.style.borderColor = 'var(--success)';
-            setTimeout(() => {
-                state.currentQuizIndex++;
-                if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
-                else renderQuizQuestion();
-            }, 800);
-        } else {
-            pauseTimer();
-            showErrorModal(proverb);
-        }
-    }
+  // Helper to normalise both user input and stored answers
+  const normalise = (str) =>
+  str
+    .trim()
+    .replace(/\.$/, '')       // remove trailing full stop
+    .replace(/,/g, '')        // remove ALL commas
+    .replace(/[,;!?]/g, '')   
+    .trim()
+    .toLowerCase();
+  const userAnswer = normalise(rawAnswer);
+
+  const correctAnswers = proverb.quizAnswers.map(a => normalise(a));
+
+  if (correctAnswers.includes(userAnswer)) {
+    // Correct answer
+    state.score++;
+    updateHeaderScore();
+
+    // Green flash
+    inputField.classList.add('quiz-input-correct');
+
+    setTimeout(() => {
+      state.currentQuizIndex++;
+      if (state.currentQuizIndex >= state.totalInSession) {
+        finishQuiz();
+      } else {
+        renderQuizQuestion();
+      }
+    }, 700);
+  } else {
+    // Wrong answer
+    pauseTimer();
+    showErrorModal(proverb);
+  }
+}
 
     function showErrorModal(proverb) {
         modalOverlay.innerHTML = `
