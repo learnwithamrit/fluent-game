@@ -512,15 +512,17 @@ function parseCSV(txt) {
       const quizQuestion = cols[2].trim();
 
       // ✅ Fix: first split by ";" then expand each part with bracket expander
-      const rawAnswers = cols[3].split(';').map(s => s.trim()).filter(Boolean);
-      const quizAnswers = rawAnswers.flatMap(ans => expandBrackets(ans)).filter(Boolean);
+      // Split the cell by ";" → each part is a different meaning
+const rawAnswers = cols[3].split(';').map(s => s.trim()).filter(Boolean);
+// Expand each meaning’s brackets, preserving the group
+const quizAnswers = rawAnswers.map(ans => expandBrackets(ans));
 
-      rows.push({
-        bengali: bengali.length ? bengali : [cols[0]],
-        english: english.length ? english : [cols[1]],
-        quizQuestion: quizQuestion || '',
-        quizAnswers: quizAnswers.length ? quizAnswers : [cols[3]]
-      });
+rows.push({
+  bengali: bengali.length ? bengali : [cols[0]],
+  english: english.length ? english : [cols[1]],
+  quizQuestion: quizQuestion || '',
+  quizAnswers: quizAnswers.length ? quizAnswers : [[cols[3]]]   // always an array of arrays
+});
     }
   }
   return rows;
@@ -806,74 +808,93 @@ function parseCSV(txt) {
         });
     }
 
-    function handleQuizSubmit() {
+
+function findBestGroup(userInput, groups) {
+  const userWords = userInput.split(/\s+/).filter(w => w.length > 0);
+  let bestGroup = groups[0] || [];
+  let bestScore = 0;
+
+  for (const group of groups) {
+    let groupScore = 0;
+    for (const variant of group) {
+      const variantWords = variant.split(/\s+/);
+      const overlap = userWords.filter(w => variantWords.includes(w)).length;
+      groupScore += overlap;
+    }
+    if (groupScore > bestScore) {
+      bestScore = groupScore;
+      bestGroup = group;
+    }
+  }
+  return bestGroup;
+}
+
+    
+function handleQuizSubmit() {
   const inputField = document.getElementById('quizTextInput');
   if (!inputField) return;
   const rawAnswer = inputField.value;
   if (rawAnswer.trim() === '') return;
 
-  // Prevent double-submit
   document.getElementById('btnSubmitAnswer').disabled = true;
   inputField.disabled = true;
 
   const proverb = state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
 
-  // Helper to normalise both user input and stored answers
+  // Normalisation helper
   const normalise = (str) =>
-  str
-    .trim()
-    .replace(/\.$/, '')       // remove trailing full stop
-    .replace(/,/g, '')        // remove ALL commas
-    .replace(/[,;!?]/g, '')   
-    .trim()
-    .toLowerCase();
+    str.trim().replace(/\.$/, '').replace(/,/g, '').trim().toLowerCase();
+
   const userAnswer = normalise(rawAnswer);
 
-  const correctAnswers = proverb.quizAnswers.map(a => normalise(a));
+  // Flatten all groups for checking
+  const allExpanded = proverb.quizAnswers.flat();
+  const correctAnswers = allExpanded.map(a => normalise(a));
 
   if (correctAnswers.includes(userAnswer)) {
-    // Correct answer
+    // Correct!
     state.score++;
     updateHeaderScore();
-
-    // Green flash
     inputField.classList.add('quiz-input-correct');
-
     setTimeout(() => {
       state.currentQuizIndex++;
-      if (state.currentQuizIndex >= state.totalInSession) {
-        finishQuiz();
-      } else {
-        renderQuizQuestion();
-      }
+      if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
+      else renderQuizQuestion();
     }, 700);
   } else {
-    // Wrong answer
+    // Wrong – find the meaning group closest to the user’s words
     pauseTimer();
-    showErrorModal(proverb);
+
+    // Ensure groups are always array of arrays (compatibility)
+    const groups = Array.isArray(proverb.quizAnswers[0])
+      ? proverb.quizAnswers
+      : [proverb.quizAnswers];
+
+    const bestGroup = findBestGroup(userAnswer, groups);
+    showErrorModal(proverb, bestGroup);
   }
 }
 
-    function showErrorModal(proverb) {
-        modalOverlay.innerHTML = `
-            <div class="idiom-modal-panel">
-                <div style="font-size:2.5rem; margin-bottom:10px;">❌</div>
-                <div class="idiom-modal-label">Correct Answer(s)</div>
-                <div class="idiom-modal-bengali">${escapeHTML(proverb.quizQuestion)}</div>
-                <div class="idiom-modal-correct">→ ${formatVariantList(proverb.quizAnswers)}</div>
-                <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnGotIt">👍 Got It</button>
-            </div>`;
-        modalOverlay.classList.remove('hidden');
+function showErrorModal(proverb, groupVariants) {
+  modalOverlay.innerHTML = `
+    <div class="idiom-modal-panel">
+      <div style="font-size:2.5rem; margin-bottom:10px;">❌</div>
+      <div class="idiom-modal-label">Correct Answer(s) for this meaning</div>
+      <div class="idiom-modal-bengali">${escapeHTML(proverb.quizQuestion)}</div>
+      <div class="idiom-modal-correct">→ ${formatVariantList(groupVariants)}</div>
+      <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnGotIt">👍 Got It</button>
+    </div>`;
+  modalOverlay.classList.remove('hidden');
 
-        document.getElementById('btnGotIt').addEventListener('click', () => {
-            modalOverlay.classList.add('hidden');
-            modalOverlay.innerHTML = '';
-            resumeTimer();
-            state.currentQuizIndex++;
-            if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
-            else renderQuizQuestion();
-        });
-    }
+  document.getElementById('btnGotIt').addEventListener('click', () => {
+    modalOverlay.classList.add('hidden');
+    modalOverlay.innerHTML = '';
+    resumeTimer();
+    state.currentQuizIndex++;
+    if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
+    else renderQuizQuestion();
+  });
+}
 
     function finishQuiz() {
         state.phase = 'results';
