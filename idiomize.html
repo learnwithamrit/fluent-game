@@ -467,60 +467,65 @@
         }
     }
 
-    // ---------- DATA LOADING ----------
-    function parseCSV(txt) {
-        const rows = [];
-        const lines = txt.trim().split(/\r?\n/);
-        for (const line of lines) {
-            if (!line.trim()) continue;
-            const cols = [];
-            let cur = '', inQ = false;
-            for (let i = 0; i < line.length; i++) {
-                const ch = line[i];
-                if (ch === '"') {
-                    if (inQ && i + 1 < line.length && line[i + 1] === '"') { cur += '"'; i++; }
-                    else inQ = !inQ;
-                } else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-                else cur += ch;
-            }
-            cols.push(cur.trim());
-            if (cols.length >= 4) {
-                const bengali = cols[0].split(';').map(s => s.trim()).filter(Boolean);
-                const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
-                const quizQuestion = cols[2].trim();
-                const quizAnswers = cols[3].split(';').map(s => s.trim()).filter(Boolean);
-                const quizAnswers = rawAnswers.flatMap(ans => expandBrackets(ans)).filter(Boolean);
-                rows.push({
-                    bengali: bengali.length ? bengali : [cols[0]],
-                    english: english.length ? english : [cols[1]],
-                    quizQuestion: quizQuestion || '',
-                    quizAnswers: quizAnswers.length ? quizAnswers : [cols[3]]
-                });
-            }
-        }
-        return rows;
-    }
-
 
 function expandBrackets(str) {
-  // Find all occurrences of [ ... ] and split the inside by "/"
   const bracketRegex = /\[([^\]]+)\]/g;
   const matches = [...str.matchAll(bracketRegex)];
+  if (matches.length === 0) return [str.trim()];
 
-  if (matches.length === 0) {
-    return [str.trim()];   // no brackets → return original string
-  }
-
-  // Extract the alternatives for each bracket group
   const groups = matches.map(m => m[1].split('/').map(s => s.trim()));
-
-  // Generate all combinations using cartesian product
   function cartesian(arrays) {
     return arrays.reduce((acc, curr) =>
       acc.flatMap(a => curr.map(c => [...a, c])),
       [[]]
     );
   }
+  const combinations = cartesian(groups);
+  return combinations.map(comb => {
+    let i = 0;
+    return str.replace(bracketRegex, () => comb[i++]);
+  }).map(s => s.trim());
+}
+
+
+    
+    // ---------- DATA LOADING ----------
+function parseCSV(txt) {
+  const rows = [];
+  const lines = txt.trim().split(/\r?\n/);
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQ && i + 1 < line.length && line[i + 1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else cur += ch;
+    }
+    cols.push(cur.trim());
+    if (cols.length >= 4) {
+      const bengali = cols[0].split(';').map(s => s.trim()).filter(Boolean);
+      const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
+      const quizQuestion = cols[2].trim();
+
+      // ✅ Fix: first split by ";" then expand each part with bracket expander
+      const rawAnswers = cols[3].split(';').map(s => s.trim()).filter(Boolean);
+      const quizAnswers = rawAnswers.flatMap(ans => expandBrackets(ans)).filter(Boolean);
+
+      rows.push({
+        bengali: bengali.length ? bengali : [cols[0]],
+        english: english.length ? english : [cols[1]],
+        quizQuestion: quizQuestion || '',
+        quizAnswers: quizAnswers.length ? quizAnswers : [cols[3]]
+      });
+    }
+  }
+  return rows;
+}
+
 
   const combinations = cartesian(groups);
 
