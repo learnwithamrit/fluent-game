@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluent — by Amrit</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<meta name="theme-color" content="#ff8906">
+<meta name="description" content="Fluent by Amrit — interactive English learning games. Word puzzles, vocabulary quiz, story reading and more.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Fluent — by Amrit">
+<meta property="og:description" content="Interactive English learning games for students. Build sentences, test vocabulary, read stories.">
+<meta property="og:url" content="https://learnwithamrit.github.io/fluent-game/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://learnwithamrit.github.io/fluent-game/icon-512.png">
+<style>
+  body{
+    background:#0d0d1a;color:#e8e8f0;
+    font-family:'Segoe UI',system-ui,sans-serif;
+    min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:16px;
+    text-align:center;
+  }
+  .logo{font-size:2rem;font-weight:900;color:#ff8906;
+    letter-spacing:2px;text-transform:uppercase;}
+  .by{font-size:0.85rem;color:#7070a0;font-weight:700;}
+  .spin{width:36px;height:36px;border:3px solid #2e2e52;
+    border-top-color:#ff8906;border-radius:50%;
+    animation:spin .8s linear infinite;margin-top:8px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .msg{font-size:0.72rem;color:#7070a0;}
+</style>
+</head>
+<body>
+<div class="logo">Fluent</div>
+<div class="by">by Amrit</div>
+<div class="spin"></div>
+<div class="msg">Loading…</div>
+<script>
+  // index.html is now the entry point — redirects straight to hub
+  // If someone lands here from a bookmark or direct URL, send them to hub
+  // Preserve any name param that might have been passed
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get('name');
+  if(name){
+    window.location.replace('hub.html?name=' + encodeURIComponent(name));
+  } else {
+    window.location.replace('hub.html');
+  }
+</script>
+</body>
+</html>
