@@ -295,7 +295,14 @@
 .idiom-app.correct-flash {
     animation: appFlashGreen 0.6s ease-out;
 }
-
+.idiom-hint-text {
+    color: var(--error);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+    min-height: 20px;
+    margin-top: 4px;
+}
         /* Quiz – wider options */
 @media (min-width: 768px) {
     .idiom-quiz-card { max-width: 600px; }
@@ -696,6 +703,7 @@ function renderQuizQuestion() {
                 </button>
             `).join('')}
         </div>
+        <div class="idiom-hint-text" id="idiomHintText"></div>
         <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnSubmitAnswer">Submit</button>
     `;
 
@@ -713,6 +721,7 @@ function renderQuizQuestion() {
                 state.selectedOptions.add(idx);
                 this.classList.add('selected');
             }
+            document.getElementById('idiomHintText').textContent = '';   // ← clear hint
         });
     });
 
@@ -722,18 +731,28 @@ function renderQuizQuestion() {
     });
 }
 
-   function checkQuizAnswer() {
+function checkQuizAnswer() {
     const selected = state.selectedOptions;
     const correct = state.correctIndices;
     const allBtns = document.querySelectorAll('.idiom-option-btn');
     const submitBtn = document.getElementById('btnSubmitAnswer');
+    const hintEl = document.getElementById('idiomHintText');
     if (!submitBtn) return;
+
+    // ---------- Nothing selected ----------
+    if (selected.size === 0) {
+        hintEl.textContent = 'Please select an option.';
+        return;
+    }
+
+    // Clear hint on valid submission
+    hintEl.textContent = '';
 
     // Disable further interaction
     submitBtn.disabled = true;
     allBtns.forEach(b => b.style.pointerEvents = 'none');
 
-    // Determine what kind of failure (if any)
+    // Determine if any wrong option was chosen
     let anyWrong = false;
     for (const idx of selected) {
         if (!correct.has(idx)) {
