@@ -246,6 +246,22 @@
         .text-muted { color: var(--text-secondary); }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+
+/* Full‑app green flash */
+.idiom-app.correct-flash {
+    animation: appFlashGreen 0.6s ease-out;
+}
+
+@keyframes appFlashGreen {
+    0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.6), inset 0 0 0 0 rgba(16,185,129,0.4); }
+    40%  { box-shadow: 0 0 30px 10px rgba(16,185,129,0.5), inset 0 0 40px 10px rgba(16,185,129,0.25); }
+    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0), inset 0 0 0 0 rgba(16,185,129,0); }
+}
+
+        
+
+        
     </style>
 </head>
 <body>
@@ -330,6 +346,8 @@
         const m = Math.floor(state.timerSeconds/60), s = state.timerSeconds%60;
         headerTimer.textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
     }
+    function pauseTimer() { state.isTimerPaused = true; }
+    function resumeTimer() { state.isTimerPaused = false; }
     function formatTime(sec) { const m=Math.floor(sec/60), s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
 
     function updateHeaderPlayerName() { headerPlayerName.textContent = state.playerName; }
@@ -349,34 +367,35 @@
     }
 
     // ---------- DATA LOADING ----------
-    function parseCSV(txt) {
-        const rows = [];
-        txt.trim().split(/\r?\n/).forEach(line => {
-            if (!line.trim()) return;
-            const cols = [];
-            let cur = '', inQ = false;
-            for (let i = 0; i < line.length; i++) {
-                const ch = line[i];
-                if (ch === '"') {
-                    if (inQ && i+1 < line.length && line[i+1] === '"') { cur += '"'; i++; }
-                    else inQ = !inQ;
-                } else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-                else cur += ch;
-            }
-            cols.push(cur.trim());
-            if (cols.length >= 5) {
-                const bengali = cols[0].split(';').map(s => s.trim()).filter(Boolean);
-                const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
-                const distractors = [cols[2], cols[3], cols[4]];
-                rows.push({
-                    bengali: bengali.length ? bengali : [cols[0]],
-                    english: english.length ? english : [cols[1]],
-                    distractors: distractors
-                });
-            }
-        });
-        return rows;
-    }
+   function parseCSV(txt) {
+    const rows = [];
+    txt.trim().split(/\r?\n/).forEach(line => {
+        if (!line.trim()) return;
+        const cols = [];
+        let cur = '', inQ = false;
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (ch === '"') {
+                if (inQ && i+1 < line.length && line[i+1] === '"') { cur += '"'; i++; }
+                else inQ = !inQ;
+            } else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+            else cur += ch;
+        }
+        cols.push(cur.trim());
+        // Now expect at least 6 columns (A to F)
+        if (cols.length >= 6) {
+            const bengali = cols[0].split(';').map(s => s.trim()).filter(Boolean);
+            const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
+            const distractors = [cols[2], cols[3], cols[4], cols[5]];
+            rows.push({
+                bengali: bengali.length ? bengali : [cols[0]],
+                english: english.length ? english : [cols[1]],
+                distractors: distractors
+            });
+        }
+    });
+    return rows;
+}
 
     async function loadProverbData() {
         if (CONFIG.googleSheetCSVUrl && CONFIG.googleSheetCSVUrl.trim() !== '') {
@@ -571,109 +590,140 @@
     }
 
     // ---------- MULTI‑SELECT QUIZ ----------
-    function renderQuizQuestion() {
-        if (state.currentQuizIndex >= state.totalInSession) { finishQuiz(); return; }
-        state.phase = 'quiz'; updateHeaderScore(); updateHeaderCardIndex();
-        state.selectedOptions.clear();
+function renderQuizQuestion() {
+    if (state.currentQuizIndex >= state.totalInSession) { finishQuiz(); return; }
+    state.phase = 'quiz'; updateHeaderScore(); updateHeaderCardIndex();
+    state.selectedOptions.clear();
 
-        const sessionIdx = state.quizOrder[state.currentQuizIndex];
-        const proverb = state.sessionProverbs[sessionIdx];
+    const sessionIdx = state.quizOrder[state.currentQuizIndex];
+    const proverb = state.sessionProverbs[sessionIdx];
 
-        // Build options: correct ones (from english) + distractors
-        const corrects = proverb.english;
-        const distractors = [...proverb.distractors];
-        // Shuffle distractors and take enough to fill to 4
-        for (let i=distractors.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [distractors[i], distractors[j]] = [distractors[j], distractors[i]]; }
-        const needed = 4 - corrects.length;
-        const selectedDistractors = distractors.slice(0, needed);
-
-        // Combine and shuffle
-        const options = [
-            ...corrects.map(text => ({ text, isCorrect: true })),
-            ...selectedDistractors.map(text => ({ text, isCorrect: false }))
-        ];
-        for (let i=options.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [options[i], options[j]] = [options[j], options[i]]; }
-
-        // Store option data for later checking
-        state.currentOptions = options;
-        state.correctIndices = new Set(options.reduce((acc, opt, idx) => { if(opt.isCorrect) acc.push(idx); return acc; }, []));
-
-        mainContent.innerHTML = `
-            <div class="idiom-quiz-card">
-                <div class="idiom-quiz-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
-            </div>
-            <div class="idiom-options-list" id="idiomOptionsList">
-                ${options.map((opt, idx) => `
-                    <button class="idiom-option-btn" data-index="${idx}">
-                        <span class="check-circle"></span>
-                        <span>${escapeHTML(opt.text)}</span>
-                    </button>
-                `).join('')}
-            </div>
-            <div class="idiom-hint-text" id="idiomHintText"></div>
-            <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnSubmitAnswer">Submit</button>
-        `;
-
-        bottomNav.innerHTML = `
-            <button class="idiom-btn idiom-btn-ghost idiom-btn-full" id="btnBackToHubQuiz">← Back to Hub</button>
-        `;
-
-        // Attach option toggle
-        document.querySelectorAll('.idiom-option-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const idx = parseInt(this.dataset.index);
-                if (state.selectedOptions.has(idx)) {
-                    state.selectedOptions.delete(idx);
-                    this.classList.remove('selected');
-                } else {
-                    state.selectedOptions.add(idx);
-                    this.classList.add('selected');
-                }
-                document.getElementById('idiomHintText').textContent = ''; // clear hint on change
-            });
-        });
-
-        document.getElementById('btnSubmitAnswer').addEventListener('click', checkQuizAnswer);
-        document.getElementById('btnBackToHubQuiz').addEventListener('click', () => { if (confirm('Leave quiz?')) { stopTimer(); renderHub(); } });
+    const corrects = proverb.english.slice(0, 5);   // max 5 corrects
+    const allDistractors = [...proverb.distractors]; // 4 distractors
+    for (let i = allDistractors.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allDistractors[i], allDistractors[j]] = [allDistractors[j], allDistractors[i]];
     }
+    const needed = 5 - corrects.length;
+    const chosenDistractors = allDistractors.slice(0, needed);
+
+    const options = [
+        ...corrects.map(text => ({ text, isCorrect: true })),
+        ...chosenDistractors.map(text => ({ text, isCorrect: false }))
+    ];
+    for (let i = options.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [options[i], options[j]] = [options[j], options[i]];
+    }
+
+    state.currentOptions = options;
+    state.correctIndices = new Set(options.reduce((acc, opt, idx) => {
+        if (opt.isCorrect) acc.push(idx);
+        return acc;
+    }, []));
+
+    mainContent.innerHTML = `
+        <div class="idiom-quiz-card">
+            <div class="idiom-quiz-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
+        </div>
+        <div class="idiom-options-list" id="idiomOptionsList">
+            ${options.map((opt, idx) => `
+                <button class="idiom-option-btn" data-index="${idx}">
+                    <span class="check-circle"></span>
+                    <span>${escapeHTML(opt.text)}</span>
+                </button>
+            `).join('')}
+        </div>
+        <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnSubmitAnswer">Submit</button>
+    `;
+
+    bottomNav.innerHTML = `
+        <button class="idiom-btn idiom-btn-ghost idiom-btn-full" id="btnBackToHubQuiz">← Back to Hub</button>
+    `;
+
+    document.querySelectorAll('.idiom-option-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const idx = parseInt(this.dataset.index);
+            if (state.selectedOptions.has(idx)) {
+                state.selectedOptions.delete(idx);
+                this.classList.remove('selected');
+            } else {
+                state.selectedOptions.add(idx);
+                this.classList.add('selected');
+            }
+        });
+    });
+
+    document.getElementById('btnSubmitAnswer').addEventListener('click', checkQuizAnswer);
+    document.getElementById('btnBackToHubQuiz').addEventListener('click', () => {
+        if (confirm('Leave quiz?')) { stopTimer(); renderHub(); }
+    });
+}
 
     function checkQuizAnswer() {
-        const selected = state.selectedOptions;
-        const correct = state.correctIndices;
-        const hintEl = document.getElementById('idiomHintText');
+    const selected = state.selectedOptions;
+    const correct = state.correctIndices;
+    const allBtns = document.querySelectorAll('.idiom-option-btn');
+    const submitBtn = document.getElementById('btnSubmitAnswer');
+    if (!submitBtn) return;
 
-        // Check if any wrong option selected
-        let anyWrong = false;
-        for (const idx of selected) {
-            if (!correct.has(idx)) { anyWrong = true; break; }
-        }
+    // Disable further interaction
+    submitBtn.disabled = true;
+    allBtns.forEach(b => b.style.pointerEvents = 'none');
 
-        if (anyWrong) {
-            hintEl.textContent = 'Some selected options are incorrect. Try again.';
-            return;
-        }
+    // Check if exactly the correct set is selected (no wrongs allowed automatically by toggle logic, but we verify)
+    const isCorrect = selected.size === correct.size && [...selected].every(idx => correct.has(idx));
 
-        // All selected are correct. Check if all correct are selected.
-        if (selected.size === correct.size) {
-            // Correct!
-            state.score++;
-            updateHeaderScore();
-            // Flash correct options
-            document.querySelectorAll('.idiom-option-btn').forEach(btn => {
-                const idx = parseInt(btn.dataset.index);
-                if (correct.has(idx)) btn.classList.add('correct-flash');
-            });
-            document.getElementById('btnSubmitAnswer').disabled = true;
-            setTimeout(() => {
-                state.currentQuizIndex++;
-                if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
-                else renderQuizQuestion();
-            }, 800);
-        } else {
-            const missing = correct.size - selected.size;
-            hintEl.textContent = `You need ${missing} more correct answer${missing>1?'s':''}.`;
-        }
+    if (isCorrect) {
+        // Success
+        state.score++;
+        updateHeaderScore();
+        // Full‑app green flash
+        document.getElementById('idiomApp').classList.add('correct-flash');
+        // Also flash the correct options
+        allBtns.forEach(btn => {
+            const idx = parseInt(btn.dataset.index);
+            if (correct.has(idx)) btn.classList.add('correct-flash');
+        });
+        setTimeout(() => {
+            document.getElementById('idiomApp').classList.remove('correct-flash');
+            state.currentQuizIndex++;
+            if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
+            else renderQuizQuestion();
+        }, 700);
+    } else {
+        // Wrong – show modal with correct answers
+        pauseTimer();
+        showErrorModal();
     }
+}
+
+//.................... Show Error Modal Pop-UP-----------------------//
+
+function showErrorModal() {
+    const proverb = state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
+    modalOverlay.innerHTML = `
+        <div class="idiom-modal-panel">
+            <div style="font-size:2.5rem; margin-bottom:10px;">❌</div>
+            <div class="idiom-modal-label">Correct Answer(s)</div>
+            <div class="idiom-modal-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
+            <div class="idiom-modal-correct">→ ${formatVariantList(proverb.english)}</div>
+            <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnGotIt">👍 Got It</button>
+        </div>`;
+    modalOverlay.classList.remove('hidden');
+
+    document.getElementById('btnGotIt').addEventListener('click', () => {
+        modalOverlay.classList.add('hidden');
+        modalOverlay.innerHTML = '';
+        resumeTimer();
+        state.currentQuizIndex++;
+        if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
+        else renderQuizQuestion();
+    });
+}
+
+
+    
 
     function finishQuiz() {
         state.phase = 'results'; stopTimer(); updateHeaderScore(); updateHeaderCardIndex();
