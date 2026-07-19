@@ -66,6 +66,10 @@
             position: relative; transition: all 0.3s ease;
         }
 
+        .idiom-modal-panel {
+    /* existing styles */
+    transition: border-color 0.3s;
+}
         @media (min-width: 500px) {
             body { padding: 16px; }
             .idiom-app {
@@ -718,7 +722,7 @@ function renderQuizQuestion() {
     });
 }
 
-    function checkQuizAnswer() {
+   function checkQuizAnswer() {
     const selected = state.selectedOptions;
     const correct = state.correctIndices;
     const allBtns = document.querySelectorAll('.idiom-option-btn');
@@ -729,16 +733,22 @@ function renderQuizQuestion() {
     submitBtn.disabled = true;
     allBtns.forEach(b => b.style.pointerEvents = 'none');
 
-    // Check if exactly the correct set is selected (no wrongs allowed automatically by toggle logic, but we verify)
-    const isCorrect = selected.size === correct.size && [...selected].every(idx => correct.has(idx));
+    // Determine what kind of failure (if any)
+    let anyWrong = false;
+    for (const idx of selected) {
+        if (!correct.has(idx)) {
+            anyWrong = true;
+            break;
+        }
+    }
 
-    if (isCorrect) {
-        // Success
+    const isComplete = selected.size === correct.size && !anyWrong;
+
+    if (isComplete) {
+        // Perfect!
         state.score++;
         updateHeaderScore();
-        // Full‑app green flash
         document.getElementById('idiomApp').classList.add('correct-flash');
-        // Also flash the correct options
         allBtns.forEach(btn => {
             const idx = parseInt(btn.dataset.index);
             if (correct.has(idx)) btn.classList.add('correct-flash');
@@ -750,20 +760,121 @@ function renderQuizQuestion() {
             else renderQuizQuestion();
         }, 700);
     } else {
-        // Wrong – show modal with correct answers
+        // Failure – pause timer and show appropriate modal
         pauseTimer();
-        showErrorModal();
+        if (anyWrong) {
+            showErrorModal('wrong');
+        } else {
+            const missingCount = correct.size - selected.size;
+            showErrorModal('incomplete', missingCount);
+        }
     }
 }
 
 //.................... Show Error Modal Pop-UP-----------------------//
 
-function showErrorModal() {
+function showErrorModal(type, missingCount = 0) {
     const proverb = state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
+    
+    // Choose icon and message based on type
+    let iconHtml = '';
+    let message = '';
+    let borderColor = '';
+
+    if (type === 'incomplete') {
+        // The SVG you shared – scaled down
+        iconHtml = `
+            <div style="width: 90px; height: 90px; margin: 0 auto 10px;">
+                <svg xmlns="http://w3.org" viewBox="0 0 500 560" width="100%" height="100%">
+                    <defs>
+                        <radialGradient id="bodyGrad" cx="45%" cy="35%" r="60%">
+                            <stop offset="0%" stop-color="#ff9d3b"/>
+                            <stop offset="70%" stop-color="#ff6a00"/>
+                            <stop offset="100%" stop-color="#cc4400"/>
+                        </radialGradient>
+                        <radialGradient id="cheekGradL" cx="30%" cy="30%" r="50%">
+                            <stop offset="0%" stop-color="#ff8522" stop-opacity="0.6"/>
+                            <stop offset="100%" stop-color="#ff6a00" stop-opacity="0"/>
+                        </radialGradient>
+                        <radialGradient id="cheekGradR" cx="70%" cy="30%" r="50%">
+                            <stop offset="0%" stop-color="#ff8522" stop-opacity="0.6"/>
+                            <stop offset="100%" stop-color="#ff6a00" stop-opacity="0"/>
+                        </radialGradient>
+                        <radialGradient id="eyeGrad" cx="40%" cy="40%" r="65%">
+                            <stop offset="0%" stop-color="#ffffff"/>
+                            <stop offset="85%" stop-color="#f0f0f0"/>
+                            <stop offset="100%" stop-color="#d9d9d9"/>
+                        </radialGradient>
+                        <radialGradient id="pupilGrad" cx="35%" cy="35%" r="60%">
+                            <stop offset="0%" stop-color="#0b5ba1"/>
+                            <stop offset="50%" stop-color="#033266"/>
+                            <stop offset="100%" stop-color="#001126"/>
+                        </radialGradient>
+                        <linearGradient id="handGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ffaa4d"/>
+                            <stop offset="100%" stop-color="#e65c00"/>
+                        </linearGradient>
+                        <linearGradient id="toothGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ffa347"/>
+                            <stop offset="100%" stop-color="#d65100"/>
+                        </linearGradient>
+                        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#4d1400" flood-opacity="0.3"/>
+                        </filter>
+                    </defs>
+                    <path d="M150,45 C175,25 210,30 225,48 C210,38 175,35 155,52 Z" fill="#7a2200"/>
+                    <path d="M350,45 C325,25 290,30 275,48 C290,38 325,35 345,52 Z" fill="#7a2200"/>
+                    <circle cx="250" cy="240" r="215" fill="url(#bodyGrad)" stroke="#993300" stroke-width="3"/>
+                    <circle cx="140" cy="210" r="60" fill="url(#cheekGradL)"/>
+                    <circle cx="360" cy="210" r="60" fill="url(#cheekGradR)"/>
+                    <path d="M120,120 C175,110 225,150 225,210 C225,260 175,290 120,275 C75,260 70,180 120,120 Z" fill="url(#eyeGrad)" stroke="#993300" stroke-width="2" filter="url(#shadow)"/>
+                    <path d="M380,120 C325,110 275,150 275,210 C275,260 325,290 380,275 C425,260 430,180 380,120 Z" fill="url(#eyeGrad)" stroke="#993300" stroke-width="2" filter="url(#shadow)"/>
+                    <g transform="translate(170, 200)">
+                        <circle cx="0" cy="0" r="28" fill="url(#pupilGrad)" stroke="#001126" stroke-width="1"/>
+                        <circle cx="0" cy="0" r="14" fill="#000814"/>
+                        <circle cx="-8" cy="-8" r="7" fill="#ffffff"/>
+                        <circle cx="6" cy="6" r="3" fill="#ffffff"/>
+                    </g>
+                    <g transform="translate(300, 200)">
+                        <circle cx="0" cy="0" r="28" fill="url(#pupilGrad)" stroke="#001126" stroke-width="1"/>
+                        <circle cx="0" cy="0" r="14" fill="#000814"/>
+                        <circle cx="-8" cy="-8" r="7" fill="#ffffff"/>
+                        <circle cx="6" cy="6" r="3" fill="#ffffff"/>
+                    </g>
+                    <path d="M75,215 C110,180 170,195 210,235 C160,230 110,240 75,215 Z" fill="#ff801a" opacity="0.4"/>
+                    <path d="M425,215 C390,180 330,195 290,235 C340,230 390,240 425,215 Z" fill="#ff801a" opacity="0.4"/>
+                    <path d="M120,290 C120,240 380,240 380,290 C380,390 120,390 120,290 Z" fill="#661a00" stroke="#4d1400" stroke-width="3"/>
+                    <g filter="url(#shadow)">
+                        <path d="M132,285 C170,270 210,265 250,265 C290,265 330,270 368,285 C360,315 330,325 250,325 C170,325 140,315 132,285 Z" fill="url(#toothGrad)" stroke="#993300" stroke-width="2"/>
+                        <path d="M142,345 C170,360 210,365 250,365 C290,365 330,360 358,345 C350,320 320,315 250,315 C180,315 150,320 142,345 Z" fill="url(#toothGrad)" stroke="#993300" stroke-width="2"/>
+                        <path d="M165,280 L170,323 M205,272 L208,325 M250,265 L250,325 M295,272 L292,325 M335,280 L330,323" stroke="#802000" stroke-width="1.5" opacity="0.7"/>
+                        <path d="M175,348 L180,320 M210,356 L212,320 M250,365 L250,315 M290,356 L288,320 M325,348 L320,320" stroke="#802000" stroke-width="1.5" opacity="0.7"/>
+                    </g>
+                    <g filter="url(#shadow)">
+                        <path d="M170,500 C150,430 220,390 245,460 C255,490 230,550 180,550 C150,550 175,510 170,500 Z" fill="url(#handGrad)" stroke="#993300" stroke-width="2"/>
+                        <path d="M190,425 C195,410 215,415 220,440" fill="none" stroke="#802000" stroke-width="2"/>
+                        <path d="M172,445 C180,430 198,435 202,465" fill="none" stroke="#802000" stroke-width="2"/>
+                        <path d="M162,475 C170,460 185,465 188,495" fill="none" stroke="#802000" stroke-width="2"/>
+                        <path d="M330,500 C350,430 280,390 255,460 C245,490 270,550 320,550 C350,550 325,510 330,500 Z" fill="url(#handGrad)" stroke="#993300" stroke-width="2"/>
+                        <path d="M310,425 C305,410 285,415 280,440" fill="none" stroke="#802000" stroke-width="2"/>
+                        <path d="M328,445 C320,430 302,435 298,465" fill="none" stroke="#802000" stroke-width="2"/>
+                        <path d="M338,475 C330,460 315,465 312,495" fill="none" stroke="#802000" stroke-width="2"/>
+                    </g>
+                </svg>
+            </div>`;
+        message = `Good start! You still need to select all the correct answers. You missed ${missingCount}.`;
+        borderColor = 'rgba(251,191,36,0.4)';   // gold/orange border
+    } else {
+        // Wrong answer
+        iconHtml = '<div style="font-size:2.5rem; margin-bottom:10px;">❌</div>';
+        message = 'That’s incorrect.';
+        borderColor = 'rgba(239,68,68,0.4)';    // red border
+    }
+
     modalOverlay.innerHTML = `
-        <div class="idiom-modal-panel">
-            <div style="font-size:2.5rem; margin-bottom:10px;">❌</div>
-            <div class="idiom-modal-label">Correct Answer(s)</div>
+        <div class="idiom-modal-panel" style="border-color: ${borderColor};">
+            ${iconHtml}
+            <div class="idiom-modal-label">${message}</div>
             <div class="idiom-modal-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
             <div class="idiom-modal-correct">→ ${formatVariantList(proverb.english)}</div>
             <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnGotIt">👍 Got It</button>
