@@ -82,6 +82,23 @@
             .idiom-app { max-width: 720px; min-height: 75vh; max-height: 90vh; border-radius: 40px; }
         }
 
+        /* Large desktop – almost full width */
+@media (min-width: 1200px) {
+    .idiom-app {
+        max-width: 1100px; /* comfortable reading width */
+        min-height: 75vh;
+        max-height: 90vh;
+        border-radius: 40px;
+    }
+}
+
+/* Ultrawide / 4K screens – expand further */
+@media (min-width: 1600px) {
+    .idiom-app {
+        max-width: 1400px;
+    }
+}
+
         /* Header */
         .idiom-header {
             display: flex; align-items: center; justify-content: space-between;
@@ -142,10 +159,32 @@
 
         /* Learning card */
         .idiom-card-wrapper { overflow: hidden; width: 100%; max-width: 380px; position: relative; }
+        /* Increase card size on larger screens */
+@media (min-width: 768px) {
+    .idiom-card-wrapper { max-width: 540px; }
+    .idiom-card-stage { aspect-ratio: 1.7 / 1; }
+}
+
+@media (min-width: 1200px) {
+    .idiom-card-wrapper { max-width: 650px; }
+    .idiom-card-bengali { font-size: 1.8rem; }
+    .idiom-card-english { font-size: 1.4rem; }
+}
         .idiom-card-stage {
             perspective: 1000px; width: 100%; aspect-ratio: 1.6/1;
             cursor: pointer; position: relative; transition: transform 0.3s ease; will-change: transform;
         }
+        /* Increase card size on larger screens */
+@media (min-width: 768px) {
+    .idiom-card-wrapper { max-width: 540px; }
+    .idiom-card-stage { aspect-ratio: 1.7 / 1; }
+}
+
+@media (min-width: 1200px) {
+    .idiom-card-wrapper { max-width: 650px; }
+    .idiom-card-bengali { font-size: 1.8rem; }
+    .idiom-card-english { font-size: 1.4rem; }
+}
         .idiom-card-inner {
             width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
             transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); will-change: transform;
@@ -251,6 +290,25 @@
 /* Full‑app green flash */
 .idiom-app.correct-flash {
     animation: appFlashGreen 0.6s ease-out;
+}
+
+        /* Quiz – wider options */
+@media (min-width: 768px) {
+    .idiom-quiz-card { max-width: 600px; }
+    .idiom-options-list { max-width: 600px; }
+    .idiom-option-btn { padding: 16px 20px; font-size: 1rem; }
+}
+
+@media (min-width: 1200px) {
+    .idiom-quiz-card { max-width: 750px; }
+    .idiom-options-list { max-width: 750px; }
+    .idiom-option-btn { padding: 18px 24px; font-size: 1.1rem; }
+}
+
+@media (min-width: 1200px) {
+    .idiom-header-item { font-size: 0.85rem; }
+    .idiom-header-item .value { font-size: 0.9rem; }
+    .idiom-btn { padding: 16px 28px; font-size: 1.05rem; }
 }
 
 @keyframes appFlashGreen {
