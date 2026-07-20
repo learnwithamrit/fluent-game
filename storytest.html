@@ -191,6 +191,7 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
             height: 150px;
             transition: transform 0.2s;
+            cursor: pointer;
         }
         .book-card:active { transform: scale(0.98); }
 
@@ -254,7 +255,7 @@
             white-space: nowrap;
         }
 
-        .read-btn {
+/*        .read-btn {
             position: absolute;
             bottom: 0;
             right: 0;
@@ -895,16 +896,7 @@
                 card.appendChild(cover);
                 card.appendChild(details);
 
-                const readBtn = document.createElement('button');
-                readBtn.className = 'read-btn';
-                readBtn.textContent = 'Read it';
-                readBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    startStory(idx);
-                });
-                card.appendChild(readBtn);
-
-                container.appendChild(card);
+card.addEventListener('click', () => startStory(idx));
             });
         }
 
