@@ -5,207 +5,446 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocab Story Game</title>
     <style>
-        /* Simple, child-friendly styling */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f0e8;
-            color: #333;
-            max-width: 700px;
-            margin: auto;
-            padding: 20px;
-        }
+   /* ==========================================
+   DARK THEME (default) – "Popular Books" style
+   ========================================== */
+:root {
+    --bg-color: #1a1625;
+    --card-bg: #221c33;
+    --text-main: #ffffff;
+    --text-muted: #a096b5;
+    --accent-yellow: #ffd23f;
+    --accent-pink: #ff4d8d;
+    --progress-bg: #362e4c;
+    --btn-primary: #64b5f6;
+    --btn-secondary: #ffb74d;
+}
 
-        /* The counter is now inside the header, so just a simple display control */
-        .counter {
-        display: none;   /* still hidden until first word */
-        }
-        
-        .screen {
-            display: none;
-        }
-        .screen.active {
-            display: block;
-        }
-        .level-btn, .story-btn, .pill, .got-it-btn, .menu-btn {
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .level-btn {
-            display: block;
-            width: 80%;
-            margin: 15px auto;
-            padding: 20px;
-            font-size: 1.5em;
-            border: none;
-            border-radius: 20px;
-            background: #a5d6a7;
-            color: #1e3d1e;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        /* Special Mega Stories button */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--bg-color);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0;
+    transition: background 0.4s, color 0.4s;
+}
+
+/* ========== HEADER BAR (sticky, like mobile app) ========== */
+#topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 20px;
+    background: rgba(34, 28, 51, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin-bottom: 20px;
+}
+
+.counter {
+    display: none;   /* shown by JS */
+    background: var(--accent-yellow);
+    color: #1a1625;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+}
+
+/* Theme toggle pill */
+#themeToggle {
+    cursor: pointer;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 40px;
+    padding: 8px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 0.9em;
+    color: #fff;
+    user-select: none;
+    transition: all 0.3s;
+}
+
+/* ========== SCREENS (hide/show system) ========== */
+.screen {
+    display: none;
+    padding: 0 20px 30px;
+}
+.screen.active {
+    display: block;
+}
+
+/* ========== LEVEL SELECTION SCREEN ========== */
+.level-btn {
+    display: block;
+    width: 100%;
+    margin: 15px auto;
+    padding: 20px;
+    font-size: 1.5em;
+    border: none;
+    border-radius: 20px;
+    background: var(--card-bg);
+    color: var(--text-main);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: transform 0.1s, background 0.3s;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.level-btn:hover { transform: scale(1.02); background: #2e2642; }
+
+/* Mega Stories button special */
 .mega-btn {
     background: linear-gradient(135deg, #ffd54f, #ffb300);
-    color: #3e2723;
+    color: #1e1e1e;
     font-weight: bold;
     font-size: 1.8em;
-    border: 3px solid #ff8f00;
-    box-shadow: 0 6px 12px rgba(255, 160, 0, 0.4);
-    margin-top: 30px;
+    border: none;
 }
-.mega-btn:hover {
-    transform: scale(1.03);
+.mega-btn:hover { background: linear-gradient(135deg, #ffca28, #ff8f00); }
+
+/* ========== STORY LIST SCREEN (book cards) ========== */
+#listScreen h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
-body.dark .mega-btn {
-    background: linear-gradient(135deg, #ffca28, #ff8f00);
-    color: #1e1e1e;
-    border-color: #ff6f00;
+
+.info-section {
+    position: relative;
+    margin-bottom: 25px;
 }
-        .story-btn {
-            display: block;
-            width: 90%;
-            margin: 10px auto;
-            padding: 15px;
-            font-size: 1.2em;
-            background: #fff9c4;
-            border: 2px solid #fbc02d;
-            border-radius: 15px;
-        }
-        .pill {
-            display: inline-block;
-            background: #ff8a65;
-            color: white;
-            padding: 2px 12px;
-            border-radius: 20px;
-            margin: 5px 3px;
-            font-weight: bold;
-        }
-        .story-text {
-            line-height: 2;
-            font-size: 1.2em;
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        /* Modal overlay */
-/* Modal overlay – always flex, hidden with opacity */
+
+.info-section p.subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.stats-container {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+.stat-box {
+    display: flex;
+    flex-direction: column;
+}
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+}
+.stat-label {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.mascot-art {
+    position: absolute;
+    right: 10px;
+    bottom: 0;
+    width: 100px;
+    height: 100px;
+    opacity: 0.7;
+}
+
+.book-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.book-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    height: 150px;
+    transition: transform 0.2s;
+}
+.book-card:active { transform: scale(0.98); }
+
+.book-cover {
+    width: 100px;
+    height: 100%;
+    background: #2e2642;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: rgba(255,255,255,0.4);
+    flex-shrink: 0;
+}
+
+.book-details {
+    flex: 1;
+    padding: 15px 15px 15px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.book-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #fff;
+}
+
+.book-tags {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.progress-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--progress-bg);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    background: var(--accent-pink);
+    border-radius: 3px;
+    width: 0%;   /* dynamic via JS */
+    transition: width 0.3s;
+}
+.progress-text {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.read-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: var(--accent-yellow);
+    color: #1a1625;
+    padding: 8px 20px;
+    font-weight: 700;
+    font-size: 13px;
+    border-radius: 24px 0 0 0;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s;
+}
+.read-btn:hover { opacity: 0.9; }
+
+/* ========== ACTIVE STORY SCREEN ========== */
+#storyScreen h2 {
+    font-size: 26px;
+    margin-bottom: 20px;
+}
+
+.story-text {
+    line-height: 2;
+    font-size: 1.2em;
+    background: var(--card-bg);
+    color: var(--text-main);
+    padding: 25px;
+    border-radius: 24px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+.pill {
+    display: inline-block;
+    background: var(--accent-pink);
+    color: #fff;
+    padding: 2px 12px;
+    border-radius: 20px;
+    margin: 3px 3px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.pill:active { transform: scale(0.95); }
+
+/* Story screen buttons */
+.story-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.menu-btn {
+    background: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 12px 25px;
+    font-size: 1em;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.menu-btn:hover { background: #2e2642; }
+
+#nextStory { background: var(--accent-yellow); color: #1a1625; border: none; font-weight: 700; }
+#finishStory { background: var(--btn-primary); color: #fff; border: none; }
+
+/* ========== SUMMARY SCREEN ========== */
+#summaryScreen h1 {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+.summary-list {
+    list-style: none;
+    padding: 0;
+}
+.summary-list li {
+    background: var(--card-bg);
+    margin: 8px 0;
+    padding: 12px 16px;
+    border-radius: 12px;
+    color: var(--text-main);
+}
+
+/* ========== MODALS ========== */
 .modal {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;                /* always flex, never hidden via display */
+    background: rgba(0,0,0,0.7);
+    display: flex;
     justify-content: center;
     align-items: center;
-    pointer-events: none;        /* disabled when invisible */
+    pointer-events: none;
     opacity: 0;
-    transition: opacity 0.25s ease;
-    z-index: 1000;               /* ensure it’s on top */
+    transition: opacity 0.25s;
+    z-index: 1000;
 }
 .modal.show {
     pointer-events: auto;
     opacity: 1;
 }
 
-/* Modal card – smooth transform + opacity */
 .modal-content {
-    background: white;
-    border-radius: 30px;
+    background: var(--card-bg);
+    border-radius: 28px;
     padding: 30px;
-    max-width: 400px;
+    max-width: 380px;
     text-align: center;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
     transform: translate(0, 0) scale(1);
     opacity: 1;
-    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s;
     will-change: transform, opacity;
-}
-        .got-it-btn {
-            margin-top: 20px;
-            padding: 12px 30px;
-            font-size: 1.2em;
-            background: #81c784;
-            border: none;
-            border-radius: 40px;
-            color: white;
-        }
-        .menu-btn {
-            background: #64b5f6;
-            border: none;
-            padding: 12px 25px;
-            font-size: 1.1em;
-            color: white;
-            border-radius: 30px;
-            margin-top: 20px;
-        }
-        .summary-list {
-            list-style-type: none;
-            padding: 0;
-            text-align: left;
-        }
-        .summary-list li {
-            background: #f1f8e9;
-            margin: 8px 0;
-            padding: 12px;
-            border-radius: 12px;
-        }
-        /* ========== Dark Mode Styles ========== */
-body.dark {
-    background: #1e1e2f;
-    color: #e0e0e0;
-}
-body.dark .counter {
-    background: #3a3a5c;
-    color: #221e12;
-}
-body.dark .level-btn {
-    background: #2e7d32;
-    color: #e8f5e9;
-}
-body.dark .story-btn {
-    background: #4e342e;
-    border-color: #ffb74d;
-    color: #ffe0b2;
-}
-body.dark .pill {
-    background: #d84315;
     color: #fff;
 }
-body.dark .story-text {
-    background: #2c2c3e;
-    color: #f0f0f0;
-}
-body.dark .modal-content {
-    background: #2c2c3e;
-    color: #f0f0f0;
-}
-body.dark .got-it-btn {
-    background: #388e3c;
-}
-body.dark .menu-btn {
-    background: #1565c0;
-}
-body.dark .summary-list li {
-    background: #37474f;
-    color: #eceff1;
-}
-body.dark #themeToggle {
-    filter: invert(1);
+.got-it-btn {
+    margin-top: 20px;
+    padding: 12px 30px;
+    background: var(--accent-yellow);
+    color: #1a1625;
+    font-weight: 700;
+    border: none;
+    border-radius: 40px;
+    font-size: 1.1em;
+    cursor: pointer;
 }
 
-body.dark #themeToggle {
-  background: #ffffff20;
-  color: #f0f0f0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+/* ========== LIGHT MODE OVERRIDES ========== */
+body:not(.dark) {
+    --bg-color: #f5f0e8;
+    --card-bg: #ffffff;
+    --text-main: #333;
+    --text-muted: #7a6e6e;
+    --accent-yellow: #ffb300;
+    --accent-pink: #ff8a65;
+    --progress-bg: #e0d7c6;
+}
+body:not(.dark) #topBar {
+    background: rgba(255,255,255,0.85);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+body:not(.dark) .counter {
+    background: #ffecb3;
+    color: #333;
+}
+body:not(.dark) #themeToggle {
+    background: rgba(255,255,255,0.7);
+    color: #333;
+}
+body:not(.dark) .level-btn {
+    background: #a5d6a7;
+    color: #1e3d1e;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+body:not(.dark) .mega-btn {
+    background: linear-gradient(135deg, #ffd54f, #ffb300);
+    color: #3e2723;
+}
+body:not(.dark) .book-cover {
+    background: #e0d7c6;
+}
+body:not(.dark) .read-btn {
+    background: #ffb300;
+    color: #1a1625;
+}
+body:not(.dark) .story-text {
+    background: #fff;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+body:not(.dark) .pill {
+    background: #ff8a65;
+}
+body:not(.dark) .menu-btn {
+    background: #64b5f6;
+    color: #fff;
+    border: none;
+}
+body:not(.dark) #nextStory {
+    background: #ffb74d;
+    color: #333;
+}
+body:not(.dark) .summary-list li {
+    background: #f1f8e9;
+    color: #333;
+}
+body:not(.dark) .modal-content {
+    background: #fff;
+    color: #333;
+}
+body:not(.dark) .got-it-btn {
+    background: #81c784;
+    color: #fff;
 }
 
-/* All-done modal buttons spacing */
-#allDoneModal .menu-btn {
-    display: inline-block;
-}
-        
-    </style>
+</style>
 </head>
 <body>
 
@@ -251,11 +490,37 @@ body.dark #themeToggle {
 </button>
     
     <!-- Screen: Story List -->
-    <div id="listScreen" class="screen">
+<div id="listScreen" class="screen">
+    <!-- Info section with stats and mascot (same as the snippet) -->
+    <section class="info-section">
         <h2 id="levelTitle"></h2>
-        <div id="storyButtons"></div>
-        <button class="menu-btn" id="backToLevels">⬅ Back to Levels</button>
-    </div>
+        <p class="subtitle">Carefully selected for you – read, tap words, learn!</p>
+        <div class="stats-container">
+            <div class="stat-box">
+                <span class="stat-value" id="totalStoriesStat">0</span>
+                <span class="stat-label">Stories</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value" id="wordsLearnedStat">0</span>
+                <span class="stat-label">Words learned</span>
+            </div>
+        </div>
+        <svg class="mascot-art" viewBox="0 0 100 100">
+            <path fill="#ffd23f" d="M15 70 l30-20 l5 5 l-30 20 z" />
+            <path fill="#ff4d8d" d="M50 30 c15 0 25 10 25 25 c0 15-5 20-15 20 c-15 0-25-10-25-25 c0-15 5-25 15-25 z" />
+            <circle cx="45" cy="45" r="3" fill="#fff"/>
+            <circle cx="58" cy="45" r="3" fill="#fff"/>
+            <path d="M 46 55 Q 51 60 56 55" stroke="#fff" stroke-width="2" fill="none"/>
+            <path fill="#ff4d8d" d="M70 50 q15-5 20 10 q-5 10-20-10 M30 55 q-15 5-20-10 q 5-10 20 10" />
+            <polygon points="65,15 70,25 80,25 72,32 75,42 65,35 55,42 58,32 50,25 60,25" fill="#ffd23f"/>
+        </svg>
+    </section>
+
+    <!-- Book cards will be injected here by JS -->
+    <div id="storyButtons" class="book-list"></div>
+
+    <button class="menu-btn" id="backToLevels" style="margin-top: 30px;">⬅ Back to Levels</button>
+</div>
 
     <!-- Screen: Active Story -->
     <div id="storyScreen" class="screen">
@@ -321,6 +586,7 @@ body.dark #themeToggle {
 
     let learnedWords = {};
     let learntCount = 0;
+    let sessionReadCount = {};   // tracks how many stories finished per level this session
 
     // UI elements
     const counterDiv = document.getElementById('counter');
@@ -504,19 +770,74 @@ body.dark #themeToggle {
             document.getElementById('megaStoriesBtn').addEventListener('click', () => {
             showScreen(document.getElementById('megaScreen'));
             });
-            const container = document.getElementById('storyButtons');
-            container.innerHTML = '';
-            if (currentStories.length === 0) {
-                container.innerHTML = '<p>No stories yet for this level.</p>';
-            } else {
-                currentStories.forEach((story, idx) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'story-btn';
-                    btn.textContent = story.Title;
-                    btn.addEventListener('click', () => startStory(idx));
-                    container.appendChild(btn);
-                });
-            }
+const container = document.getElementById('storyButtons');
+container.innerHTML = '';
+
+// Update stats
+document.getElementById('totalStoriesStat').textContent = currentStories.length;
+document.getElementById('wordsLearnedStat').textContent = learntCount;
+
+if (currentStories.length === 0) {
+    container.innerHTML = '<p style="color: var(--text-muted); text-align:center;">No stories yet. Add some in the Google Sheet!</p>';
+} else {
+    currentStories.forEach((story, idx) => {
+        const card = document.createElement('div');
+        card.className = 'book-card';
+
+        // Cover placeholder (first letter of title)
+        const cover = document.createElement('div');
+        cover.className = 'book-cover';
+        cover.textContent = story.Title.charAt(0).toUpperCase();
+
+        // Details
+        const details = document.createElement('div');
+        details.className = 'book-details';
+
+        const titleEl = document.createElement('h2');
+        titleEl.className = 'book-title';
+        titleEl.textContent = story.Title;
+
+        const tags = document.createElement('p');
+        tags.className = 'book-tags';
+        tags.textContent = story.Level + ' · vocabulary builder';
+
+        // Progress bar (how many stories finished in this level so far)
+        const progressContainer = document.createElement('div');
+        progressContainer.className = 'progress-container';
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+        const progressFill = document.createElement('div');
+        progressFill.className = 'progress-fill';
+        const total = currentStories.length;
+        const readSoFar = sessionReadCount[story.Level] || 0;  // we'll define this variable
+        const percent = total > 0 ? Math.round((readSoFar / total) * 100) : 0;
+        progressFill.style.width = percent + '%';
+        progressBar.appendChild(progressFill);
+        const progressText = document.createElement('span');
+        progressText.className = 'progress-text';
+        progressText.textContent = percent + '%';
+        progressContainer.appendChild(progressBar);
+        progressContainer.appendChild(progressText);
+
+        details.appendChild(titleEl);
+        details.appendChild(tags);
+        details.appendChild(progressContainer);
+        card.appendChild(cover);
+        card.appendChild(details);
+
+        // "Read it" button
+        const readBtn = document.createElement('button');
+        readBtn.className = 'read-btn';
+        readBtn.textContent = 'Read it';
+        readBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            startStory(idx);
+        });
+        card.appendChild(readBtn);
+
+        container.appendChild(card);
+    });
+}
             showScreen(listScreen);
         });
     });
@@ -545,25 +866,29 @@ document.getElementById('megaBackToLevels').addEventListener('click', () => {
 
     // ========== Story Screen Buttons ==========
     // "Finish reading" → summary (delegated)
-    document.getElementById('storyScreen').addEventListener('click', (e) => {
-        const finishBtn = e.target.closest('#finishStory');
-        if (!finishBtn) return;
+   document.getElementById('storyScreen').addEventListener('click', (e) => {
+    const finishBtn = e.target.closest('#finishStory');
+    if (!finishBtn) return;
 
-        const summaryList = document.getElementById('summaryList');
-        summaryList.innerHTML = '';
-        if (Object.keys(learnedWords).length === 0) {
-            summaryList.innerHTML = '<li>You haven’t collected any words yet. Keep reading!</li>';
-        } else {
-            for (let key in learnedWords) {
-                const lw = learnedWords[key];
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>${lw.word}</strong> – ${lw.definition}<br><em>${lw.example}</em>`;
-                summaryList.appendChild(li);
-            }
+    // Increment the number of stories finished in this level (for progress bars)
+    if (!sessionReadCount[currentLevel]) sessionReadCount[currentLevel] = 0;
+    sessionReadCount[currentLevel]++;
+
+    // Build the summary list
+    const summaryList = document.getElementById('summaryList');
+    summaryList.innerHTML = '';
+    if (Object.keys(learnedWords).length === 0) {
+        summaryList.innerHTML = '<li>You haven’t collected any words yet. Keep reading!</li>';
+    } else {
+        for (let key in learnedWords) {
+            const lw = learnedWords[key];
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${lw.word}</strong> – ${lw.definition}<br><em>${lw.example}</em>`;
+            summaryList.appendChild(li);
         }
-        showScreen(summaryScreen);
-    });
-
+    }
+    showScreen(summaryScreen);
+});
     // ========== All‑Done Modal Logic ==========
     function showAllDoneModal() {
         const levelNames = ['Beginner', 'Intermediate', 'Advanced'];
@@ -612,15 +937,19 @@ document.getElementById('megaBackToLevels').addEventListener('click', () => {
     }
 
     // "Next story" button → next story or all‑done modal
-    document.getElementById('nextStory').addEventListener('click', () => {
-        if (currentStories.length === 0) return;
-        const nextIndex = currentStoryIndex + 1;
-        if (nextIndex < currentStories.length) {
-            startStory(nextIndex);
-        } else {
-            showAllDoneModal();
-        }
-    });
+document.getElementById('nextStory').addEventListener('click', () => {
+    if (currentStories.length === 0) return;
+    // Count current story as read before moving to the next
+    if (!sessionReadCount[currentLevel]) sessionReadCount[currentLevel] = 0;
+    sessionReadCount[currentLevel]++;
+
+    const nextIndex = currentStoryIndex + 1;
+    if (nextIndex < currentStories.length) {
+        startStory(nextIndex);
+    } else {
+        showAllDoneModal();
+    }
+});
 
     // Close all‑done modal by clicking outside
     document.getElementById('allDoneModal').addEventListener('click', (e) => {
@@ -654,11 +983,12 @@ document.getElementById('megaBackToLevels').addEventListener('click', () => {
         }
     }
 
-    if (localStorage.getItem('theme') === 'dark') {
-        setTheme(true);
-    } else {
-        setTheme(false);
-    }
+  // Initialize from saved preference (default dark)
+if (localStorage.getItem('theme') === null || localStorage.getItem('theme') === 'dark') {
+    setTheme(true);
+} else {
+    setTheme(false);
+}
 
     themeToggle.addEventListener('click', () => {
         setTheme(!body.classList.contains('dark'));
