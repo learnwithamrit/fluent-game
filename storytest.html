@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocab Story Game</title>
+    <style>
+        /* Simple, child-friendly styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f0e8;
+            color: #333;
+            max-width: 700px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        /* The counter is now inside the header, so just a simple display control */
+        .counter {
+        display: none;   /* still hidden until first word */
+        }
+        
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .level-btn, .story-btn, .pill, .got-it-btn, .menu-btn {
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .level-btn {
+            display: block;
+            width: 80%;
+            margin: 15px auto;
+            padding: 20px;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 20px;
+            background: #a5d6a7;
+            color: #1e3d1e;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        /* Special Mega Stories button */
+.mega-btn {
+    background: linear-gradient(135deg, #ffd54f, #ffb300);
+    color: #3e2723;
+    font-weight: bold;
+    font-size: 1.8em;
+    border: 3px solid #ff8f00;
+    box-shadow: 0 6px 12px rgba(255, 160, 0, 0.4);
+    margin-top: 30px;
+}
+.mega-btn:hover {
+    transform: scale(1.03);
+}
+body.dark .mega-btn {
+    background: linear-gradient(135deg, #ffca28, #ff8f00);
+    color: #1e1e1e;
+    border-color: #ff6f00;
+}
+        .story-btn {
+            display: block;
+            width: 90%;
+            margin: 10px auto;
+            padding: 15px;
+            font-size: 1.2em;
+            background: #fff9c4;
+            border: 2px solid #fbc02d;
+            border-radius: 15px;
+        }
+        .pill {
+            display: inline-block;
+            background: #ff8a65;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin: 5px 3px;
+            font-weight: bold;
+        }
+        .story-text {
+            line-height: 2;
+            font-size: 1.2em;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        /* Modal overlay */
+/* Modal overlay – always flex, hidden with opacity */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;                /* always flex, never hidden via display */
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;        /* disabled when invisible */
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    z-index: 1000;               /* ensure it’s on top */
+}
+.modal.show {
+    pointer-events: auto;
+    opacity: 1;
+}
+
+/* Modal card – smooth transform + opacity */
+.modal-content {
+    background: white;
+    border-radius: 30px;
+    padding: 30px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+    will-change: transform, opacity;
+}
+        .got-it-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 1.2em;
+            background: #81c784;
+            border: none;
+            border-radius: 40px;
+            color: white;
+        }
+        .menu-btn {
+            background: #64b5f6;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            color: white;
+            border-radius: 30px;
+            margin-top: 20px;
+        }
+        .summary-list {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+        }
+        .summary-list li {
+            background: #f1f8e9;
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 12px;
+        }
+        /* ========== Dark Mode Styles ========== */
+body.dark {
+    background: #1e1e2f;
+    color: #e0e0e0;
+}
+body.dark .counter {
+    background: #3a3a5c;
+    color: #221e12;
+}
+body.dark .level-btn {
+    background: #2e7d32;
+    color: #e8f5e9;
+}
+body.dark .story-btn {
+    background: #4e342e;
+    border-color: #ffb74d;
+    color: #ffe0b2;
+}
+body.dark .pill {
+    background: #d84315;
+    color: #fff;
+}
+body.dark .story-text {
+    background: #2c2c3e;
+    color: #f0f0f0;
+}
+body.dark .modal-content {
+    background: #2c2c3e;
+    color: #f0f0f0;
+}
+body.dark .got-it-btn {
+    background: #388e3c;
+}
+body.dark .menu-btn {
+    background: #1565c0;
+}
+body.dark .summary-list li {
+    background: #37474f;
+    color: #eceff1;
+}
+body.dark #themeToggle {
+    filter: invert(1);
+}
+
+body.dark #themeToggle {
+  background: #ffffff20;
+  color: #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* All-done modal buttons spacing */
+#allDoneModal .menu-btn {
+    display: inline-block;
+}
+        
+    </style>
+</head>
+<body>
+
+    <!-- Persistent counter -->
+    <!-- Dark / Light mode toggle -->
+    <div id="topBar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 10px 15px; background: #ffffffcc; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 0 0 20px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; margin-bottom: 20px;">
+  <div id="counter" class="counter" style="display: none; margin: 0; padding: 5px 15px; font-size: 1em; background: #ffecb3; border-radius: 20px;">Words Learnt: <span id="counterNum">0</span></div>
+  <div id="themeToggle" style="cursor: pointer; background: #ffffffcc; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 40px; padding: 8px 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.9em; color: #333; user-select: none; transition: all 0.3s ease;">
+    <span id="themeIcon">🌙</span>
+    <span id="themeLabel">Dark Mode</span>
+  </div>
+</div>
+
+    <!-- Screen: Level Selection -->
+    <div id="levelScreen" class="screen active">
+        <h1>🌟 Choose Your Level</h1>
+        <button class="level-btn" data-level="Beginner">Beginner 🐣</button>
+        <button class="level-btn" data-level="Intermediate">Intermediate 🐥</button>
+        <button class="level-btn" data-level="Advanced">Advanced 🦉</button>
+        <button class="level-btn mega-btn" id="megaStoriesBtn">🚀 The Mega Stories</button>
+    </div>
+
+
+    <!-- Back to HUb Page button -->
+    <button onclick="window.location.href='index.html'" style="
+  background:#1e1e38;
+  border:2px solid #2e2e52;
+  color:#7070a0;
+  border-radius:10px;
+  padding:10px 20px;
+  font-size:0.75rem;
+  font-weight:800;
+  cursor:pointer;
+  font-family:'Segoe UI',system-ui,sans-serif;
+  transition:all .2s;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  letter-spacing:.3px;
+" onmouseover="this.style.borderColor='#7070a0';this.style.color='#e8e8f0';"
+   onmouseout="this.style.borderColor='#2e2e52';this.style.color='#7070a0';">
+  ← Back to Hub
+</button>
+    
+    <!-- Screen: Story List -->
+    <div id="listScreen" class="screen">
+        <h2 id="levelTitle"></h2>
+        <div id="storyButtons"></div>
+        <button class="menu-btn" id="backToLevels">⬅ Back to Levels</button>
+    </div>
+
+    <!-- Screen: Active Story -->
+    <div id="storyScreen" class="screen">
+        <h2 id="storyTitle"></h2>
+        <div class="story-text" id="storyContent"></div>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
+  <button class="menu-btn" id="finishStory" style="flex: 1; min-width: 140px;">📖 Finish reading</button>
+  <button class="menu-btn" id="nextStory" style="flex: 1; min-width: 140px; background: #ffb74d; color: #333;">➡ Next story</button>
+</div>
+    </div>
+
+    <!-- Screen: Summary -->
+    <div id="summaryScreen" class="screen">
+        <h1>🎉 Great Job!</h1>
+        <p>Words you learned this session:</p>
+        <ul id="summaryList" class="summary-list"></ul>
+        <button class="menu-btn" id="backToMenu">🔙 Back to Menu</button>
+    </div>
+
+    <!-- Screen: Mega Stories (placeholder) -->
+<div id="megaScreen" class="screen">
+    <h1>🚀 Mega Stories</h1>
+    <p style="font-size:1.2em; margin: 40px 0;">Novel‑length adventures are on their way!<br>We’re crafting multi‑part tales with rich vocabulary.</p>
+    <p style="font-size:1em; opacity:0.8;">✨ Check back soon for the first saga ✨</p>
+    <button class="menu-btn" id="megaBackToLevels">⬅ Back to Levels</button>
+</div>
+
+    <!-- Modal for word definitions -->
+    <div class="modal" id="wordModal">
+        <div class="modal-content">
+            <h2 id="modalWord"></h2>
+            <p><strong>Meaning:</strong> <span id="modalDefinition"></span></p>
+            <p><em>Example:</em> <span id="modalExample"></span></p>
+            <button class="got-it-btn" id="gotItBtn">Got it! 👍</button>
+        </div>
+    </div>
+
+    <!-- Modal: All stories completed -->
+<div class="modal" id="allDoneModal">
+    <div class="modal-content" style="text-align: center;">
+        <h2>🎉 You’ve read them all!</h2>
+        <p id="allDoneMessage" style="margin: 20px 0; font-size: 1.1em;"></p>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
+            <button class="menu-btn" id="reReadStories" style="flex: 1; min-width: 140px; background: #ffb74d; color: #333;">🔄 Re‑read</button>
+            <button class="menu-btn" id="goNextLevel" style="flex: 1; min-width: 140px;">➡ Next Level</button>
+            
+        </div>
+    </div>
+</div>
+    
+   <script>
+    // ========== CONFIGURATION ==========
+    const STORIES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47-snxzaPFRnl4_nzuPgOXiw9leZApJ5zQ7OFaER6tNPy7LKa1qJxJGECvEKyo-MKp8Xb47EsNWLd/pub?gid=0&single=true&output=tsv';
+    const VOCAB_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47-snxzaPFRnl4_nzuPgOXiw9leZApJ5zQ7OFaER6tNPy7LKa1qJxJGECvEKyo-MKp8Xb47EsNWLd/pub?gid=1607542814&single=true&output=tsv';
+    // ===================================
+
+    // Global data
+    let allStories = [];
+    let vocabMap = new Map();     // key: "word::level" -> { definition, example }
+    let currentLevel = null;
+    let currentStories = [];
+    let currentStoryIndex = 0;
+
+    let learnedWords = {};
+    let learntCount = 0;
+
+    // UI elements
+    const counterDiv = document.getElementById('counter');
+    const counterNum = document.getElementById('counterNum');
+    const levelScreen = document.getElementById('levelScreen');
+    const listScreen = document.getElementById('listScreen');
+    const storyScreen = document.getElementById('storyScreen');
+    const summaryScreen = document.getElementById('summaryScreen');
+    const wordModal = document.getElementById('wordModal');
+    const modalWord = document.getElementById('modalWord');
+    const modalDefinition = document.getElementById('modalDefinition');
+    const modalExample = document.getElementById('modalExample');
+
+    // ========== Animated Modal Logic ==========
+    let currentPillRect = null;
+
+    function showModal(pillElement, word, vocab) {
+        currentPillRect = pillElement.getBoundingClientRect();
+        const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
+        const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
+        const viewportW = window.innerWidth;
+        const viewportH = window.innerHeight;
+
+        modalWord.textContent = word;
+        modalDefinition.textContent = vocab.definition;
+        modalExample.textContent = vocab.example;
+        wordModal.dataset.currentWord = word;
+
+        const content = document.querySelector('.modal-content');
+        const offsetX = pillCenterX - viewportW / 2;
+        const offsetY = pillCenterY - viewportH / 2;
+        content.style.transition = 'none';
+        content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
+        content.style.opacity = '0';
+
+        wordModal.classList.add('show');
+
+        content.getBoundingClientRect(); // reflow
+        content.style.transition = '';
+        content.style.transform = 'translate(0, 0) scale(1)';
+        content.style.opacity = '1';
+    }
+
+    function hideModal() {
+        if (!currentPillRect) {
+            wordModal.classList.remove('show');
+            return;
+        }
+        const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
+        const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
+        const viewportW = window.innerWidth;
+        const viewportH = window.innerHeight;
+        const offsetX = pillCenterX - viewportW / 2;
+        const offsetY = pillCenterY - viewportH / 2;
+
+        const content = document.querySelector('.modal-content');
+        content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
+        content.style.opacity = '0';
+
+        setTimeout(() => {
+            wordModal.classList.remove('show');
+            content.style.transition = 'none';
+            content.style.transform = 'translate(0, 0) scale(1)';
+            content.style.opacity = '1';
+            currentPillRect = null;
+        }, 350);
+    }
+
+    // Pill click → animated modal
+    document.getElementById('storyContent').addEventListener('click', (e) => {
+        const pill = e.target.closest('.pill');
+        if (!pill) return;
+        const word = pill.dataset.word;
+        const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
+        const vocab = vocabMap.get(lookupKey);
+        if (!vocab) {
+            alert(`Definition not found for "${word}" in level ${currentLevel}.`);
+            return;
+        }
+        showModal(pill, word, vocab);
+    });
+
+    // "Got it" button
+    document.getElementById('gotItBtn').addEventListener('click', () => {
+        const word = wordModal.dataset.currentWord;
+        if (!word) return;
+        const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
+        const vocab = vocabMap.get(lookupKey);
+        if (!learnedWords[word.toLowerCase()]) {
+            learnedWords[word.toLowerCase()] = {
+                word: word,
+                definition: vocab ? vocab.definition : '',
+                example: vocab ? vocab.example : ''
+            };
+            learntCount++;
+            updateCounter();
+        }
+        hideModal();
+    });
+
+    // Close modal by clicking overlay
+    wordModal.addEventListener('click', (e) => {
+        if (e.target === wordModal) hideModal();
+    });
+
+    // ========== Data loading ==========
+    function parseTSV(tsvText) {
+        const lines = tsvText.trim().split('\n');
+        if (lines.length < 2) return [];
+        const headers = lines[0].split('\t');
+        const result = [];
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split('\t');
+            const obj = {};
+            headers.forEach((header, idx) => {
+                obj[header.trim()] = (values[idx] || '').trim();
+            });
+            result.push(obj);
+        }
+        return result;
+    }
+
+    async function loadData() {
+        try {
+            const [storiesResp, vocabResp] = await Promise.all([
+                fetch(STORIES_URL),
+                fetch(VOCAB_URL)
+            ]);
+            const storiesTSV = await storiesResp.text();
+            const vocabTSV = await vocabResp.text();
+
+            allStories = parseTSV(storiesTSV);
+            const vocabRows = parseTSV(vocabTSV);
+
+            vocabRows.forEach(row => {
+                const word = row.Word.toLowerCase();
+                const level = row.Level;
+                const key = `${word}::${level}`;
+                vocabMap.set(key, {
+                    definition: row.Definition,
+                    example: row.Example
+                });
+            });
+            console.log(`Loaded ${allStories.length} stories and ${vocabRows.length} vocabulary entries.`);
+        } catch (err) {
+            alert('Oops! Could not load the story data. Check your internet and the links.');
+            console.error(err);
+        }
+    }
+
+    // ========== Helpers ==========
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+
+    function showScreen(screen) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        screen.classList.add('active');
+    }
+
+    function updateCounter() {
+        if (learntCount > 0) {
+            counterDiv.style.display = 'block';
+            counterNum.textContent = learntCount;
+        } else {
+            counterDiv.style.display = 'none';
+        }
+    }
+
+    // ========== Level Selection ==========
+    document.querySelectorAll('.level-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentLevel = btn.dataset.level;
+            document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
+            currentStories = allStories.filter(s => s.Level === currentLevel);
+            shuffleArray(currentStories);
+            // Mega Stories button → show placeholder screen---------------------------------------------------------------------------------------------------------------------------------------------Added the Mega Button Function
+            document.getElementById('megaStoriesBtn').addEventListener('click', () => {
+            showScreen(document.getElementById('megaScreen'));
+            });
+            const container = document.getElementById('storyButtons');
+            container.innerHTML = '';
+            if (currentStories.length === 0) {
+                container.innerHTML = '<p>No stories yet for this level.</p>';
+            } else {
+                currentStories.forEach((story, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'story-btn';
+                    btn.textContent = story.Title;
+                    btn.addEventListener('click', () => startStory(idx));
+                    container.appendChild(btn);
+                });
+            }
+            showScreen(listScreen);
+        });
+    });
+
+    // Back to level selection from list screen
+    document.getElementById('backToLevels').addEventListener('click', () => {
+        showScreen(levelScreen);
+    });
+// Back to levels from mega screen-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+document.getElementById('megaBackToLevels').addEventListener('click', () => {
+    showScreen(levelScreen);
+});
+    // ========== Start a Story ==========
+    function startStory(index) {
+        currentStoryIndex = index;
+        const story = currentStories[index];
+        document.getElementById('storyTitle').textContent = story.Title;
+        const storyText = story.StoryText;
+        const replaced = storyText.replace(/\[([^\]]+)\]/g, (match, word) => {
+            return `<span class="pill" data-word="${word}">${word}</span>`;
+        });
+        document.getElementById('storyContent').innerHTML = replaced;
+        showScreen(storyScreen);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ========== Story Screen Buttons ==========
+    // "Finish reading" → summary (delegated)
+    document.getElementById('storyScreen').addEventListener('click', (e) => {
+        const finishBtn = e.target.closest('#finishStory');
+        if (!finishBtn) return;
+
+        const summaryList = document.getElementById('summaryList');
+        summaryList.innerHTML = '';
+        if (Object.keys(learnedWords).length === 0) {
+            summaryList.innerHTML = '<li>You haven’t collected any words yet. Keep reading!</li>';
+        } else {
+            for (let key in learnedWords) {
+                const lw = learnedWords[key];
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${lw.word}</strong> – ${lw.definition}<br><em>${lw.example}</em>`;
+                summaryList.appendChild(li);
+            }
+        }
+        showScreen(summaryScreen);
+    });
+
+    // ========== All‑Done Modal Logic ==========
+    function showAllDoneModal() {
+        const levelNames = ['Beginner', 'Intermediate', 'Advanced'];
+        const currentIdx = levelNames.indexOf(currentLevel);
+        const nextLevel = (currentIdx >= 0 && currentIdx < levelNames.length - 1) ? levelNames[currentIdx + 1] : null;
+
+        document.getElementById('allDoneMessage').textContent =
+            `You’ve finished every story in the ${currentLevel} level. What would you like to do next?`;
+
+        const nextBtn = document.getElementById('goNextLevel');
+        if (nextLevel) {
+            nextBtn.style.display = 'inline-block';
+            nextBtn.textContent = `➡ Go to ${nextLevel}`;
+            nextBtn.onclick = () => {
+                document.getElementById('allDoneModal').classList.remove('show');
+                currentLevel = nextLevel;
+                document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
+                currentStories = allStories.filter(s => s.Level === currentLevel);
+                shuffleArray(currentStories);
+                const container = document.getElementById('storyButtons');
+                container.innerHTML = '';
+                if (currentStories.length === 0) {
+                    container.innerHTML = '<p>No stories yet for this level.</p>';
+                } else {
+                    currentStories.forEach((story, idx) => {
+                        const btn = document.createElement('button');
+                        btn.className = 'story-btn';
+                        btn.textContent = story.Title;
+                        btn.addEventListener('click', () => startStory(idx));
+                        container.appendChild(btn);
+                    });
+                }
+                showScreen(listScreen);
+            };
+        } else {
+            nextBtn.style.display = 'none';
+        }
+
+        document.getElementById('reReadStories').onclick = () => {
+            document.getElementById('allDoneModal').classList.remove('show');
+            shuffleArray(currentStories);
+            startStory(0);
+        };
+
+        document.getElementById('allDoneModal').classList.add('show');
+    }
+
+    // "Next story" button → next story or all‑done modal
+    document.getElementById('nextStory').addEventListener('click', () => {
+        if (currentStories.length === 0) return;
+        const nextIndex = currentStoryIndex + 1;
+        if (nextIndex < currentStories.length) {
+            startStory(nextIndex);
+        } else {
+            showAllDoneModal();
+        }
+    });
+
+    // Close all‑done modal by clicking outside
+    document.getElementById('allDoneModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('allDoneModal')) {
+            document.getElementById('allDoneModal').classList.remove('show');
+        }
+    });
+
+    // Back to menu from summary screen
+    document.getElementById('backToMenu').addEventListener('click', () => {
+        showScreen(levelScreen);
+    });
+
+    // ========== Dark / Light Mode Toggle ==========
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeLabel = document.getElementById('themeLabel');
+    const body = document.body;
+
+    function setTheme(isDark) {
+        if (isDark) {
+            body.classList.add('dark');
+            themeIcon.textContent = '☀️';
+            themeLabel.textContent = 'Light Mode';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            body.classList.remove('dark');
+            themeIcon.textContent = '🌙';
+            themeLabel.textContent = 'Dark Mode';
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    if (localStorage.getItem('theme') === 'dark') {
+        setTheme(true);
+    } else {
+        setTheme(false);
+    }
+
+    themeToggle.addEventListener('click', () => {
+        setTheme(!body.classList.contains('dark'));
+    });
+
+    // ========== Initialise ==========
+window.addEventListener('DOMContentLoaded', async () => {
+    await loadData();
+    if (allStories.length === 0) {
+        levelScreen.innerHTML = '<h1>🌟 Choose Your Level</h1><p>No stories loaded...</p>';
+    }
+
+    // ----- Auto‑navigate to hub if requested -----
+    const section = getQueryParam('section');
+    const name = getQueryParam('name');
+    if (section === 'hub') {
+        // If name is missing, you can either show login first or go to hub without name.
+        // I'll assume the name is already in the URL (from quiz/story) or in session.
+        if (!name) {
+            // Option A: redirect to login with a return parameter (safer)
+            // window.location.href = 'index.html?section=hub'; // but that would loop.
+            // Option B: just show hub with a default? Let's store name in sessionStorage later.
+            // For simplicity, if you require a name, we'll check sessionStorage.
+            const storedName = sessionStorage.getItem('playerName');
+            if (storedName) {
+                // Use the stored name, optionally update the URL for consistency
+                window.history.replaceState({}, '', `?name=${storedName}&section=hub`);
+                showScreen(levelScreen); // or the function that shows the hub
+            } else {
+                // No name at all - redirect to login with a return URL
+                window.location.href = 'index.html?section=hub&returnFrom=hub';
+            }
+        } else {
+            // Name is present, save it and go straight to hub
+            sessionStorage.setItem('playerName', name);
+            showScreen(levelScreen);  // <-- This directly shows the level selection
+        }
+    }
+    // -------------------------------------------------
+});
+       
+</script>
+</body>
+</html>
