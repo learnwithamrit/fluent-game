@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- ═══════════════════════════════════════
+     PAGE IDENTITY
+     Update title and description when
+     this page goes live
+════════════════════════════════════════ -->
+<title>Topics — Fluent by Amrit</title>
+<meta name="description" content="Explore English learning topics with Fluent by Amrit. Phrases, vocabulary, collocations and conversation skills.">
+<meta property="og:title" content="Topics — Fluent by Amrit">
+<meta property="og:type" content="website">
+
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png">
+<meta name="theme-color" content="#ff8906">
+
+<style>
+
+/* ═══════════════════════════════════════
+   DESIGN TOKENS
+   Matches Fluent game palette exactly
+════════════════════════════════════════ */
+:root {
+  /* Core palette */
+  --bg:     #0d0d1a;
+  --sur:    #161628;
+  --sur2:   #1e1e38;
+  --brd:    #2e2e52;
+  --txt:    #e8e8f0;
+  --mut:    #7070a0;
+  --acc:    #ff8906;   /* orange */
+  --ac2:    #f9c74f;   /* yellow */
+  --grn:    #06d6a0;   /* green */
+  --blu:    #3da9fc;   /* blue */
+  --red:    #ef4565;   /* red/pink */
+  --pur:    #9b72cf;   /* purple */
+
+  /* Topic card fill colours
+     Each topic gets its own colour pair:
+     --topicN-fill  = the background fill
+     --topicN-dark  = darker text/icon colour
+  ─────────────────────────────────────
+  Change these to restyle topic colours
+  without touching anything else */
+  --t1-fill:  #ff8906;   /* Phraseosphere   — orange  */
+  --t1-dark:  #7a3800;
+  --t2-fill:  #06d6a0;   /* Zoosphere       — green   */
+  --t2-dark:  #00503c;
+  --t3-fill:  #3da9fc;   /* Time Triplets   — blue    */
+  --t3-dark:  #003d6b;
+  --t4-fill:  #9b72cf;   /* Collocations    — purple  */
+  --t4-dark:  #3d1f6e;
+  --t5-fill:  #f9c74f;   /* Conversation101 — yellow  */
+  --t5-dark:  #5a4200;
+
+  /* Layout */
+  --max-w:   520px;
+  --radius:  20px;
+  --gap:     14px;
+}
+
+/* ═══════════════════════════════════════
+   RESET & BASE
+════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg);
+  color: var(--txt);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ═══════════════════════════════════════
+   TOP NAV BAR
+   Sticky — always visible while scrolling
+════════════════════════════════════════ */
+#top-nav {
+  width: 100%;
+  background: var(--sur);
+  border-bottom: 1px solid var(--brd);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Brand name in nav */
+#top-nav .nav-brand {
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: var(--acc);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+/* Back to Hub button in nav */
+#top-nav .nav-back {
+  background: var(--sur2);
+  border: 1.5px solid var(--brd);
+  color: var(--mut);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: .3px;
+  font-family: inherit;
+}
+
+#top-nav .nav-back:hover {
+  border-color: var(--acc);
+  color: var(--acc);
+}
+
+/* ═══════════════════════════════════════
+   PAGE WRAPPER
+   Constrains width and centres content
+════════════════════════════════════════ */
+#page-wrapper {
+  width: 100%;
+  max-width: var(--max-w);
+  padding: 0 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══════════════════════════════════════
+   PAGE HEADER
+   Title area at the top of the page
+════════════════════════════════════════ */
+#page-header {
+  padding: 40px 0 32px;
+  text-align: center;
+}
+
+/* Small label above title */
+#page-header .header-eyebrow {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--acc);
+  background: #ff890614;
+  border: 1px solid #ff890633;
+  border-radius: 20px;
+  padding: 4px 14px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+/* Main heading */
+#page-header h1 {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--txt);
+  line-height: 1.2;
+  margin-bottom: 10px;
+  letter-spacing: -.3px;
+}
+
+/* Subtitle */
+#page-header p {
+  font-size: 0.78rem;
+  color: var(--mut);
+  line-height: 1.6;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+/* ═══════════════════════════════════════
+   TOPIC CARDS LIST
+   The main list of topic buttons
+════════════════════════════════════════ */
+#topics-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding-bottom: 48px;
+}
+
+/* ── BASE TOPIC CARD ──
+   All five cards share this structure.
+   Only the colour variables differ.
+   Do NOT change this block to restyle
+   individual cards — change the colour
+   variables in :root instead.
+─────────────────────────────────────── */
+.topic-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: transform .22s cubic-bezier(.34,1.2,.64,1),
+              box-shadow .22s,
+              filter .22s;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+  /* Shadow lifts the card off the dark background */
+  box-shadow: 0 6px 24px #00000044, 0 2px 6px #00000033;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Subtle inner highlight at the top edge */
+.topic-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: rgba(255,255,255,0.15);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+/* Hover / active states */
+.topic-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px #00000055, 0 4px 12px #00000033;
+  filter: brightness(1.06);
+}
+
+.topic-card:active {
+  transform: translateY(0px) scale(0.98);
+  filter: brightness(0.95);
+}
+
+/* ── ICON BOX ──
+   The rounded square on the left of each card */
+.topic-card .card-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+/* ── TEXT BLOCK ──
+   Title and description inside the card */
+.topic-card .card-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.topic-card .card-title {
+  font-size: 1.05rem;
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  /* colour set per-card below */
+}
+
+.topic-card .card-desc {
+  font-size: 0.68rem;
+  line-height: 1.5;
+  opacity: 0.75;
+  /* colour inherits from card */
+}
+
+/* ── ARROW ──
+   The › chevron on the right */
+.topic-card .card-arrow {
+  font-size: 1.3rem;
+  opacity: 0.5;
+  flex-shrink: 0;
+  transition: opacity .2s, transform .2s;
+}
+
+.topic-card:hover .card-arrow {
+  opacity: 0.9;
+  transform: translateX(3px);
+}
+
+/* ── BADGE ──
+   Optional small label (e.g. NEW, SOON) */
+.topic-card .card-badge {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 0.48rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: rgba(0,0,0,0.22);
+  border-radius: 6px;
+  padding: 3px 7px;
+  opacity: 0.85;
+}
+
+/* ═══════════════════════════════════════
+   INDIVIDUAL CARD COLOUR OVERRIDES
+   Each card gets its fill colour and
+   matching text colour from the tokens
+   defined in :root above.
+   To change a card's colour, update the
+   --tN-fill and --tN-dark variables only.
+════════════════════════════════════════ */
+
+/* ── Topic 1: The Phraseosphere ── */
+#topic-phraseosphere {
+  background: linear-gradient(135deg, var(--t1-fill) 0%, #e07000 100%);
+  color: var(--t1-dark);
+}
+#topic-phraseosphere .card-title { color: #0d0d1a; }
+#topic-phraseosphere .card-desc  { color: #3a1800; }
+
+/* ── Topic 2: The Zoosphere ── */
+#topic-zoosphere {
+  background: linear-gradient(135deg, var(--t2-fill) 0%, #04b887 100%);
+  color: var(--t2-dark);
+}
+#topic-zoosphere .card-title { color: #001a14; }
+#topic-zoosphere .card-desc  { color: #003326; }
+
+/* ── Topic 3: Time Expression Triplets ── */
+#topic-time-triplets {
+  background: linear-gradient(135deg, var(--t3-fill) 0%, #2288d8 100%);
+  color: var(--t3-dark);
+}
+#topic-time-triplets .card-title { color: #001929; }
+#topic-time-triplets .card-desc  { color: #002a40; }
+
+/* ── Topic 4: Collocations ── */
+#topic-collocations {
+  background: linear-gradient(135deg, var(--t4-fill) 0%, #7a52b0 100%);
+  color: var(--t4-dark);
+}
+#topic-collocations .card-title { color: #0e0020; }
+#topic-collocations .card-desc  { color: #260b50; }
+
+/* ── Topic 5: Conversation 101 ── */
+#topic-conversation {
+  background: linear-gradient(135deg, var(--t5-fill) 0%, #e0a800 100%);
+  color: var(--t5-dark);
+}
+#topic-conversation .card-title { color: #1a1000; }
+#topic-conversation .card-desc  { color: #3a2800; }
+
+/* ═══════════════════════════════════════
+   FOOTER
+   Same branding footer as content pages
+════════════════════════════════════════ */
+#page-footer {
+  width: 100%;
+  background: var(--sur);
+  border-top: 1px solid var(--brd);
+  padding: 40px 20px 28px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+#footer-brand {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--acc);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+#footer-by {
+  font-size: 0.62rem;
+  color: var(--mut);
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+#footer-divider {
+  width: 36px;
+  border: none;
+  border-top: 1px solid var(--brd);
+  margin: 4px 0;
+}
+
+#footer-mail {
+  font-size: 0.62rem;
+  color: var(--mut);
+  text-decoration: none;
+  transition: color .2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+#footer-mail:hover { color: var(--acc); }
+
+#footer-copy {
+  font-size: 0.58rem;
+  color: var(--brd);
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════ */
+
+/* Tablet — 768px and up */
+@media (min-width: 768px) {
+  #page-wrapper         { max-width: 580px; padding: 0 24px; }
+  #page-header          { padding: 52px 0 36px; }
+  #page-header h1       { font-size: 2.2rem; }
+  #page-header p        { font-size: 0.88rem; }
+  .topic-card           { padding: 24px 22px; gap: 20px; }
+  .topic-card .card-icon{ width: 58px; height: 58px; font-size: 1.8rem; }
+  .topic-card .card-title { font-size: 1.1rem; }
+  .topic-card .card-desc  { font-size: 0.72rem; }
+}
+
+/* Laptop — 1024px and up */
+@media (min-width: 1024px) {
+  :root { --max-w: 620px; }
+  body  { padding-top: 16px; }
+  #page-header          { padding: 60px 0 40px; }
+  #page-header h1       { font-size: 2.5rem; }
+  #page-header p        { font-size: 0.92rem; max-width: 440px; }
+  .topic-card           { padding: 26px 24px; border-radius: 22px; }
+  .topic-card .card-icon{ width: 62px; height: 62px; font-size: 2rem; border-radius: 16px; }
+  .topic-card .card-title { font-size: 1.15rem; }
+  .topic-card .card-desc  { font-size: 0.75rem; }
+  .topic-card .card-arrow { font-size: 1.5rem; }
+  #topics-list { gap: 16px; }
+}
+
+/* Large desktop — 1280px and up */
+@media (min-width: 1280px) {
+  :root { --max-w: 660px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     TOP NAV BAR
+     Sticky navigation — same on all pages
+════════════════════════════════════════ -->
+<nav id="top-nav">
+  <a class="nav-brand" href="hub.html">Fluent</a>
+  <button class="nav-back" onclick="goToHub()">← Hub</button>
+</nav>
+
+
+<!-- ═══════════════════════════════════════
+     PAGE WRAPPER
+════════════════════════════════════════ -->
+<div id="page-wrapper">
+
+
+  <!-- ═══════════════════════════════════════
+       PAGE HEADER
+       Update eyebrow, h1, and p for each
+       version of this page if reused
+  ════════════════════════════════════════ -->
+  <header id="page-header">
+    <div class="header-eyebrow">Learning Topics</div>
+    <h1>What do you want<br>to learn today?</h1>
+    <p>
+      Choose a topic below to explore lessons,
+      examples, and exercises — all designed for
+      real English fluency.
+    </p>
+  </header>
+  <!-- END PAGE HEADER -->
+
+
+  <!-- ═══════════════════════════════════════
+       TOPICS LIST
+       ─────────────────────────────────────
+       HOW TO ADD A NEW TOPIC:
+       1. Copy any .topic-card block below
+       2. Give it a new id (e.g. id="topic-grammar")
+       3. Add a colour override block in the CSS
+          under "INDIVIDUAL CARD COLOUR OVERRIDES"
+       4. Update the onclick to point to your page
+       5. Change icon, title, and description
+       ─────────────────────────────────────
+       HOW TO CONNECT A TOPIC TO A PAGE:
+       Replace  onclick="comingSoon()"
+       with     onclick="goTo('yourpage.html')"
+  ════════════════════════════════════════ -->
+  <main id="topics-list">
+
+
+    <!-- ── TOPIC 1: THE PHRASEOSPHERE ──
+         Orange card
+         Change onclick target when page is ready
+    ─────────────────────────────────────────── -->
+    <div class="topic-card"
+         id="topic-phraseosphere"
+         onclick="comingSoon('The Phraseosphere')"
+         role="button"
+         tabindex="0"
+         aria-label="The Phraseosphere — coming soon">
+
+      <!-- Icon -->
+      <div class="card-icon">🌐</div>
+
+      <!-- Text -->
+      <div class="card-text">
+        <div class="card-title">The Phraseosphere</div>
+        <div class="card-desc">
+          Phrasal verbs, fixed expressions, and the
+          language that holds English together.
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="card-arrow">›</div>
+
+      <!-- Badge — remove when live -->
+      <div class="card-badge">Soon</div>
+
+    </div>
+    <!-- END TOPIC 1 -->
+
+
+    <!-- ── TOPIC 2: THE ZOOSPHERE ──
+         Green card
+         Change onclick target when page is ready
+    ─────────────────────────────────────────── -->
+    <div class="topic-card"
+         id="topic-zoosphere"
+         onclick="comingSoon('The Zoosphere')"
+         role="button"
+         tabindex="0"
+         aria-label="The Zoosphere — coming soon">
+
+      <!-- Icon -->
+      <div class="card-icon">🦁</div>
+
+      <!-- Text -->
+      <div class="card-text">
+        <div class="card-title">The Zoosphere</div>
+        <div class="card-desc">
+          Animal idioms, expressions, and vocabulary
+          drawn from the natural world.
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="card-arrow">›</div>
+
+      <!-- Badge — remove when live -->
+      <div class="card-badge">Soon</div>
+
+    </div>
+    <!-- END TOPIC 2 -->
+
+
+    <!-- ── TOPIC 3: TIME EXPRESSION TRIPLETS ──
+         Blue card
+         Change onclick target when page is ready
+    ─────────────────────────────────────────── -->
+    <div class="topic-card"
+         id="topic-time-triplets"
+         onclick="comingSoon('Time Expression Triplets')"
+         role="button"
+         tabindex="0"
+         aria-label="Time Expression Triplets — coming soon">
+
+      <!-- Icon -->
+      <div class="card-icon">⏱️</div>
+
+      <!-- Text -->
+      <div class="card-text">
+        <div class="card-title">Time Expression Triplets</div>
+        <div class="card-desc">
+          Past, present, future — learn the three
+          forms of every key time expression.
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="card-arrow">›</div>
+
+      <!-- Badge — remove when live -->
+      <div class="card-badge">Soon</div>
+
+    </div>
+    <!-- END TOPIC 3 -->
+
+
+    <!-- ── TOPIC 4: COLLOCATIONS ──
+         Purple card
+         Change onclick target when page is ready
+    ─────────────────────────────────────────── -->
+    <div class="topic-card"
+         id="topic-collocations"
+         onclick="comingSoon('Collocations')"
+         role="button"
+         tabindex="0"
+         aria-label="Collocations — coming soon">
+
+      <!-- Icon -->
+      <div class="card-icon">🔗</div>
+
+      <!-- Text -->
+      <div class="card-text">
+        <div class="card-title">Collocations</div>
+        <div class="card-desc">
+          Words that naturally go together in English.
+          Make your sentences sound native and natural.
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="card-arrow">›</div>
+
+      <!-- Badge — remove when live -->
+      <div class="card-badge">Soon</div>
+
+    </div>
+    <!-- END TOPIC 4 -->
+
+
+    <!-- ── TOPIC 5: CONVERSATION 101 ──
+         Yellow card
+         Change onclick target when page is ready
+    ─────────────────────────────────────────── -->
+    <div class="topic-card"
+         id="topic-conversation"
+         onclick="comingSoon('Conversation 101')"
+         role="button"
+         tabindex="0"
+         aria-label="Conversation 101 — coming soon">
+
+      <!-- Icon -->
+      <div class="card-icon">💬</div>
+
+      <!-- Text -->
+      <div class="card-text">
+        <div class="card-title">Conversation 101</div>
+        <div class="card-desc">
+          Real-world dialogue starters, responses,
+          and the phrases every speaker needs to know.
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="card-arrow">›</div>
+
+      <!-- Badge — remove when live -->
+      <div class="card-badge">Soon</div>
+
+    </div>
+    <!-- END TOPIC 5 -->
+
+
+    <!-- ═══════════════════════════════════════
+         ADD NEW TOPICS HERE
+         Copy the block above and follow the
+         instructions in the HOW TO ADD section
+    ════════════════════════════════════════ -->
+
+
+  </main>
+  <!-- END TOPICS LIST -->
+
+
+</div>
+<!-- END PAGE WRAPPER -->
+
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+     Same on every page — do not change
+════════════════════════════════════════ -->
+<footer id="page-footer">
+  <div id="footer-brand">Fluent</div>
+  <div id="footer-by">by Amrit</div>
+  <hr id="footer-divider">
+  <a id="footer-mail" href="mailto:ilearnwithamrit@gmail.com">
+    ✉ ilearnwithamrit@gmail.com
+  </a>
+  <p id="footer-copy">© 2026 Fluent by Amrit</p>
+</footer>
+<!-- END FOOTER -->
+
+
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT
+     Navigation helpers — same on every page
+     ─────────────────────────────────────
+     TO CONNECT A TOPIC TO A PAGE:
+     Change  onclick="comingSoon('Name')"
+     to      onclick="goTo('pagename.html')"
+     in the HTML above
+════════════════════════════════════════ -->
+<script>
+
+  // ── Get player name from URL or local variable ──
+  function getPlayerName(){
+    if(typeof playerName !== 'undefined' && playerName) return playerName;
+    return decodeURIComponent(
+      new URLSearchParams(window.location.search).get('name') || ''
+    );
+  }
+
+  // ── Navigate to hub, carrying the player name ──
+  function goToHub(){
+    const name = getPlayerName();
+    window.location.href = 'hub.html' +
+      (name ? '?name=' + encodeURIComponent(name) : '');
+  }
+
+  // ── Navigate to any page, carrying the player name ──
+  // Use this when a topic page is ready:
+  // onclick="goTo('phraseosphere.html')"
+  function goTo(page){
+    const name = getPlayerName();
+    window.location.href = page +
+      (name ? '?name=' + encodeURIComponent(name) : '');
+  }
+
+  // ── Placeholder for topics not yet built ──
+  // Remove comingSoon() call from a card's onclick
+  // and replace with goTo('page.html') when ready
+  function comingSoon(topicName){
+    // Simple toast-style message — no browser alert popup
+    showToast(topicName + ' is coming soon! 🌟');
+  }
+
+  // ── Toast notification ──
+  // Small non-intrusive message at the bottom of the screen
+  function showToast(message){
+    // Remove any existing toast first
+    const existing = document.getElementById('toast');
+    if(existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.textContent = message;
+    toast.style.cssText = `
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1e1e38;
+      border: 1.5px solid #2e2e52;
+      color: #e8e8f0;
+      border-radius: 12px;
+      padding: 12px 22px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity .25s, transform .25s;
+      white-space: nowrap;
+      max-width: calc(100vw - 40px);
+    `;
+    document.body.appendChild(toast);
+
+    // Animate in
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(-50%) translateY(0)';
+      });
+    });
+
+    // Animate out and remove after 2.5 seconds
+    setTimeout(()=>{
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(10px)';
+      setTimeout(()=> toast.remove(), 300);
+    }, 2500);
+  }
+
+  // ── Keyboard accessibility ──
+  // Allows Enter key to activate cards
+  document.querySelectorAll('.topic-card').forEach(card => {
+    card.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        card.click();
+      }
+    });
+  });
+
+</script>
+
+</body>
+</html>
