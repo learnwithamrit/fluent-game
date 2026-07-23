@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- ═══════════════════════════════════════
+     PAGE IDENTITY
+     Change title, description, and og tags
+     for each new content page
+════════════════════════════════════════ -->
+<title>Idioms — Fluent by Amrit</title>
+<meta name="description" content="Learn English idioms with Fluent by Amrit. Clear explanations with everyday examples.">
+<meta property="og:title" content="Idioms — Fluent by Amrit">
+<meta property="og:description" content="Learn English idioms with everyday examples.">
+<meta property="og:type" content="article">
+
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png">
+<meta name="theme-color" content="#ff8906">
+
+<style>
+
+/* ═══════════════════════════════════════
+   DESIGN TOKENS
+   All colours live here — change once,
+   updates everywhere
+════════════════════════════════════════ */
+:root {
+  /* Core palette — matches Fluent game */
+  --bg:       #0d0d1a;
+  --sur:      #161628;
+  --sur2:     #1e1e38;
+  --brd:      #2e2e52;
+  --txt:      #e8e8f0;
+  --mut:      #7070a0;
+  --acc:      #ff8906;   /* orange — primary accent */
+  --ac2:      #f9c74f;   /* yellow — secondary accent */
+  --grn:      #06d6a0;   /* green */
+  --blu:      #3da9fc;   /* blue */
+  --red:      #ef4565;   /* red */
+
+  /* Typography scale */
+  --fs-xs:    0.62rem;
+  --fs-sm:    0.78rem;
+  --fs-base:  0.95rem;
+  --fs-md:    1.1rem;
+  --fs-lg:    1.4rem;
+  --fs-xl:    1.9rem;
+  --fs-2xl:   2.4rem;
+
+  /* Spacing */
+  --gap-sm:   12px;
+  --gap-md:   24px;
+  --gap-lg:   48px;
+
+  /* Layout */
+  --max-w:    680px;
+}
+
+/* ═══════════════════════════════════════
+   RESET & BASE
+════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--txt);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: var(--fs-base);
+  line-height: 1.7;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ═══════════════════════════════════════
+   TOP NAV BAR
+   The thin bar at the very top with
+   Back to Hub button and branding
+════════════════════════════════════════ */
+#top-nav {
+  width: 100%;
+  background: var(--sur);
+  border-bottom: 1px solid var(--brd);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+#top-nav .nav-brand {
+  font-size: var(--fs-sm);
+  font-weight: 900;
+  color: var(--acc);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+#top-nav .nav-back {
+  background: var(--sur2);
+  border: 1.5px solid var(--brd);
+  color: var(--mut);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: .3px;
+  font-family: inherit;
+}
+
+#top-nav .nav-back:hover {
+  border-color: var(--acc);
+  color: var(--acc);
+}
+
+/* ═══════════════════════════════════════
+   PAGE WRAPPER
+   Constrains content width on large
+   screens and centres everything
+════════════════════════════════════════ */
+#page-wrapper {
+  width: 100%;
+  max-width: var(--max-w);
+  padding: 0 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══════════════════════════════════════
+   HEADER SECTION
+   Dynamic area — image, category label,
+   title, subtitle. Change these per page.
+════════════════════════════════════════ */
+#page-header {
+  padding: var(--gap-lg) 0 var(--gap-md);
+  text-align: center;
+  border-bottom: 1px solid var(--brd);
+  margin-bottom: var(--gap-lg);
+}
+
+/* The big illustration/icon at the top */
+#header-visual {
+  width: 88px;
+  height: 88px;
+  border-radius: 22px;
+  background: var(--sur);
+  border: 2px solid var(--brd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  margin: 0 auto var(--gap-md);
+  box-shadow: 0 8px 32px #00000044;
+  /* Replace this with an <img> tag if using a real image */
+}
+
+/* Small label above the main title — e.g. "Vocabulary · Intermediate" */
+#header-category {
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--acc);
+  background: #ff890614;
+  border: 1px solid #ff890633;
+  border-radius: 20px;
+  padding: 4px 14px;
+  display: inline-block;
+  margin-bottom: var(--gap-sm);
+}
+
+/* Main page title */
+#header-title {
+  font-size: var(--fs-xl);
+  font-weight: 900;
+  color: var(--txt);
+  line-height: 1.2;
+  letter-spacing: -.5px;
+  margin-bottom: 10px;
+}
+
+/* Subtitle / short description under the title */
+#header-subtitle {
+  font-size: var(--fs-sm);
+  color: var(--mut);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Reading time / difficulty badges row */
+#header-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: var(--gap-md);
+  flex-wrap: wrap;
+}
+
+.meta-badge {
+  font-size: var(--fs-xs);
+  color: var(--mut);
+  background: var(--sur);
+  border: 1px solid var(--brd);
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ═══════════════════════════════════════
+   CONTENT BODY
+   The main text area. All your lesson
+   content goes between the section tags
+   inside #content-body in the HTML.
+════════════════════════════════════════ */
+#content-body {
+  flex: 1;
+  padding-bottom: var(--gap-lg);
+}
+
+/* ── Section — a major chunk of content ── */
+.content-section {
+  margin-bottom: var(--gap-lg);
+}
+
+/* Section heading — e.g. "What are idioms?" */
+.section-heading {
+  font-size: var(--fs-md);
+  font-weight: 900;
+  color: var(--txt);
+  margin-bottom: var(--gap-sm);
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--brd);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-heading .section-icon {
+  font-size: 1.1rem;
+}
+
+/* Regular paragraph text */
+.content-section p {
+  color: var(--mut);
+  font-size: var(--fs-base);
+  line-height: 1.8;
+  margin-bottom: 14px;
+}
+
+.content-section p:last-child {
+  margin-bottom: 0;
+}
+
+/* Highlighted inline text */
+.highlight {
+  color: var(--acc);
+  font-weight: 700;
+}
+
+/* ── Example Card ──
+   Use this for showing idiom/word examples
+   with meaning + usage sentence ── */
+.example-card {
+  background: var(--sur);
+  border: 1.5px solid var(--brd);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: var(--gap-sm);
+  transition: border-color .2s;
+}
+
+.example-card:hover {
+  border-color: var(--acc);
+}
+
+/* The idiom/word itself */
+.example-card .example-phrase {
+  font-size: var(--fs-md);
+  font-weight: 900;
+  color: var(--acc);
+  margin-bottom: 6px;
+}
+
+/* What it means */
+.example-card .example-meaning {
+  font-size: var(--fs-sm);
+  color: var(--txt);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+/* Example sentence in context */
+.example-card .example-usage {
+  font-size: var(--fs-sm);
+  color: var(--mut);
+  font-style: italic;
+  border-left: 3px solid var(--acc);
+  padding-left: 12px;
+  line-height: 1.6;
+}
+
+/* Bengali translation line */
+.example-card .example-bengali {
+  font-size: var(--fs-xs);
+  color: var(--grn);
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+/* ── Info Box ──
+   Use for tips, notes, or warnings ── */
+.info-box {
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: var(--gap-sm);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.info-box.tip {
+  background: #06d6a014;
+  border: 1.5px solid #06d6a033;
+}
+
+.info-box.note {
+  background: #3da9fc14;
+  border: 1.5px solid #3da9fc33;
+}
+
+.info-box.warning {
+  background: #f9c74f14;
+  border: 1.5px solid #f9c74f33;
+}
+
+.info-box .info-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.info-box .info-text {
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+}
+
+.info-box.tip   .info-text { color: var(--grn); }
+.info-box.note  .info-text { color: var(--blu); }
+.info-box.warning .info-text { color: var(--ac2); }
+
+/* ── Quote Block ──
+   For memorable sentences or key points ── */
+.pull-quote {
+  border-left: 4px solid var(--acc);
+  padding: 12px 18px;
+  margin: var(--gap-md) 0;
+  background: var(--sur);
+  border-radius: 0 12px 12px 0;
+}
+
+.pull-quote p {
+  font-size: var(--fs-md) !important;
+  color: var(--txt) !important;
+  font-style: italic;
+  font-weight: 600;
+  margin: 0 !important;
+}
+
+/* ── Number List ──
+   For step-by-step instructions ── */
+.numbered-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.numbered-list li {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.numbered-list li .list-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--acc);
+  color: #0d0d1a;
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.numbered-list li .list-text {
+  font-size: var(--fs-sm);
+  color: var(--mut);
+  line-height: 1.7;
+  flex: 1;
+}
+
+/* ── Divider ── */
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--brd);
+  margin: var(--gap-lg) 0;
+}
+
+/* ── CTA Button ──
+   Use at end of a section to link to
+   a related game or next lesson ── */
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--acc);
+  color: #0d0d1a;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: var(--fs-sm);
+  font-weight: 900;
+  cursor: pointer;
+  transition: all .2s;
+  text-decoration: none;
+  font-family: inherit;
+  letter-spacing: .3px;
+}
+
+.cta-btn:hover {
+  background: #ffaa30;
+  transform: translateY(-2px);
+}
+
+.cta-btn.secondary {
+  background: var(--sur2);
+  color: var(--txt);
+  border: 1.5px solid var(--brd);
+}
+
+.cta-btn.secondary:hover {
+  border-color: var(--acc);
+  color: var(--acc);
+}
+
+/* ── CTA Row — group of buttons ── */
+.cta-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: var(--gap-md);
+}
+
+/* ═══════════════════════════════════════
+   FOOTER SECTION
+   Branding + mailto at the bottom
+   Same on every content page
+════════════════════════════════════════ */
+#page-footer {
+  width: 100%;
+  background: var(--sur);
+  border-top: 1px solid var(--brd);
+  padding: var(--gap-lg) 20px var(--gap-md);
+  margin-top: auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+#footer-brand-name {
+  font-size: var(--fs-lg);
+  font-weight: 900;
+  color: var(--acc);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+#footer-brand-by {
+  font-size: var(--fs-xs);
+  color: var(--mut);
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+#footer-tagline {
+  font-size: var(--fs-xs);
+  color: var(--mut);
+  max-width: 280px;
+  line-height: 1.6;
+}
+
+#footer-divider {
+  width: 40px;
+  border: none;
+  border-top: 1px solid var(--brd);
+}
+
+#footer-mail {
+  font-size: var(--fs-xs);
+  color: var(--mut);
+  text-decoration: none;
+  transition: color .2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#footer-mail:hover {
+  color: var(--acc);
+}
+
+#footer-copy {
+  font-size: var(--fs-xs);
+  color: var(--brd);
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════ */
+@media (min-width: 768px) {
+  #page-wrapper       { padding: 0 32px; }
+  #page-header        { padding: 56px 0 var(--gap-md); }
+  #header-visual      { width: 100px; height: 100px; font-size: 3.2rem; }
+  #header-title       { font-size: var(--fs-2xl); }
+  #header-subtitle    { font-size: var(--fs-base); }
+  .section-heading    { font-size: var(--fs-lg); }
+  .example-card       { padding: 22px 24px; }
+  .example-card .example-phrase { font-size: var(--fs-lg); }
+}
+
+@media (min-width: 1024px) {
+  :root { --max-w: 740px; }
+  #page-header  { padding: 64px 0 var(--gap-md); }
+  #header-title { font-size: 2.8rem; }
+  .content-section p { font-size: var(--fs-md); }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     TOP NAV BAR
+     Sticky bar — always visible while
+     scrolling. Back button + brand name.
+════════════════════════════════════════ -->
+<nav id="top-nav">
+  <a class="nav-brand" href="hub.html">Fluent</a>
+  <button class="nav-back" onclick="goToHub()">← Hub</button>
+</nav>
+
+
+<!-- ═══════════════════════════════════════
+     PAGE WRAPPER
+     All content sits inside this div
+════════════════════════════════════════ -->
+<div id="page-wrapper">
+
+
+  <!-- ═══════════════════════════════════════
+       HEADER SECTION
+       ─────────────────────────────────────
+       WHAT TO CHANGE PER PAGE:
+       1. #header-visual  → change the emoji
+          or replace with an <img> tag
+       2. #header-category → topic label
+       3. #header-title  → main heading
+       4. #header-subtitle → one-line desc
+       5. .meta-badge items → reading time,
+          level, lesson number etc.
+  ════════════════════════════════════════ -->
+  <header id="page-header">
+
+    <!-- Visual / Icon / Image -->
+    <div id="header-visual">
+      <!-- Option A: emoji (default) -->
+      💬
+      <!-- Option B: replace with image tag:
+      <img src="images/idioms-cover.png"
+           alt="Idioms"
+           style="width:100%;height:100%;
+                  object-fit:cover;
+                  border-radius:20px;">
+      -->
+    </div>
+
+    <!-- Category label -->
+    <div id="header-category">Vocabulary · Lesson 01</div>
+
+    <!-- Main title -->
+    <h1 id="header-title">English Idioms</h1>
+
+    <!-- Short description -->
+    <p id="header-subtitle">
+      Idioms are expressions that mean something different
+      from the literal words. Master them and sound
+      like a natural English speaker.
+    </p>
+
+    <!-- Meta info row -->
+    <div id="header-meta">
+      <span class="meta-badge">📖 5 min read</span>
+      <span class="meta-badge">🎯 Intermediate</span>
+      <span class="meta-badge">📌 10 examples</span>
+    </div>
+
+  </header>
+  <!-- END HEADER SECTION -->
+
+
+  <!-- ═══════════════════════════════════════
+       CONTENT BODY
+       ─────────────────────────────────────
+       Add as many .content-section blocks
+       as you need. Each section has:
+       — a .section-heading
+       — paragraphs, example cards,
+         info boxes, quotes, lists etc.
+  ════════════════════════════════════════ -->
+  <main id="content-body">
+
+
+    <!-- ── SECTION 1: Introduction ── -->
+    <section class="content-section">
+
+      <h2 class="section-heading">
+        <span class="section-icon">📌</span>
+        What is an Idiom?
+      </h2>
+
+      <p>
+        An idiom is a group of words whose meaning is
+        <span class="highlight">completely different</span>
+        from the individual words. For example, "kick the bucket"
+        has nothing to do with kicking or buckets — it means to die.
+      </p>
+
+      <p>
+        Native English speakers use idioms constantly in conversation,
+        books, films, and news. Understanding them is one of the fastest
+        ways to improve your comprehension and sound more natural.
+      </p>
+
+      <div class="info-box tip">
+        <span class="info-icon">💡</span>
+        <span class="info-text">
+          You cannot translate idioms word for word.
+          Always learn the full expression as one unit,
+          along with its meaning and a sample sentence.
+        </span>
+      </div>
+
+    </section>
+    <!-- END SECTION 1 -->
+
+
+    <hr class="section-divider">
+
+
+    <!-- ── SECTION 2: Examples ── -->
+    <section class="content-section">
+
+      <h2 class="section-heading">
+        <span class="section-icon">💬</span>
+        10 Common Idioms
+      </h2>
+
+      <p>
+        Here are ten everyday English idioms you will hear
+        in real conversations. Study the meaning and usage
+        sentence for each one.
+      </p>
+
+      <!-- ── EXAMPLE CARD 1 ── -->
+      <div class="example-card">
+        <div class="example-phrase">Break the ice</div>
+        <div class="example-meaning">
+          To do or say something to relieve tension
+          or awkwardness in a social situation.
+        </div>
+        <div class="example-usage">
+          "The teacher told a joke to
+          <strong>break the ice</strong>
+          on the first day of class."
+        </div>
+        <div class="example-bengali">
+          বাংলা: সম্পর্ক বা পরিস্থিতি স্বাভাবিক করা
+        </div>
+      </div>
+
+      <!-- ── EXAMPLE CARD 2 ── -->
+      <div class="example-card">
+        <div class="example-phrase">Hit the nail on the head</div>
+        <div class="example-meaning">
+          To describe exactly what is causing a situation or problem.
+        </div>
+        <div class="example-usage">
+          "You really
+          <strong>hit the nail on the head</strong>
+          when you said the problem is communication."
+        </div>
+        <div class="example-bengali">
+          বাংলা: একদম সঠিক কথা বলা
+        </div>
+      </div>
+
+      <!-- ── EXAMPLE CARD 3 ── -->
+      <div class="example-card">
+        <div class="example-phrase">Under the weather</div>
+        <div class="example-meaning">
+          Feeling slightly ill or unwell.
+        </div>
+        <div class="example-usage">
+          "I won't be coming to school today —
+          I'm feeling a bit
+          <strong>under the weather</strong>."
+        </div>
+        <div class="example-bengali">
+          বাংলা: একটু অসুস্থ বোধ করা
+        </div>
+      </div>
+
+      <!-- Add more .example-card blocks here
+           following the same pattern -->
+
+    </section>
+    <!-- END SECTION 2 -->
+
+
+    <hr class="section-divider">
+
+
+    <!-- ── SECTION 3: How to Learn ── -->
+    <section class="content-section">
+
+      <h2 class="section-heading">
+        <span class="section-icon">🎯</span>
+        How to Learn Idioms Effectively
+      </h2>
+
+      <div class="pull-quote">
+        <p>
+          "Don't just memorise the meaning — use it in
+          a sentence you could say today."
+        </p>
+      </div>
+
+      <p>
+        The biggest mistake students make is writing down
+        idioms without ever using them. Here is a
+        simple method that works:
+      </p>
+
+      <ol class="numbered-list">
+        <li>
+          <span class="list-num">1</span>
+          <span class="list-text">
+            Read the idiom and its meaning carefully.
+            Make sure you understand the context it is used in.
+          </span>
+        </li>
+        <li>
+          <span class="list-num">2</span>
+          <span class="list-text">
+            Say the example sentence out loud three times.
+            Your mouth needs to practise, not just your eyes.
+          </span>
+        </li>
+        <li>
+          <span class="list-num">3</span>
+          <span class="list-text">
+            Write your own sentence using the idiom — about
+            your school, family, or daily life. Personal
+            sentences stick in memory much longer.
+          </span>
+        </li>
+        <li>
+          <span class="list-num">4</span>
+          <span class="list-text">
+            Try to use it in conversation within 24 hours.
+            Even if you make a mistake, that is how fluency builds.
+          </span>
+        </li>
+      </ol>
+
+      <div class="info-box note">
+        <span class="info-icon">📝</span>
+        <span class="info-text">
+          Keep a small notebook just for idioms.
+          Write the idiom, meaning, and one personal
+          sentence. Review it every few days.
+        </span>
+      </div>
+
+    </section>
+    <!-- END SECTION 3 -->
+
+
+    <hr class="section-divider">
+
+
+    <!-- ── SECTION 4: CTA / Next Steps ── -->
+    <section class="content-section">
+
+      <h2 class="section-heading">
+        <span class="section-icon">▶</span>
+        Ready to Practice?
+      </h2>
+
+      <p>
+        Now that you know these idioms, test yourself
+        with the Idiomize game — tap the right meaning,
+        earn points, and build your vocabulary the fun way.
+      </p>
+
+      <div class="cta-row">
+        <button class="cta-btn" onclick="goTo('idiomize.html')">
+          Play Idiomize →
+        </button>
+        <button class="cta-btn secondary" onclick="goToHub()">
+          ← Back to Hub
+        </button>
+      </div>
+
+    </section>
+    <!-- END SECTION 4 -->
+
+
+  </main>
+  <!-- END CONTENT BODY -->
+
+
+</div>
+<!-- END PAGE WRAPPER -->
+
+
+<!-- ═══════════════════════════════════════
+     FOOTER SECTION
+     Same on every content page.
+     Only change the year in the copyright.
+════════════════════════════════════════ -->
+<footer id="page-footer">
+
+  <!-- Brand -->
+  <div id="footer-brand-name">Fluent</div>
+  <div id="footer-brand-by">by Amrit</div>
+
+  <!-- Short tagline -->
+  <p id="footer-tagline">
+    Interactive English learning games
+    for students of all levels.
+  </p>
+
+  <hr id="footer-divider">
+
+  <!-- Feedback email -->
+  <a id="footer-mail"
+     href="mailto:ilearnwithamrit@gmail.com">
+    ✉ ilearnwithamrit@gmail.com
+  </a>
+
+  <!-- Copyright -->
+  <p id="footer-copy">© 2026 Fluent by Amrit</p>
+
+</footer>
+<!-- END FOOTER -->
+
+
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT
+     Navigation helpers — same on every
+     content page, no changes needed
+════════════════════════════════════════ -->
+<script>
+
+  // ── Get the player name from URL or local var ──
+  function getPlayerName(){
+    if(typeof playerName !== 'undefined' && playerName) return playerName;
+    return decodeURIComponent(
+      new URLSearchParams(window.location.search).get('name') || ''
+    );
+  }
+
+  // ── Go back to the hub, carrying the name ──
+  function goToHub(){
+    const name = getPlayerName();
+    window.location.href = 'hub.html' +
+      (name ? '?name=' + encodeURIComponent(name) : '');
+  }
+
+  // ── Navigate to any game page, carrying the name ──
+  function goTo(page){
+    const name = getPlayerName();
+    window.location.href = page +
+      (name ? '?name=' + encodeURIComponent(name) : '');
+  }
+
+</script>
+
+</body>
+</html>
