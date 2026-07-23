@@ -27,16 +27,20 @@
             --grn: #06d6a0;
             --blu: #3da9fc;
             --red: #ef4565;
-            --fs-xs: 0.62rem;
-            --fs-sm: 0.78rem;
-            --fs-base: 0.95rem;
-            --fs-md: 1.1rem;
-            --fs-lg: 1.4rem;
-            --fs-xl: 1.9rem;
-            --fs-2xl: 2.4rem;
-            --gap-sm: 12px;
-            --gap-md: 24px;
-            --gap-lg: 48px;
+            --ex-usage: #c4c4e6;   /* more legible example text */
+
+            /* increased font scale */
+            --fs-xs: 0.72rem;
+            --fs-sm: 0.88rem;
+            --fs-base: 1.05rem;
+            --fs-md: 1.2rem;
+            --fs-lg: 1.5rem;
+            --fs-xl: 2.1rem;
+            --fs-2xl: 2.7rem;
+
+            --gap-sm: 14px;
+            --gap-md: 28px;
+            --gap-lg: 56px;
             --max-w: 740px;
         }
 
@@ -64,8 +68,10 @@
             flex-direction: column;
             align-items: center;
             position: relative;
+            padding-bottom: 100px; /* space for FAB */
         }
 
+        /* ── TOP NAV ── */
         #top-nav {
             width: 100%;
             background: var(--sur);
@@ -94,8 +100,8 @@
             background: var(--sur2);
             border: 1.5px solid var(--brd);
             color: var(--mut);
-            border-radius: 8px;
-            padding: 7px 14px;
+            border-radius: 10px;
+            padding: 8px 16px;
             font-size: var(--fs-xs);
             font-weight: 800;
             cursor: pointer;
@@ -118,6 +124,7 @@
             pointer-events: none;
         }
 
+        /* ── PAGE WRAPPER ── */
         #page-wrapper {
             width: 100%;
             max-width: var(--max-w);
@@ -127,6 +134,7 @@
             flex-direction: column;
         }
 
+        /* ── HEADER ── */
         #page-header {
             padding: var(--gap-lg) 0 var(--gap-md);
             text-align: center;
@@ -143,7 +151,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.8rem;
+            font-size: 3rem;
             margin: 0 auto var(--gap-md);
             box-shadow: 0 8px 32px #00000044;
         }
@@ -174,7 +182,7 @@
         #header-subtitle {
             font-size: var(--fs-sm);
             color: var(--mut);
-            max-width: 480px;
+            max-width: 520px;
             margin: 0 auto;
             line-height: 1.6;
         }
@@ -194,12 +202,13 @@
             background: var(--sur);
             border: 1px solid var(--brd);
             border-radius: 20px;
-            padding: 4px 12px;
+            padding: 4px 14px;
             display: inline-flex;
             align-items: center;
             gap: 5px;
         }
 
+        /* ── CONTENT ── */
         #content-body {
             flex: 1;
             padding-bottom: var(--gap-lg);
@@ -222,14 +231,14 @@
         }
 
         .section-heading .section-icon {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
         }
 
         .example-card {
             background: var(--sur);
             border: 1.5px solid var(--brd);
-            border-radius: 16px;
-            padding: 18px 20px;
+            border-radius: 18px;
+            padding: 20px 22px;
             margin-bottom: var(--gap-sm);
             transition: border-color .2s;
         }
@@ -242,23 +251,23 @@
             font-size: var(--fs-md);
             font-weight: 900;
             color: var(--acc);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .example-card .example-meaning {
             font-size: var(--fs-sm);
             color: var(--txt);
-            line-height: 1.6;
-            margin-bottom: 10px;
+            line-height: 1.7;
+            margin-bottom: 12px;
         }
 
         .example-card .example-usage {
             font-size: var(--fs-sm);
-            color: var(--mut);
+            color: var(--ex-usage);   /* now clearly visible */
             font-style: italic;
             border-left: 3px solid var(--acc);
-            padding-left: 12px;
-            line-height: 1.6;
+            padding-left: 14px;
+            line-height: 1.7;
         }
 
         .example-card .example-bengali {
@@ -266,6 +275,7 @@
             color: var(--grn);
             margin-top: 8px;
             font-weight: 700;
+            display: inline; /* keep inline with meaning */
         }
 
         /* Desktop table */
@@ -281,7 +291,7 @@
             font-size: var(--fs-sm);
             background: var(--sur);
             border: 1.5px solid var(--brd);
-            border-radius: 16px;
+            border-radius: 18px;
             overflow: hidden;
         }
 
@@ -289,7 +299,7 @@
             background: var(--sur2);
             color: var(--txt);
             font-weight: 900;
-            padding: 16px 18px;
+            padding: 18px 18px;
             text-align: left;
             border-bottom: 2px solid var(--brd);
             font-size: var(--fs-sm);
@@ -303,6 +313,7 @@
             color: var(--mut);
             vertical-align: top;
             line-height: 1.7;
+            font-size: var(--fs-base);
         }
 
         .desktop-table tr:last-child td {
@@ -319,64 +330,64 @@
             display: block;
         }
 
-        .pull-quote {
-            border-left: 4px solid var(--acc);
-            padding: 12px 18px;
-            margin: var(--gap-md) 0;
-            background: var(--sur);
-            border-radius: 0 12px 12px 0;
-        }
-
-        .pull-quote p {
-            font-size: var(--fs-md);
-            color: var(--txt);
-            font-style: italic;
-            font-weight: 600;
-        }
-
-        .cta-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: var(--gap-md);
-            justify-content: center;
-        }
-
-        .cta-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+        /* ── FLOATING HUB BUTTON ── */
+        #hub-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 150;
             background: var(--acc);
             color: #0d0d1a;
             border: none;
-            border-radius: 12px;
-            padding: 12px 24px;
-            font-size: var(--fs-sm);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.6rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 24px #00000088;
+            transition: all .2s;
+            line-height: 1;
+        }
+
+        #hub-fab:hover {
+            background: #ffaa30;
+            transform: scale(1.08);
+        }
+
+        /* ── CHOOSE TOPIC SECTION ── */
+        #topic-section {
+            margin-top: var(--gap-lg);
+            text-align: center;
+        }
+
+        .btn-topic-choose {
+            background: var(--acc);
+            color: #0d0d1a;
+            border: none;
+            border-radius: 16px;
+            padding: 18px 36px;
+            font-size: 1.6rem;
             font-weight: 900;
             cursor: pointer;
             transition: all .2s;
-            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
             font-family: inherit;
-            letter-spacing: .3px;
+            letter-spacing: .5px;
+            box-shadow: 0 8px 28px #00000066;
         }
 
-        .cta-btn:hover {
+        .btn-topic-choose:hover {
             background: #ffaa30;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
         }
 
-        .cta-btn.secondary {
-            background: var(--sur2);
-            color: var(--txt);
-            border: 1.5px solid var(--brd);
-        }
-
-        .cta-btn.secondary:hover {
-            border-color: var(--acc);
-            color: var(--acc);
-        }
-
-        /* Modal */
+        /* ── MODAL ── */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -395,56 +406,95 @@
         .modal-content {
             background: var(--sur);
             border: 1.5px solid var(--brd);
-            border-radius: 20px;
-            padding: 28px 24px;
+            border-radius: 24px;
+            padding: 32px 24px;
             width: 100%;
-            max-width: 500px;
-            max-height: 80vh;
+            max-width: 600px;
+            max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px #000000aa;
+            box-shadow: 0 20px 60px #000000dd;
         }
 
         .modal-content h2 {
             font-size: var(--fs-lg);
             font-weight: 900;
             color: var(--txt);
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             text-align: center;
         }
 
-        .modal-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        /* accordion styles */
+        .accordion-item {
+            margin-bottom: 12px;
+            border: 1.5px solid var(--brd);
+            border-radius: 14px;
+            overflow: hidden;
+            background: var(--sur2);
         }
 
-        .modal-list li button {
+        .accordion-header {
             width: 100%;
-            background: var(--sur2);
-            border: 1.5px solid var(--brd);
+            background: transparent;
+            border: none;
             color: var(--txt);
-            border-radius: 12px;
-            padding: 14px 18px;
             font-size: var(--fs-base);
-            font-weight: 700;
-            cursor: pointer;
-            transition: all .2s;
+            font-weight: 800;
+            padding: 16px 20px;
             text-align: left;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between;
             font-family: inherit;
+            transition: background .2s;
         }
 
-        .modal-list li button:hover {
-            border-color: var(--acc);
+        .accordion-header:hover {
             background: #ff890612;
         }
 
-        .modal-list .topic-icon {
-            font-size: 1.4rem;
-            flex-shrink: 0;
+        .accordion-header .acc-icon {
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+
+        .accordion-header .arrow {
+            font-size: 1rem;
+            transition: transform .2s;
+        }
+
+        .accordion-item.open .accordion-header .arrow {
+            transform: rotate(90deg);
+        }
+
+        .accordion-body {
+            display: none;
+            padding: 0 20px 16px;
+        }
+
+        .accordion-item.open .accordion-body {
+            display: block;
+        }
+
+        .sub-topic-btn {
+            width: 100%;
+            background: var(--sur);
+            border: 1px solid var(--brd);
+            color: var(--txt);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 8px;
+            font-size: var(--fs-sm);
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            transition: all .2s;
+            font-family: inherit;
+        }
+
+        .sub-topic-btn:hover {
+            border-color: var(--acc);
+            background: #ff890610;
         }
 
         .modal-close {
@@ -453,8 +503,8 @@
             background: transparent;
             border: 1.5px solid var(--brd);
             color: var(--mut);
-            border-radius: 10px;
-            padding: 10px 24px;
+            border-radius: 12px;
+            padding: 10px 28px;
             font-size: var(--fs-sm);
             font-weight: 800;
             cursor: pointer;
@@ -467,6 +517,7 @@
             color: var(--acc);
         }
 
+        /* ── FOOTER ── */
         #page-footer {
             width: 100%;
             background: var(--sur);
@@ -498,7 +549,7 @@
         #footer-tagline {
             font-size: var(--fs-xs);
             color: var(--mut);
-            max-width: 280px;
+            max-width: 300px;
             line-height: 1.6;
         }
 
@@ -527,6 +578,7 @@
             color: var(--brd);
         }
 
+        /* ── RESPONSIVE ── */
         @media (min-width: 768px) {
             #page-wrapper {
                 padding: 0 32px;
@@ -549,7 +601,7 @@
                 font-size: var(--fs-lg);
             }
             .example-card {
-                padding: 22px 24px;
+                padding: 24px 28px;
             }
             .example-card .example-phrase {
                 font-size: var(--fs-lg);
@@ -560,17 +612,22 @@
             .mobile-cards {
                 display: none;
             }
+            .desktop-table th,
+            .desktop-table td {
+                padding: 20px 22px;
+                font-size: var(--fs-base);
+            }
         }
 
         @media (min-width: 1024px) {
             :root {
-                --max-w: 780px;
+                --max-w: 800px;
             }
             #page-header {
                 padding: 64px 0 var(--gap-md);
             }
             #header-title {
-                font-size: 2.8rem;
+                font-size: 3rem;
             }
         }
     </style>
@@ -579,11 +636,14 @@
 
     <nav id="top-nav">
         <a class="nav-brand" href="hub.html">Fluent</a>
-        <button class="nav-btn" onclick="goToPrev()" id="btn-prev" disabled>← Previous</button>
-        <button class="nav-btn" onclick="goToNext()" id="btn-next" disabled>Next →</button>
-        <button class="nav-btn" onclick="openModal()">📂 Topics</button>
-        <button class="nav-btn" onclick="goToHub()">🏠 Hub</button>
+        <div style="display: flex; gap: 8px;">
+            <button class="nav-btn" onclick="goToPrev()" id="btn-prev" disabled>← Previous</button>
+            <button class="nav-btn" onclick="goToNext()" id="btn-next" disabled>Next →</button>
+        </div>
     </nav>
+
+    <!-- floating hub button -->
+    <button id="hub-fab" onclick="goToHub()" title="Back to Hub">🏠</button>
 
     <div id="page-wrapper">
         <header id="page-header">
@@ -597,13 +657,20 @@
         <main id="content-body">
             <div id="desktop-table" class="desktop-table-wrapper"></div>
             <div id="mobile-cards" class="mobile-cards"></div>
+            <!-- choose topic button placed after content -->
+            <section id="topic-section" style="display: none;">
+                <button class="btn-topic-choose" onclick="openModal()">
+                    📂 Choose Another Topic
+                </button>
+            </section>
         </main>
     </div>
 
+    <!-- accordion modal -->
     <div class="modal-overlay" id="topic-modal">
         <div class="modal-content">
-            <h2>Choose a Topic</h2>
-            <ul class="modal-list" id="modal-list"></ul>
+            <h2>Explore Topics</h2>
+            <div id="accordion-container"></div>
             <button class="modal-close" onclick="closeModal()">✕ Close</button>
         </div>
     </div>
@@ -637,15 +704,21 @@
                 return new URLSearchParams(window.location.search).get('sheet') || '';
             }
 
+            function getSectionParam() {
+                return new URLSearchParams(window.location.search).get('section') || '';
+            }
+
             function goToHub() {
                 const name = getPlayerName();
                 window.location.href = 'hub.html' + (name ? '?name=' + encodeURIComponent(name) : '');
             }
 
-            function goToLesson(sheetName) {
+            function goToLesson(sheetName, section = '') {
                 const name = getPlayerName();
-                window.location.href = 'phraseosphere.html?sheet=' + encodeURIComponent(sheetName) +
-                    (name ? '&name=' + encodeURIComponent(name) : '');
+                let url = 'phraseosphere.html?sheet=' + encodeURIComponent(sheetName);
+                if (section) url += '&section=' + encodeURIComponent(section);
+                if (name) url += '&name=' + encodeURIComponent(name);
+                window.location.href = url;
             }
 
             function goToNext() {
@@ -662,7 +735,7 @@
 
             function openModal() {
                 document.getElementById('topic-modal').classList.add('active');
-                buildModalList();
+                buildAccordion();
             }
 
             function closeModal() {
@@ -673,21 +746,74 @@
                 if (e.target === this) closeModal();
             });
 
-            function buildModalList() {
-                const list = document.getElementById('modal-list');
-                list.innerHTML = '';
+            // Build accordion from allLessons (with possible sub_categories column)
+            function buildAccordion() {
+                const container = document.getElementById('accordion-container');
+                container.innerHTML = '';
                 allLessons.forEach(lesson => {
-                    const li = document.createElement('li');
-                    const btn = document.createElement('button');
-                    btn.innerHTML =
-                        `<span class="topic-icon">${lesson.icon||'📄'}</span> ${lesson.title}`;
-                    btn.addEventListener('click', () => {
-                        closeModal();
-                        goToLesson(lesson.sheet_name);
+                    const item = document.createElement('div');
+                    item.className = 'accordion-item';
+
+                    const header = document.createElement('button');
+                    header.className = 'accordion-header';
+                    header.innerHTML = `
+                        <span><span class="acc-icon">${lesson.icon || '📄'}</span> ${lesson.title}</span>
+                        <span class="arrow">▶</span>
+                    `;
+                    header.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        item.classList.toggle('open');
                     });
-                    li.appendChild(btn);
-                    list.appendChild(li);
+
+                    const body = document.createElement('div');
+                    body.className = 'accordion-body';
+
+                    // Check for sub_categories (column index 9, after description)
+                    const subCategoriesStr = lesson.sub_categories || '';
+                    if (subCategoriesStr.trim()) {
+                        const subs = subCategoriesStr.split(',').map(s => s.trim());
+                        subs.forEach(sub => {
+                            const btn = document.createElement('button');
+                            btn.className = 'sub-topic-btn';
+                            btn.textContent = sub;
+                            btn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                closeModal();
+                                // if same lesson, just scroll; else navigate
+                                if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) {
+                                    scrollToSection(sub);
+                                } else {
+                                    goToLesson(lesson.sheet_name, sub);
+                                }
+                            });
+                            body.appendChild(btn);
+                        });
+                    } else {
+                        // No subcategories: clicking the header loads the whole lesson
+                        header.addEventListener('click', function loadLesson() {
+                            closeModal();
+                            if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) {
+                                // already there, just close
+                            } else {
+                                goToLesson(lesson.sheet_name);
+                            }
+                        });
+                        // also make the whole header clickable as fallback
+                    }
+
+                    item.appendChild(header);
+                    item.appendChild(body);
+                    container.appendChild(item);
                 });
+            }
+
+            function scrollToSection(sectionName) {
+                // slugify section name similarly to how we create ids
+                const id = sectionName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                const el = document.getElementById(id);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             }
 
             function parseCSV(text) {
@@ -723,7 +849,7 @@
 
             async function loadIndex() {
                 const rows = await fetchCSV(BASE_CSV);
-                // Find header row
+                // Find header row (order, sheet_name, gid, title, format, icon, meta_visual, meta_badges, description, sub_categories)
                 let headerIdx = -1;
                 for (let i = 0; i < rows.length; i++) {
                     if (rows[i].length >= 7 &&
@@ -748,7 +874,8 @@
                         icon: r[5].trim(),
                         meta_visual: r[6].trim(),
                         meta_badges: r[7] ? r[7].trim() : '',
-                        description: r[8] ? r[8].trim() : ''
+                        description: r[8] ? r[8].trim() : '',
+                        sub_categories: r[9] ? r[9].trim() : '' // new column for subcategories
                     });
                 }
                 allLessons.sort((a, b) => a.order - b.order);
@@ -770,7 +897,10 @@
                     });
                 }
 
-                // Parse data rows into groups
+                // Show topic section (choose button)
+                document.getElementById('topic-section').style.display = 'block';
+
+                // Group data rows by Category (column A)
                 const groups = [];
                 let currentGroup = null;
                 for (const row of dataRows) {
@@ -819,6 +949,7 @@
                             const tdExample = document.createElement('td');
                             tdExample.textContent = item.example;
                             tdExample.style.fontStyle = 'italic';
+                            tdExample.style.color = 'var(--ex-usage)';
                             tr.appendChild(tdPhrase);
                             tr.appendChild(tdMeaning);
                             tr.appendChild(tdExample);
@@ -828,14 +959,15 @@
                     tableDiv.appendChild(table);
                 }
 
-                // Build mobile cards
+                // Build mobile cards with section headings and ids
                 const mobileDiv = document.getElementById('mobile-cards');
                 mobileDiv.innerHTML = '';
                 groups.forEach(group => {
                     const section = document.createElement('section');
                     section.className = 'content-section';
+                    const slug = group.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
                     section.innerHTML = `
-                        <h2 class="section-heading">
+                        <h2 class="section-heading" id="${slug}">
                             <span class="section-icon">📌</span> ${group.name}
                         </h2>`;
                     group.items.forEach(item => {
@@ -849,13 +981,19 @@
                     });
                     mobileDiv.appendChild(section);
                 });
+
+                // After rendering, check for section param and scroll to it
+                const sectionParam = getSectionParam();
+                if (sectionParam) {
+                    setTimeout(() => scrollToSection(sectionParam), 300);
+                }
             }
 
             function formatMeaning(text) {
-                // Replace Bengali in brackets with styled span
+                // Bengali part in brackets styled green
                 return text.replace(/\(([^)]+)\)/g,
-                    '<span class="example-bengali" style="display:inline;font-size:var(--fs-xs);color:var(--grn);font-weight:700;">($1)</span>'
-                    );
+                    '<span class="example-bengali">($1)</span>'
+                );
             }
 
             function updateNavButtons() {
