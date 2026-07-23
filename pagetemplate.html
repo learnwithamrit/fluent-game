@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- ═══════════════════════════════════════
+         PAGE IDENTITY
+         ✏️  Change title, description, and og tags
+         for each new content page
+    ════════════════════════════════════════ -->
+    <title>Lesson Title — Fluent by Amrit</title>
+    <meta name="description" content="A short description of this lesson for search engines and social previews.">
+    <meta property="og:title" content="Lesson Title — Fluent by Amrit">
+    <meta property="og:description" content="A short description of this lesson for social previews.">
+    <meta property="og:type" content="article">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png">
+    <meta name="theme-color" content="#ff8906">
+
+    <style>
+
+        /* ═══════════════════════════════════════
+           DESIGN TOKENS
+           All colours live here — change once,
+           updates everywhere
+        ════════════════════════════════════════ */
+        :root {
+            /* Core palette — matches Fluent game */
+            --bg: #0d0d1a;
+            --sur: #161628;
+            --sur2: #1e1e38;
+            --brd: #2e2e52;
+            --txt: #e8e8f0;
+            --mut: #7070a0;
+            --acc: #ff8906;
+            /* orange — primary accent */
+            --ac2: #f9c74f;
+            /* yellow — secondary accent */
+            --grn: #06d6a0;
+            /* green */
+            --blu: #3da9fc;
+            /* blue */
+            --red: #ef4565;
+            /* red */
+
+            /* Typography scale */
+            --fs-xs: 0.62rem;
+            --fs-sm: 0.78rem;
+            --fs-base: 0.95rem;
+            --fs-md: 1.1rem;
+            --fs-lg: 1.4rem;
+            --fs-xl: 1.9rem;
+            --fs-2xl: 2.4rem;
+
+            /* Spacing */
+            --gap-sm: 12px;
+            --gap-md: 24px;
+            --gap-lg: 48px;
+
+            /* Layout */
+            --max-w: 680px;
+        }
+
+        /* ═══════════════════════════════════════
+           RESET & BASE
+        ════════════════════════════════════════ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--txt);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-size: var(--fs-base);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ═══════════════════════════════════════
+           TOP NAV BAR
+           The thin bar at the very top with
+           Back to Hub button and branding
+        ════════════════════════════════════════ */
+        #top-nav {
+            width: 100%;
+            background: var(--sur);
+            border-bottom: 1px solid var(--brd);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        #top-nav .nav-brand {
+            font-size: var(--fs-sm);
+            font-weight: 900;
+            color: var(--acc);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        #top-nav .nav-back {
+            background: var(--sur2);
+            border: 1.5px solid var(--brd);
+            color: var(--mut);
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: var(--fs-xs);
+            font-weight: 800;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: .3px;
+            font-family: inherit;
+        }
+
+        #top-nav .nav-back:hover {
+            border-color: var(--acc);
+            color: var(--acc);
+        }
+
+        /* ═══════════════════════════════════════
+           PAGE WRAPPER
+           Constrains content width on large
+           screens and centres everything
+        ════════════════════════════════════════ */
+        #page-wrapper {
+            width: 100%;
+            max-width: var(--max-w);
+            padding: 0 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ═══════════════════════════════════════
+           HEADER SECTION
+           ✏️  Change the visual, category label,
+           title, subtitle, and meta badges per page.
+        ════════════════════════════════════════ */
+        #page-header {
+            padding: var(--gap-lg) 0 var(--gap-md);
+            text-align: center;
+            border-bottom: 1px solid var(--brd);
+            margin-bottom: var(--gap-lg);
+        }
+
+        /* The big illustration/icon at the top */
+        #header-visual {
+            width: 88px;
+            height: 88px;
+            border-radius: 22px;
+            background: var(--sur);
+            border: 2px solid var(--brd);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            margin: 0 auto var(--gap-md);
+            box-shadow: 0 8px 32px #00000044;
+            /* ✏️  Replace this with an <img> tag if using a real image */
+        }
+
+        /* Small label above the main title */
+        #header-category {
+            font-size: var(--fs-xs);
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--acc);
+            background: #ff890614;
+            border: 1px solid #ff890633;
+            border-radius: 20px;
+            padding: 4px 14px;
+            display: inline-block;
+            margin-bottom: var(--gap-sm);
+        }
+
+        /* Main page title */
+        #header-title {
+            font-size: var(--fs-xl);
+            font-weight: 900;
+            color: var(--txt);
+            line-height: 1.2;
+            letter-spacing: -.5px;
+            margin-bottom: 10px;
+        }
+
+        /* Subtitle / short description under the title */
+        #header-subtitle {
+            font-size: var(--fs-sm);
+            color: var(--mut);
+            max-width: 480px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Reading time / difficulty badges row */
+        #header-meta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: var(--gap-md);
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            font-size: var(--fs-xs);
+            color: var(--mut);
+            background: var(--sur);
+            border: 1px solid var(--brd);
+            border-radius: 20px;
+            padding: 4px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* ═══════════════════════════════════════
+           CONTENT BODY
+           The main text area. All your lesson
+           content goes between the section tags
+           inside #content-body in the HTML.
+        ════════════════════════════════════════ */
+        #content-body {
+            flex: 1;
+            padding-bottom: var(--gap-lg);
+        }
+
+        /* ── Section — a major chunk of content ── */
+        .content-section {
+            margin-bottom: var(--gap-lg);
+        }
+
+        /* Section heading */
+        .section-heading {
+            font-size: var(--fs-md);
+            font-weight: 900;
+            color: var(--txt);
+            margin-bottom: var(--gap-sm);
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--brd);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-heading .section-icon {
+            font-size: 1.1rem;
+        }
+
+        /* Regular paragraph text */
+        .content-section p {
+            color: var(--mut);
+            font-size: var(--fs-base);
+            line-height: 1.8;
+            margin-bottom: 14px;
+        }
+
+        .content-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Highlighted inline text */
+        .highlight {
+            color: var(--acc);
+            font-weight: 700;
+        }
+
+        /* ── Example Card ──
+           Use this for showing idiom/word examples
+           with meaning + usage sentence ── */
+        .example-card {
+            background: var(--sur);
+            border: 1.5px solid var(--brd);
+            border-radius: 16px;
+            padding: 18px 20px;
+            margin-bottom: var(--gap-sm);
+            transition: border-color .2s;
+        }
+
+        .example-card:hover {
+            border-color: var(--acc);
+        }
+
+        /* The idiom/word itself */
+        .example-card .example-phrase {
+            font-size: var(--fs-md);
+            font-weight: 900;
+            color: var(--acc);
+            margin-bottom: 6px;
+        }
+
+        /* What it means */
+        .example-card .example-meaning {
+            font-size: var(--fs-sm);
+            color: var(--txt);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        /* Example sentence in context */
+        .example-card .example-usage {
+            font-size: var(--fs-sm);
+            color: var(--mut);
+            font-style: italic;
+            border-left: 3px solid var(--acc);
+            padding-left: 12px;
+            line-height: 1.6;
+        }
+
+        /* Bengali translation line */
+        .example-card .example-bengali {
+            font-size: var(--fs-xs);
+            color: var(--grn);
+            margin-top: 8px;
+            font-weight: 700;
+        }
+
+        /* ── Info Box ──
+           Use for tips, notes, or warnings ── */
+        .info-box {
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: var(--gap-sm);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .info-box.tip {
+            background: #06d6a014;
+            border: 1.5px solid #06d6a033;
+        }
+
+        .info-box.note {
+            background: #3da9fc14;
+            border: 1.5px solid #3da9fc33;
+        }
+
+        .info-box.warning {
+            background: #f9c74f14;
+            border: 1.5px solid #f9c74f33;
+        }
+
+        .info-box .info-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .info-box .info-text {
+            font-size: var(--fs-sm);
+            line-height: 1.6;
+        }
+
+        .info-box.tip .info-text {
+            color: var(--grn);
+        }
+
+        .info-box.note .info-text {
+            color: var(--blu);
+        }
+
+        .info-box.warning .info-text {
+            color: var(--ac2);
+        }
+
+        /* ── Quote Block ──
+           For memorable sentences or key points ── */
+        .pull-quote {
+            border-left: 4px solid var(--acc);
+            padding: 12px 18px;
+            margin: var(--gap-md) 0;
+            background: var(--sur);
+            border-radius: 0 12px 12px 0;
+        }
+
+        .pull-quote p {
+            font-size: var(--fs-md) !important;
+            color: var(--txt) !important;
+            font-style: italic;
+            font-weight: 600;
+            margin: 0 !important;
+        }
+
+        /* ── Numbered List ──
+           For step-by-step instructions ── */
+        .numbered-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .numbered-list li {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .numbered-list li .list-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--acc);
+            color: #0d0d1a;
+            font-size: var(--fs-xs);
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .numbered-list li .list-text {
+            font-size: var(--fs-sm);
+            color: var(--mut);
+            line-height: 1.7;
+            flex: 1;
+        }
+
+        /* ── Bullet List ──
+           For general itemised content ── */
+        .bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .bullet-list li {
+            font-size: var(--fs-sm);
+            color: var(--mut);
+            line-height: 1.7;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .bullet-list li::before {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 10px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--acc);
+        }
+
+        /* ── Comparison Table ──
+           For side-by-side or before/after ── */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 14px;
+            font-size: var(--fs-sm);
+        }
+
+        .comparison-table th {
+            background: var(--sur2);
+            color: var(--txt);
+            font-weight: 800;
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid var(--brd);
+            font-size: var(--fs-xs);
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+
+        .comparison-table td {
+            padding: 10px 14px;
+            border: 1px solid var(--brd);
+            color: var(--mut);
+            vertical-align: top;
+            line-height: 1.6;
+        }
+
+        .comparison-table tr:nth-child(even) td {
+            background: #ffffff03;
+        }
+
+        /* ── Divider ── */
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--brd);
+            margin: var(--gap-lg) 0;
+        }
+
+        /* ── CTA Button ──
+           Use at end of a section to link to
+           a related game or next lesson ── */
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--acc);
+            color: #0d0d1a;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-size: var(--fs-sm);
+            font-weight: 900;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            font-family: inherit;
+            letter-spacing: .3px;
+        }
+
+        .cta-btn:hover {
+            background: #ffaa30;
+            transform: translateY(-2px);
+        }
+
+        .cta-btn.secondary {
+            background: var(--sur2);
+            color: var(--txt);
+            border: 1.5px solid var(--brd);
+        }
+
+        .cta-btn.secondary:hover {
+            border-color: var(--acc);
+            color: var(--acc);
+        }
+
+        /* ── CTA Row — group of buttons ── */
+        .cta-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: var(--gap-md);
+        }
+
+        /* ═══════════════════════════════════════
+           FOOTER SECTION
+           Branding + mailto at the bottom
+           Same on every content page
+        ════════════════════════════════════════ */
+        #page-footer {
+            width: 100%;
+            background: var(--sur);
+            border-top: 1px solid var(--brd);
+            padding: var(--gap-lg) 20px var(--gap-md);
+            margin-top: auto;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #footer-brand-name {
+            font-size: var(--fs-lg);
+            font-weight: 900;
+            color: var(--acc);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        #footer-brand-by {
+            font-size: var(--fs-xs);
+            color: var(--mut);
+            font-weight: 700;
+            letter-spacing: .5px;
+        }
+
+        #footer-tagline {
+            font-size: var(--fs-xs);
+            color: var(--mut);
+            max-width: 280px;
+            line-height: 1.6;
+        }
+
+        #footer-divider {
+            width: 40px;
+            border: none;
+            border-top: 1px solid var(--brd);
+        }
+
+        #footer-mail {
+            font-size: var(--fs-xs);
+            color: var(--mut);
+            text-decoration: none;
+            transition: color .2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #footer-mail:hover {
+            color: var(--acc);
+        }
+
+        #footer-copy {
+            font-size: var(--fs-xs);
+            color: var(--brd);
+        }
+
+        /* ═══════════════════════════════════════
+           RESPONSIVE
+        ════════════════════════════════════════ */
+        @media (min-width: 768px) {
+            #page-wrapper {
+                padding: 0 32px;
+            }
+            #page-header {
+                padding: 56px 0 var(--gap-md);
+            }
+            #header-visual {
+                width: 100px;
+                height: 100px;
+                font-size: 3.2rem;
+            }
+            #header-title {
+                font-size: var(--fs-2xl);
+            }
+            #header-subtitle {
+                font-size: var(--fs-base);
+            }
+            .section-heading {
+                font-size: var(--fs-lg);
+            }
+            .example-card {
+                padding: 22px 24px;
+            }
+            .example-card .example-phrase {
+                font-size: var(--fs-lg);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            :root {
+                --max-w: 740px;
+            }
+            #page-header {
+                padding: 64px 0 var(--gap-md);
+            }
+            #header-title {
+                font-size: 2.8rem;
+            }
+            .content-section p {
+                font-size: var(--fs-md);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════
+         TOP NAV BAR
+         Sticky bar — always visible while
+         scrolling. Back button + brand name.
+    ════════════════════════════════════════ -->
+    <nav id="top-nav">
+        <a class="nav-brand" href="hub.html">Fluent</a>
+        <button class="nav-back" onclick="goToHub()">← Hub</button>
+    </nav>
+
+
+    <!-- ═══════════════════════════════════════
+         PAGE WRAPPER
+         All content sits inside this div
+    ════════════════════════════════════════ -->
+    <div id="page-wrapper">
+
+
+        <!-- ═══════════════════════════════════════
+             HEADER SECTION
+             ─────────────────────────────────────
+             ✏️  WHAT TO CHANGE PER PAGE:
+             1. #header-visual  → change the emoji
+                or replace with an <img> tag
+             2. #header-category → topic label
+             3. #header-title  → main heading
+             4. #header-subtitle → one-line desc
+             5. .meta-badge items → reading time,
+                level, lesson number etc.
+        ════════════════════════════════════════ -->
+        <header id="page-header">
+
+            <!-- ✏️  Visual / Icon / Image -->
+            <div id="header-visual">
+                <!-- Option A: emoji (default) -->
+                📚
+                <!-- Option B: replace with image tag:
+                <img src="images/your-cover.png"
+                     alt="Lesson visual"
+                     style="width:100%;height:100%;
+                            object-fit:cover;
+                            border-radius:20px;">
+                -->
+            </div>
+
+            <!-- ✏️  Category label -->
+            <div id="header-category">Category · Lesson 00</div>
+
+            <!-- ✏️  Main title -->
+            <h1 id="header-title">Your Lesson Title</h1>
+
+            <!-- ✏️  Short description -->
+            <p id="header-subtitle">
+                A concise one- or two-line description of what
+                this lesson covers and why it matters to the learner.
+            </p>
+
+            <!-- ✏️  Meta info row -->
+            <div id="header-meta">
+                <span class="meta-badge">📖 X min read</span>
+                <span class="meta-badge">🎯 Level</span>
+                <span class="meta-badge">📌 N examples</span>
+            </div>
+
+        </header>
+        <!-- END HEADER SECTION -->
+
+
+        <!-- ═══════════════════════════════════════
+             CONTENT BODY
+             ─────────────────────────────────────
+             ✏️  Add as many .content-section blocks
+             as you need. Each section has:
+             — a .section-heading
+             — paragraphs, example cards,
+               info boxes, quotes, lists, tables etc.
+        ════════════════════════════════════════ -->
+        <main id="content-body">
+
+
+            <!-- ── SECTION 1: Introduction ── -->
+            <section class="content-section">
+
+                <h2 class="section-heading">
+                    <span class="section-icon">📌</span>
+                    ✏️ Section Heading
+                </h2>
+
+                <p>
+                    This is a regular paragraph. Use
+                    <span class="highlight">highlighted text</span>
+                    to draw attention to key terms or important ideas.
+                    Keep paragraphs short and scannable — dense walls of
+                    text are hard to read on mobile screens.
+                </p>
+
+                <p>
+                    A second paragraph can expand on the first point
+                    or introduce a related idea. The muted text colour
+                    keeps the reading experience comfortable on a dark
+                    background.
+                </p>
+
+                <div class="info-box tip">
+                    <span class="info-icon">💡</span>
+                    <span class="info-text">
+                        This is a <strong>tip</strong> info box.
+                        Use it for helpful advice, shortcuts,
+                        or positive reinforcement.
+                    </span>
+                </div>
+
+            </section>
+            <!-- END SECTION 1 -->
+
+
+            <hr class="section-divider">
+
+
+            <!-- ── SECTION 2: Example Cards ── -->
+            <section class="content-section">
+
+                <h2 class="section-heading">
+                    <span class="section-icon">💬</span>
+                    ✏️ Example Cards Section
+                </h2>
+
+                <p>
+                    Below are example cards — ideal for vocabulary items,
+                    idioms, grammar points, or any content that pairs a
+                    <strong>term</strong> with a <strong>meaning</strong>
+                    and <strong>usage sentence</strong>.
+                </p>
+
+                <!-- ✏️  EXAMPLE CARD 1 -->
+                <div class="example-card">
+                    <div class="example-phrase">✏️ Term or Phrase</div>
+                    <div class="example-meaning">
+                        ✏️ A clear, concise definition or explanation
+                        of what this term means.
+                    </div>
+                    <div class="example-usage">
+                        "✏️ A sample sentence showing the term
+                        <strong>used naturally</strong> in context."
+                    </div>
+                    <div class="example-bengali">
+                        ✏️ বাংলা: বাংলা অর্থ বা অনুবাদ (optional)
+                    </div>
+                </div>
+
+                <!-- ✏️  EXAMPLE CARD 2 -->
+                <div class="example-card">
+                    <div class="example-phrase">✏️ Another Term</div>
+                    <div class="example-meaning">
+                        ✏️ Definition of the second term goes here.
+                    </div>
+                    <div class="example-usage">
+                        "✏️ Another contextual sentence with
+                        <strong>the term in use</strong>."
+                    </div>
+                    <div class="example-bengali">
+                        ✏️ বাংলা: (optional Bengali line — remove if not needed)
+                    </div>
+                </div>
+
+                <!-- ✏️  Copy-paste more .example-card blocks as needed -->
+
+            </section>
+            <!-- END SECTION 2 -->
+
+
+            <hr class="section-divider">
+
+
+            <!-- ── SECTION 3: Info Box Variants ── -->
+            <section class="content-section">
+
+                <h2 class="section-heading">
+                    <span class="section-icon">ℹ️</span>
+                    ✏️ Info Box Variants
+                </h2>
+
+                <p>
+                    Use the three info box types below to add
+                    colour-coded contextual notes throughout
+                    your lesson content.
+                </p>
+
+                <div class="info-box tip">
+                    <span class="info-icon">💡</span>
+                    <span class="info-text">
+                        <strong>Tip box</strong> — green border.
+                        Great for learning hacks, memory tricks,
+                        and best practices.
+                    </span>
+                </div>
+
+                <div class="info-box note">
+                    <span class="info-icon">📝</span>
+                    <span class="info-text">
+                        <strong>Note box</strong> — blue border.
+                        Use for additional context, clarifications,
+                        or "by the way" information.
+                    </span>
+                </div>
+
+                <div class="info-box warning">
+                    <span class="info-icon">⚠️</span>
+                    <span class="info-text">
+                        <strong>Warning box</strong> — yellow border.
+                        Perfect for common mistakes, pitfalls,
+                        and things to watch out for.
+                    </span>
+                </div>
+
+            </section>
+            <!-- END SECTION 3 -->
+
+
+            <hr class="section-divider">
+
+
+            <!-- ── SECTION 4: Pull Quote ── -->
+            <section class="content-section">
+
+                <h2 class="section-heading">
+                    <span class="section-icon">💬</span>
+                    ✏️ Pull Quote
+                </h2>
+
+                <div class="pull-quote">
+                    <p>
+                        ✏️ "A memorable quote, key takeaway, or
+                        inspiring sentence that deserves extra
+                        visual emphasis on the page."
+                    </p>
+                </div>
+
+                <p>
+                    The pull quote component draws the reader's eye
+                    to an important idea. Use it sparingly — once
+                    per page is usually enough for maximum impact.
+                </p>
+
+            </section>
+            <!-- END SECTION 4 -->
+
+
+            <hr class="section-divider">
+
+
+            <!-- ── SECTION 5: Numbered List ── -->
+            <section class="content-section">
+
+                <h2 class="section-heading">
+                    <span class="section-icon">🎯</span>
+                    ✏️ Step-by-Step List
+                </h2>
+
+                <p>
+                    The numbered list is perfect for instructions,
+                    processes, or any sequential content:
+                </p>
+
+                <ol class="numbered-list">
+                    <li>
+                        <span class="list-num">1</span>
+                        <span class="list-text">
+                            ✏️ <strong>First step.</strong>
+                            Describe what the learner should do here.
+                            Be specific and actionable.
+                        </span>
+                    </li>
+                    <li>
+                        <span class="list-num">2</span>
+                        <span class="list-text">
+                            ✏️ <strong>Second step.</strong>
+                            Build on the previous step. Each item
+                            should flow naturally to the next.
+                        </span>
+                    </li>
+                    <li>
+                        <span class="list-num">3</span>
+                        <span class="list-text">
+                            ✏️ <strong>Third step.</strong>
+                            The final step — ideally something
+                            the learner can do right away.
+                        </span>
+                    </li>
+                </ol>
+
+            </section>
+            <!-- END SECTION 5 -->
+
+
+            <hr class="section-divider">
+
+
+            <!-- ── SECTION 6: Bullet List ── -->
+            <section class="content-section">
+
+                <h2 class="section-heading">
+                    <span class="section-icon">📋</span>
+                    ✏️ Bullet List
+                </h2>
+
+                <p>
+                    For non-sequential items, use a bullet list
+                    with the orange dot marker:
+                </p>
+
+                <ul class="bullet-list">
+                    <li>✏️ First bullet point — a key fact or idea</li>
+                    <li>✏️ Second bullet point — another important item</li>
+                    <li>✏️ Third bullet point — yet another noteworthy detail</li>
+                    <li>✏️ Fourth bullet point — keep items concise</li>
+                </ul>
+
+            </section>
+            <!-- END SECTION 6 -->
+
+
+            <hr class="section-divider">
+
+
+            <!-- ── SECTION 7: Comparison Table ── -->
+            <section class="content-section">
+
+                <h2 class="section-heading">
+                    <span class="section-icon">📊</span>
+                    ✏️ Comparison Table
+                </h2>
+
+                <p>
+                    Use the comparison table for before/after,
+                    correct/incorrect, or side-by-side examples:
+                </p>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>✏️ Column A</th>
+                            <th>✏️ Column B</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>✏️ Row 1, Cell A</td>
+                            <td>✏️ Row 1, Cell B</td>
+                        </tr>
+                        <tr>
+                            <td>✏️ Row 2, Cell A</td>
+                            <td>✏️ Row 2, Cell B</td>
+                        </tr>
+                        <tr>
+                            <td>✏️ Row 3, Cell A</td>
+                            <td>✏️ Row 3, Cell B</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box note">
+                    <span class="info-icon">📝</span>
+                    <span class="info-text">
+                        Add or remove rows as needed.
+                        The alternating row background helps
+                        readability on wider tables.
+                    </span>
+                </div>
+
+            </section>
+            <!-- END SECTION 7 -->
+
+
+            <hr class="section-divider">
+
+
+            <!-- ── SECTION 8: CTA / Next Steps ── -->
+            <section class="content-section">
+
+                <h2 class="section-heading">
+                    <span class="section-icon">▶</span>
+                    ✏️ Call to Action
+                </h2>
+
+                <p>
+                    ✏️ Encourage the learner to take the next step —
+                    whether that is playing a related game, reading
+                    the next lesson, or practising what they learned.
+                </p>
+
+                <div class="cta-row">
+                    <!-- ✏️  Primary CTA — link to a game or key action -->
+                    <button class="cta-btn" onclick="goTo('game-name.html')">
+                        ✏️ Play Game →
+                    </button>
+                    <!-- ✏️  Secondary CTA — link to hub or another lesson -->
+                    <button class="cta-btn secondary" onclick="goToHub()">
+                        ← Back to Hub
+                    </button>
+                </div>
+
+            </section>
+            <!-- END SECTION 8 -->
+
+
+        </main>
+        <!-- END CONTENT BODY -->
+
+
+    </div>
+    <!-- END PAGE WRAPPER -->
+
+
+    <!-- ═══════════════════════════════════════
+         FOOTER SECTION
+         Same on every content page.
+         Only change the year in the copyright.
+    ════════════════════════════════════════ -->
+    <footer id="page-footer">
+
+        <!-- Brand -->
+        <div id="footer-brand-name">Fluent</div>
+        <div id="footer-brand-by">by Amrit</div>
+
+        <!-- Short tagline -->
+        <p id="footer-tagline">
+            Interactive English learning games
+            for students of all levels.
+        </p>
+
+        <hr id="footer-divider">
+
+        <!-- Feedback email -->
+        <a id="footer-mail"
+            href="mailto:ilearnwithamrit@gmail.com">
+            ✉ ilearnwithamrit@gmail.com
+        </a>
+
+        <!-- Copyright -->
+        <p id="footer-copy">© 2026 Fluent by Amrit</p>
+
+    </footer>
+    <!-- END FOOTER -->
+
+
+    <!-- ═══════════════════════════════════════
+         JAVASCRIPT
+         Navigation helpers — same on every
+         content page, no changes needed
+    ════════════════════════════════════════ -->
+    <script>
+        // ── Get the player name from URL or local var ──
+        function getPlayerName() {
+            if (typeof playerName !== 'undefined' && playerName) return playerName;
+            return decodeURIComponent(
+                new URLSearchParams(window.location.search).get('name') || ''
+            );
+        }
+
+        // ── Go back to the hub, carrying the name ──
+        function goToHub() {
+            const name = getPlayerName();
+            window.location.href = 'hub.html' +
+                (name ? '?name=' + encodeURIComponent(name) : '');
+        }
+
+        // ── Navigate to any game page, carrying the name ──
+        function goTo(page) {
+            const name = getPlayerName();
+            window.location.href = page +
+                (name ? '?name=' + encodeURIComponent(name) : '');
+        }
+    </script>
+
+</body>
+</html>
