@@ -959,384 +959,402 @@
         <p id="footer-copy">© 2026 Fluent by Amrit</p>
     </footer>
 
-    <script>
-        (function() {
-            const BASE_CSV =
-                'https://docs.google.com/spreadsheets/d/e/2PACX-1vRf3J6Gr15efJH6zt_mEJcFf-gfjOmSYYXSAsFGJXoKZp89w3lRz72wnvRo6pwN6E_h2hdhlZb6swPc/pub?output=csv';
+   <script>
+(function() {
+    const BASE_CSV =
+        'https://docs.google.com/spreadsheets/d/e/2PACX-1vRf3J6Gr15efJH6zt_mEJcFf-gfjOmSYYXSAsFGJXoKZp89w3lRz72wnvRo6pwN6E_h2hdhlZb6swPc/pub?output=csv';
 
-            let allLessons = [];
-            let currentLesson = null;
-            let currentIndex = -1;
+    let allLessons = [];
+    let currentLesson = null;
+    let currentIndex = -1;
 
-            function getPlayerName() {
-                if (typeof playerName !== 'undefined' && playerName) return playerName;
-                return decodeURIComponent(
-                    new URLSearchParams(window.location.search).get('name') || ''
-                );
-            }
+    // ── Helpers ──────────────────────────────────
+    function getPlayerName() {
+        if (typeof playerName !== 'undefined' && playerName) return playerName;
+        return decodeURIComponent(
+            new URLSearchParams(window.location.search).get('name') || ''
+        );
+    }
 
-            function getSheetParam() {
-                return new URLSearchParams(window.location.search).get('sheet') || '';
-            }
+    function getSheetParam() {
+        return new URLSearchParams(window.location.search).get('sheet') || '';
+    }
 
-            function getSectionParam() {
-                return new URLSearchParams(window.location.search).get('section') || '';
-            }
+    function getSectionParam() {
+        return new URLSearchParams(window.location.search).get('section') || '';
+    }
 
-            function goToHub() {
-                const name = getPlayerName();
-                window.location.href = 'hub.html' + (name ? '?name=' + encodeURIComponent(name) : '');
-            }
+    function goToHub() {
+        const name = getPlayerName();
+        window.location.href = 'hub.html' + (name ? '?name=' + encodeURIComponent(name) : '');
+    }
 
-            function goToLesson(sheetName, section = '') {
-                const name = getPlayerName();
-                let url = 'phraseosphere.html?sheet=' + encodeURIComponent(sheetName);
-                if (section) url += '&section=' + encodeURIComponent(section);
-                if (name) url += '&name=' + encodeURIComponent(name);
-                window.location.href = url;
-            }
+    function goToLesson(sheetName, section = '') {
+        const name = getPlayerName();
+        let url = 'phraseosphere.html?sheet=' + encodeURIComponent(sheetName);
+        if (section) url += '&section=' + encodeURIComponent(section);
+        if (name) url += '&name=' + encodeURIComponent(name);
+        window.location.href = url;
+    }
 
-            function goToNext() {
-                if (currentIndex >= 0 && currentIndex < allLessons.length - 1) {
-                    goToLesson(allLessons[currentIndex + 1].sheet_name);
-                }
-            }
+    function goToNext() {
+        if (currentIndex >= 0 && currentIndex < allLessons.length - 1) {
+            goToLesson(allLessons[currentIndex + 1].sheet_name);
+        }
+    }
 
-            function goToPrev() {
-                if (currentIndex > 0) {
-                    goToLesson(allLessons[currentIndex - 1].sheet_name);
-                }
-            }
+    function goToPrev() {
+        if (currentIndex > 0) {
+            goToLesson(allLessons[currentIndex - 1].sheet_name);
+        }
+    }
 
-            function openModal() {
-                document.getElementById('topic-modal').classList.add('active');
-                populatePhraseosphereAccordion();
-                // ensure phraseosphere card is expanded
-                document.getElementById('modal-card-phraseosphere').classList.add('expanded');
-                document.body.style.overflow = 'hidden';
-            }
+    function scrollToSection(sectionName) {
+        const id = sectionName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
 
-            function closeModal() {
-                document.getElementById('topic-modal').classList.remove('active');
-                document.body.style.overflow = '';
-            }
+    function formatMeaning(text) {
+        return text.replace(/\(([^)]+)\)/g,
+            '<span class="example-bengali">($1)</span>'
+        );
+    }
 
-            document.getElementById('topic-modal').addEventListener('click', function(e) {
-                if (e.target === this) closeModal();
+    function showToast(message) {
+        const existing = document.getElementById('toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(0)';
             });
+        });
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(10px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 2500);
+    }
 
-            function toggleModalCard(cardId) {
-                const card = document.getElementById(cardId);
-                if (card.classList.contains('expanded')) {
-                    card.classList.remove('expanded');
-                } else {
-                    // close all others first
-                    document.querySelectorAll('.modal-topic-card.expanded').forEach(c => c.classList.remove(
-                        'expanded'));
-                    card.classList.add('expanded');
-                }
-            }
-
-            function populatePhraseosphereAccordion() {
-                const container = document.getElementById('accordion-phraseosphere');
-                container.innerHTML = '';
-                if (allLessons.length === 0) {
-                    container.innerHTML =
-                        '<p style="font-size:0.7rem;opacity:0.6;padding:8px 0;">Loading lessons…</p>';
-                    return;
-                }
-                allLessons.forEach(lesson => {
-                    const btn = document.createElement('button');
-                    btn.className = 'sub-lesson-btn';
-                    if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) {
-                        btn.classList.add('current');
-                    }
-                    btn.innerHTML =
-                        `<span class="sub-icon">${lesson.icon || '📄'}</span> ${lesson.title}`;
-                    btn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        closeModal();
-                        if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) {
-                            // already on this lesson, just close
-                            return;
-                        }
-                        goToLesson(lesson.sheet_name);
-                    });
-                    container.appendChild(btn);
-                });
-            }
-
-            function showComingSoon(topicName) {
-                showToast(topicName + ' is coming soon! 🌟');
-            }
-
-            function showToast(message) {
-                const existing = document.getElementById('toast');
-                if (existing) existing.remove();
-
-                const toast = document.createElement('div');
-                toast.id = 'toast';
-                toast.textContent = message;
-                document.body.appendChild(toast);
-
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        toast.style.opacity = '1';
-                        toast.style.transform = 'translateX(-50%) translateY(0)';
-                    });
-                });
-
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateX(-50%) translateY(10px)';
-                    setTimeout(() => toast.remove(), 300);
-                }, 2500);
-            }
-
-            function parseCSV(text) {
-                const rows = [];
-                const lines = text.split(/\r?\n/);
-                for (const line of lines) {
-                    if (!line.trim()) continue;
-                    const cols = [];
-                    let current = '';
-                    let inQuotes = false;
-                    for (const char of line) {
-                        if (char === '"') {
-                            inQuotes = !inQuotes;
-                        } else if (char === ',' && !inQuotes) {
-                            cols.push(current.trim());
-                            current = '';
-                        } else {
-                            current += char;
-                        }
-                    }
+    // ── CSV parsing & fetching ────────────────────
+    function parseCSV(text) {
+        const rows = [];
+        const lines = text.split(/\r?\n/);
+        for (const line of lines) {
+            if (!line.trim()) continue;
+            const cols = [];
+            let current = '';
+            let inQuotes = false;
+            for (const char of line) {
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
                     cols.push(current.trim());
-                    rows.push(cols);
+                    current = '';
+                } else {
+                    current += char;
                 }
-                return rows;
             }
+            cols.push(current.trim());
+            rows.push(cols);
+        }
+        return rows;
+    }
 
-            async function fetchCSV(url) {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error('Failed to fetch ' + url);
-                const text = await res.text();
-                return parseCSV(text);
-            }
+    async function fetchCSV(url) {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Failed to fetch ' + url);
+        const text = await res.text();
+        return parseCSV(text);
+    }
 
-            // Cache key for the index
-const INDEX_CACHE_KEY = 'phraseosphere_index';
-const INDEX_CACHE_TIME = 30 * 60 * 1000; // 30 minutes
+    // ── Index loading with localStorage cache ─────
+    const INDEX_CACHE_KEY = 'phraseosphere_index_v1';
+    const INDEX_CACHE_TIME = 30 * 60 * 1000; // 30 minutes
 
-async function loadIndex(forceRefresh = false) {
-    // Try cache first
-    if (!forceRefresh) {
-        const cached = localStorage.getItem(INDEX_CACHE_KEY);
-        if (cached) {
+    async function loadIndex(forceRefresh = false) {
+        // Try cache first
+        if (!forceRefresh) {
             try {
-                const data = JSON.parse(cached);
-                if (data.timestamp && Date.now() - data.timestamp < INDEX_CACHE_TIME) {
-                    allLessons = data.lessons;
-                    return; // cache hit
+                const cached = localStorage.getItem(INDEX_CACHE_KEY);
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    if (data.timestamp && Date.now() - data.timestamp < INDEX_CACHE_TIME) {
+                        allLessons = data.lessons;
+                        return; // success from cache
+                    }
                 }
-            } catch (e) { /* ignore parse error */ }
+            } catch (e) { /* ignore */ }
         }
-    }
 
-    // Fetch fresh data
-    const rows = await fetchCSV(BASE_CSV);
-    // ... (rest of parsing identical to before, finding header row and populating allLessons) ...
-    // After allLessons is populated:
-    allLessons.sort((a, b) => a.order - b.order);
-    
-    // Save to cache
-    try {
-        localStorage.setItem(INDEX_CACHE_KEY, JSON.stringify({
-            timestamp: Date.now(),
-            lessons: allLessons
-        }));
-    } catch (e) { /* storage full or unavailable */ }
-}
-
-           function renderLesson(lesson, dataRows) {
-    // Header
-    document.getElementById('header-visual').textContent = lesson.meta_visual || '💬';
-    document.getElementById('header-title').textContent = lesson.title;
-    document.getElementById('header-subtitle').textContent = lesson.description || '';
-    const metaDiv = document.getElementById('header-meta');
-    metaDiv.innerHTML = '';
-    if (lesson.meta_badges) {
-        lesson.meta_badges.split(',').forEach(b => {
-            const span = document.createElement('span');
-            span.className = 'meta-badge';
-            span.textContent = b.trim();
-            metaDiv.appendChild(span);
-        });
-    }
-
-    // Show topic section (choose button)
-    document.getElementById('topic-section').style.display = 'block';
-
-    // Group data rows by Category (column A)
-    const groups = [];
-    let currentGroup = null;
-    for (const row of dataRows) {
-        if (row.length < 4) continue;
-        const category = row[0].trim();
-        const phrase = row[1].trim();
-        const meaning = row[2].trim();
-        const example = row[3].trim();
-        if (!category || !phrase || !meaning) continue;
-
-        if (!currentGroup || currentGroup.name !== category) {
-            currentGroup = { name: category, items: [] };
-            groups.push(currentGroup);
+        // Fetch from network
+        const rows = await fetchCSV(BASE_CSV);
+        let headerIdx = -1;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].length >= 7 &&
+                rows[i][0].toLowerCase().includes('order') &&
+                rows[i][1].toLowerCase().includes('sheet')) {
+                headerIdx = i;
+                break;
+            }
         }
-        currentGroup.items.push({ phrase, meaning, example });
-    }
+        if (headerIdx === -1) throw new Error('_index header not found');
 
-    // Build desktop table – three columns only
-    const tableDiv = document.getElementById('desktop-table');
-    tableDiv.innerHTML = '';
-    if (groups.length > 0) {
-        const table = document.createElement('table');
-        table.className = 'desktop-table';
-        table.innerHTML = `
-            <thead><tr>
-                <th>Phrase</th><th>Meaning</th><th>Example</th>
-            </tr></thead><tbody></tbody>`;
-        const tbody = table.querySelector('tbody');
-        groups.forEach(group => {
-            group.items.forEach(item => {
-                const tr = document.createElement('tr');
-                const tdPhrase = document.createElement('td');
-                tdPhrase.className = 'phrase-cell';
-                tdPhrase.textContent = item.phrase;
-                const tdMeaning = document.createElement('td');
-                tdMeaning.innerHTML = formatMeaning(item.meaning);
-                const tdExample = document.createElement('td');
-                tdExample.textContent = item.example;
-                tdExample.style.fontStyle = 'italic';
-                tdExample.style.color = 'var(--ex-usage)';
-                tr.appendChild(tdPhrase);
-                tr.appendChild(tdMeaning);
-                tr.appendChild(tdExample);
-                tbody.appendChild(tr);
+        allLessons = [];
+        for (let i = headerIdx + 1; i < rows.length; i++) {
+            const r = rows[i];
+            if (!r[0] || r[0].trim() === '') continue;
+            if (r.length < 7) continue;
+            allLessons.push({
+                order: parseInt(r[0].trim(), 10),
+                sheet_name: r[1].trim(),
+                gid: r[2].trim(),
+                title: r[3].trim(),
+                format: r[4].trim(),
+                icon: r[5].trim(),
+                meta_visual: r[6].trim(),
+                meta_badges: r[7] ? r[7].trim() : '',
+                description: r[8] ? r[8].trim() : ''
             });
-        });
-        tableDiv.appendChild(table);
+        }
+        allLessons.sort((a, b) => a.order - b.order);
+
+        // Save to cache
+        try {
+            localStorage.setItem(INDEX_CACHE_KEY, JSON.stringify({
+                timestamp: Date.now(),
+                lessons: allLessons
+            }));
+        } catch (e) { /* storage full */ }
     }
 
-    // Build mobile cards – grouped with section headings
-    const mobileDiv = document.getElementById('mobile-cards');
-    mobileDiv.innerHTML = '';
-    groups.forEach(group => {
-        const section = document.createElement('section');
-        section.className = 'content-section';
-        const slug = group.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        section.innerHTML = `
-            <h2 class="section-heading" id="${slug}">
-                <span class="section-icon">📌</span> ${group.name}
-            </h2>`;
-        group.items.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'example-card';
-            card.innerHTML = `
-                <div class="example-phrase">${item.phrase}</div>
-                <div class="example-meaning">${formatMeaning(item.meaning)}</div>
-                <div class="example-usage">"${item.example}"</div>`;
-            section.appendChild(card);
-        });
-        mobileDiv.appendChild(section);
-    });
-
-    // Scroll to section if URL parameter is present
-    const sectionParam = getSectionParam();
-    if (sectionParam) {
-        setTimeout(() => scrollToSection(sectionParam), 300);
+    // ── Fetch lesson data by sheet name ───────────
+    async function fetchLessonSheet(sheetName) {
+        const lesson = allLessons.find(l => l.sheet_name === sheetName);
+        if (!lesson) return null;
+        const csvUrl =
+            `https://docs.google.com/spreadsheets/d/e/2PACX-1vRf3J6Gr15efJH6zt_mEJcFf-gfjOmSYYXSAsFGJXoKZp89w3lRz72wnvRo6pwN6E_h2hdhlZb6swPc/pub?gid=${lesson.gid}&single=true&output=csv`;
+        return await fetchCSV(csvUrl);
     }
-}
 
-            function scrollToSection(sectionName) {
-                const id = sectionName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                const el = document.getElementById(id);
-                if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }
+    // ── Render lesson content ─────────────────────
+    function renderLesson(lesson, dataRows) {
+        // Header
+        document.getElementById('header-visual').textContent = lesson.meta_visual || '💬';
+        document.getElementById('header-title').textContent = lesson.title;
+        document.getElementById('header-subtitle').textContent = lesson.description || '';
+        const metaDiv = document.getElementById('header-meta');
+        metaDiv.innerHTML = '';
+        if (lesson.meta_badges) {
+            lesson.meta_badges.split(',').forEach(b => {
+                const span = document.createElement('span');
+                span.className = 'meta-badge';
+                span.textContent = b.trim();
+                metaDiv.appendChild(span);
+            });
+        }
 
-            function formatMeaning(text) {
-                return text.replace(/\(([^)]+)\)/g,
-                    '<span class="example-bengali">($1)</span>'
-                );
-            }
+        // Show the "Choose Another Topic" button
+        document.getElementById('topic-section').style.display = 'block';
 
-            function updateNavButtons() {
-                const prevBtn = document.getElementById('btn-prev');
-                const nextBtn = document.getElementById('btn-next');
-                prevBtn.disabled = currentIndex <= 0;
-                nextBtn.disabled = currentIndex >= allLessons.length - 1;
-            }
+        // Group rows by Category (first column)
+        const groups = [];
+        let currentGroup = null;
+        for (const row of dataRows) {
+            if (row.length < 4) continue;
+            const category = row[0].trim();
+            const phrase = row[1].trim();
+            const meaning = row[2].trim();
+            const example = row[3].trim();
+            if (!category || !phrase || !meaning) continue;
 
-async function init() {
-    try {
-        const sheetName = getSheetParam();
-        if (!sheetName && allLessons.length === 0) {
-            // No sheet requested — probably first visit; just load index then redirect
-            await loadIndex();
-            if (allLessons.length > 0) {
-                goToLesson(allLessons[0].sheet_name);
+            if (!currentGroup || currentGroup.name !== category) {
+                currentGroup = { name: category, items: [] };
+                groups.push(currentGroup);
             }
+            currentGroup.items.push({ phrase, meaning, example });
+        }
+
+        // Desktop table – three columns (Category removed)
+        const tableDiv = document.getElementById('desktop-table');
+        tableDiv.innerHTML = '';
+        if (groups.length > 0) {
+            const table = document.createElement('table');
+            table.className = 'desktop-table';
+            table.innerHTML = `
+                <thead><tr>
+                    <th>Phrase</th><th>Meaning</th><th>Example</th>
+                </tr></thead><tbody></tbody>`;
+            const tbody = table.querySelector('tbody');
+            groups.forEach(group => {
+                group.items.forEach(item => {
+                    const tr = document.createElement('tr');
+                    const tdPhrase = document.createElement('td');
+                    tdPhrase.className = 'phrase-cell';
+                    tdPhrase.textContent = item.phrase;
+                    const tdMeaning = document.createElement('td');
+                    tdMeaning.innerHTML = formatMeaning(item.meaning);
+                    const tdExample = document.createElement('td');
+                    tdExample.textContent = item.example;
+                    tdExample.style.fontStyle = 'italic';
+                    tdExample.style.color = 'var(--ex-usage)';
+                    tr.appendChild(tdPhrase);
+                    tr.appendChild(tdMeaning);
+                    tr.appendChild(tdExample);
+                    tbody.appendChild(tr);
+                });
+            });
+            tableDiv.appendChild(table);
+        }
+
+        // Mobile cards with section headings
+        const mobileDiv = document.getElementById('mobile-cards');
+        mobileDiv.innerHTML = '';
+        groups.forEach(group => {
+            const section = document.createElement('section');
+            section.className = 'content-section';
+            const slug = group.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            section.innerHTML = `
+                <h2 class="section-heading" id="${slug}">
+                    <span class="section-icon">📌</span> ${group.name}
+                </h2>`;
+            group.items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'example-card';
+                card.innerHTML = `
+                    <div class="example-phrase">${item.phrase}</div>
+                    <div class="example-meaning">${formatMeaning(item.meaning)}</div>
+                    <div class="example-usage">"${item.example}"</div>`;
+                section.appendChild(card);
+            });
+            mobileDiv.appendChild(section);
+        });
+
+        // Scroll to a specific category if `section` param exists
+        const sectionParam = getSectionParam();
+        if (sectionParam) {
+            setTimeout(() => scrollToSection(sectionParam), 300);
+        }
+    }
+
+    // ── Navigation button states ──────────────────
+    function updateNavButtons() {
+        const prevBtn = document.getElementById('btn-prev');
+        const nextBtn = document.getElementById('btn-next');
+        prevBtn.disabled = currentIndex <= 0;
+        nextBtn.disabled = currentIndex >= allLessons.length - 1;
+    }
+
+    // ── Modal accordion for Phraseosphere subtopics ──
+    function populatePhraseosphereAccordion() {
+        const container = document.getElementById('accordion-phraseosphere');
+        if (!container) return;
+        container.innerHTML = '';
+        if (allLessons.length === 0) {
+            container.innerHTML = '<p style="font-size:0.7rem;opacity:0.6;padding:8px 0;">Loading…</p>';
             return;
         }
+        allLessons.forEach(lesson => {
+            const btn = document.createElement('button');
+            btn.className = 'sub-lesson-btn';
+            if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) {
+                btn.classList.add('current');
+            }
+            btn.innerHTML = `<span class="sub-icon">${lesson.icon || '📄'}</span> ${lesson.title}`;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeModal();
+                if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) return;
+                goToLesson(lesson.sheet_name);
+            });
+            container.appendChild(btn);
+        });
+    }
 
-        // Fetch index and lesson sheet in parallel
-        const [indexPromise, lessonPromise] = [
-            loadIndex(),
-            sheetName ? fetchLessonSheet(sheetName) : Promise.resolve(null)
-        ];
-
-        await indexPromise;
-        const dataRows = await lessonPromise;
-
-        // Find current lesson
-        currentLesson = allLessons.find(l => l.sheet_name === sheetName);
-        if (!currentLesson) {
-            document.getElementById('header-title').textContent = 'Lesson not found';
-            return;
-        }
-        currentIndex = allLessons.indexOf(currentLesson);
-        updateNavButtons();
-
-        if (dataRows) {
-            renderLesson(currentLesson, dataRows);
-        }
-
+    function openModal() {
+        document.getElementById('topic-modal').classList.add('active');
         populatePhraseosphereAccordion();
-    } catch (err) {
-        console.error(err);
-        document.getElementById('header-title').textContent = 'Error loading lesson';
+        document.getElementById('modal-card-phraseosphere').classList.add('expanded');
+        document.body.style.overflow = 'hidden';
     }
-}
 
-// New helper to fetch a lesson by sheet name
-async function fetchLessonSheet(sheetName) {
-    const lesson = allLessons.find(l => l.sheet_name === sheetName);
-    if (!lesson) return null;
-    const csvUrl = `https://docs.google.com/spreadsheets/d/e/2PACX-1vRf3J6Gr15efJH6zt_mEJcFf-gfjOmSYYXSAsFGJXoKZp89w3lRz72wnvRo6pwN6E_h2hdhlZb6swPc/pub?gid=${lesson.gid}&single=true&output=csv`;
-    return await fetchCSV(csvUrl);
-}
+    function closeModal() {
+        document.getElementById('topic-modal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
 
-            window.goToHub = goToHub;
-            window.goToNext = goToNext;
-            window.goToPrev = goToPrev;
-            window.openModal = openModal;
-            window.closeModal = closeModal;
-            window.toggleModalCard = toggleModalCard;
-            window.showComingSoon = showComingSoon;
+    function toggleModalCard(cardId) {
+        const card = document.getElementById(cardId);
+        if (!card) return;
+        const isOpen = card.classList.contains('expanded');
+        // close all
+        document.querySelectorAll('.modal-topic-card.expanded').forEach(c => c.classList.remove('expanded'));
+        if (!isOpen) card.classList.add('expanded');
+    }
 
-            init();
-        })();
-    </script>
+    function showComingSoon(topicName) {
+        showToast(topicName + ' is coming soon! 🌟');
+    }
+
+    // ── Init – load index then lesson ──────────────
+    async function init() {
+        try {
+            const sheetName = getSheetParam();
+
+            // Load index (with cache) first – always.
+            await loadIndex();
+
+            // If no sheet requested, redirect to first lesson
+            if (!sheetName && allLessons.length > 0) {
+                goToLesson(allLessons[0].sheet_name);
+                return;
+            }
+
+            // Find the lesson metadata
+            currentLesson = allLessons.find(l => l.sheet_name === sheetName);
+            if (!currentLesson) {
+                document.getElementById('header-title').textContent = 'Lesson not found';
+                return;
+            }
+            currentIndex = allLessons.indexOf(currentLesson);
+            updateNavButtons();
+
+            // Fetch the lesson data (table rows)
+            const dataRows = await fetchLessonSheet(sheetName);
+            if (dataRows) {
+                renderLesson(currentLesson, dataRows);
+            } else {
+                document.getElementById('header-title').textContent = 'No data found for this lesson';
+            }
+
+            // Populate the modal accordion
+            populatePhraseosphereAccordion();
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('header-title').textContent = 'Error loading lesson';
+        }
+    }
+
+    // ── Expose functions to global scope ──────────
+    window.goToHub = goToHub;
+    window.goToNext = goToNext;
+    window.goToPrev = goToPrev;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.toggleModalCard = toggleModalCard;
+    window.showComingSoon = showComingSoon;
+
+    // Kick off
+    init();
+})();
+</script>
 </body>
 </html>
