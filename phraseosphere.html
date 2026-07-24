@@ -239,10 +239,26 @@
             scrollbar-width: thin;
             scrollbar-color: var(--brd) transparent;
         }
-
+        
         #filter-pills::-webkit-scrollbar { height: 4px; }
         #filter-pills::-webkit-scrollbar-thumb { background: var(--brd); border-radius: 2px; }
 
+         #filter-pills-bottom {
+            display: flex;
+            gap: 8px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding: 8px 0 12px;
+            margin-top: var(--gap-md);
+            margin-bottom: var(--gap-sm);
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--brd) transparent;
+        }
+        #filter-pills-bottom::-webkit-scrollbar { height: 4px; }
+        #filter-pills-bottom::-webkit-scrollbar-thumb { background: var(--brd); border-radius: 2px; }
+
+        
         .pill-btn {
             background: var(--sur2);
             border: 1.5px solid var(--brd);
@@ -435,8 +451,8 @@
         }
 
         .btn-topic-choose {
-            background: var(--acc);
-            color: #0d0d1a;
+            background: #1086ff;
+            color: White;
             border: none;
             border-radius: 16px;
             padding: 18px 36px;
@@ -453,7 +469,7 @@
         }
 
         .btn-topic-choose:hover {
-            background: #ffaa30;
+            background: #3399ff;
             transform: translateY(-3px);
         }
 
@@ -796,17 +812,20 @@
             <div id="header-meta"></div>
         </header>
 
-        <main id="content-body">
-            <!-- ── FILTER PILLS & STATS ── -->
+                <main id="content-body">
+            <!-- ── TOP FILTER PILLS & STATS ── -->
             <div id="stats-bar"></div>
             <div id="filter-pills"></div>
 
             <div id="desktop-table" class="desktop-table-wrapper"></div>
             <div id="mobile-cards" class="mobile-cards"></div>
 
+            <!-- ── BOTTOM FILTER PILLS ── -->
+            <div id="filter-pills-bottom"></div>
+
             <section id="topic-section" style="display: none;">
                 <button class="btn-topic-choose" onclick="openModal()">
-                    📂 Choose Another Topic
+                    📂 Discover More
                 </button>
             </section>
         </main>
@@ -1061,8 +1080,8 @@
             }
 
             // ── FILTER FUNCTIONS ──
-            function setActiveFilter(category) {
-                document.querySelectorAll('#filter-pills .pill-btn').forEach(btn => {
+                function setActiveFilter(category) {
+                document.querySelectorAll('#filter-pills .pill-btn, #filter-pills-bottom .pill-btn').forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.category === category);
                 });
                 applyFilter(category);
@@ -1130,25 +1149,33 @@
                 const totalCats = groups.length;
                 document.getElementById('stats-bar').innerHTML = `<span>📊 Total Idioms: <strong>${totalIdioms}</strong></span> <span>📂 Categories: <strong>${totalCats}</strong></span>`;
 
+                // Helper to create a pill button quickly
+                function createPill(text, category, isActive = false) {
+                    const pill = document.createElement('button');
+                    pill.className = 'pill-btn' + (isActive ? ' active' : '');
+                    pill.textContent = text;
+                    pill.dataset.category = category;
+                    pill.addEventListener('click', () => setActiveFilter(category));
+                    return pill;
+                }
+
+                // ── Top pills ──
                 const pillContainer = document.getElementById('filter-pills');
                 pillContainer.innerHTML = '';
-                // "All" pill
-                const allPill = document.createElement('button');
-                allPill.className = 'pill-btn active';
-                allPill.textContent = 'All';
-                allPill.dataset.category = 'all';
-                allPill.addEventListener('click', () => setActiveFilter('all'));
-                pillContainer.appendChild(allPill);
-
-                // category pills
+                pillContainer.appendChild(createPill('All', 'all', true));
                 groups.forEach(g => {
-                    const pill = document.createElement('button');
-                    pill.className = 'pill-btn';
-                    pill.textContent = g.name;
-                    pill.dataset.category = g.name;
-                    pill.addEventListener('click', () => setActiveFilter(g.name));
-                    pillContainer.appendChild(pill);
+                    pillContainer.appendChild(createPill(g.name, g.name));
                 });
+
+                // ── Bottom pills (identical) ──
+                const pillContainerBottom = document.getElementById('filter-pills-bottom');
+                if (pillContainerBottom) {
+                    pillContainerBottom.innerHTML = '';
+                    pillContainerBottom.appendChild(createPill('All', 'all', true));
+                    groups.forEach(g => {
+                        pillContainerBottom.appendChild(createPill(g.name, g.name));
+                    });
+                }
 
                 // Desktop table with data-category
                 const tableDiv = document.getElementById('desktop-table');
