@@ -30,7 +30,6 @@
             --pur: #9b72cf;
             --ex-usage: #fff8e4;
 
-            /* Topic card colours — matches topics.html exactly */
             --t1-fill: #ff8906;
             --t1-dark: #7a3800;
             --t2-fill: #06d6a0;
@@ -217,6 +216,68 @@
             gap: 5px;
         }
 
+        /* ── FILTER PILLS & STATS BAR ── */
+        #stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: var(--gap-sm);
+            font-size: var(--fs-xs);
+            color: var(--mut);
+            font-weight: 700;
+            flex-wrap: wrap;
+        }
+
+        #filter-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding: 8px 0 12px;
+            margin-bottom: var(--gap-md);
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--brd) transparent;
+        }
+
+        #filter-pills::-webkit-scrollbar { height: 4px; }
+        #filter-pills::-webkit-scrollbar-thumb { background: var(--brd); border-radius: 2px; }
+
+        .pill-btn {
+            background: var(--sur2);
+            border: 1.5px solid var(--brd);
+            color: var(--mut);
+            border-radius: 50px;
+            padding: 8px 18px;
+            font-size: var(--fs-xs);
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .2s;
+            font-family: inherit;
+            letter-spacing: .3px;
+            flex-shrink: 0;
+        }
+
+        .pill-btn:hover {
+            border-color: var(--acc);
+            color: var(--acc);
+        }
+
+        .pill-btn.active {
+            background: var(--acc);
+            border-color: var(--acc);
+            color: #0d0d1a;
+            font-weight: 900;
+            box-shadow: 0 0 12px rgba(255,137,6,0.3);
+        }
+
+        /* Filtered rows / sections are hidden */
+        .desktop-table tr.filtered,
+        .mobile-cards .content-section.filtered {
+            display: none;
+        }
+
         #content-body {
             flex: 1;
             padding-bottom: var(--gap-lg);
@@ -337,36 +398,36 @@
             display: block;
         }
 
-#hub-fab {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 150;
-  background: var(--sur2);
-  border: 1.5px solid var(--brd);
-  color: var(--mut);
-  border-radius: 12px;
-  width: auto;
-  height: auto;
-  padding: 10px 16px;
-  font-size: var(--fs-xs);
-  font-weight: 800;
-  letter-spacing: .3px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  box-shadow: 0 4px 16px #00000044;
-  transition: all .2s;
-  font-family: inherit;
-  line-height: 1;
-}
+        #hub-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 150;
+            background: var(--sur2);
+            border: 1.5px solid var(--brd);
+            color: var(--mut);
+            border-radius: 12px;
+            width: auto;
+            height: auto;
+            padding: 10px 16px;
+            font-size: var(--fs-xs);
+            font-weight: 800;
+            letter-spacing: .3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px #00000044;
+            transition: all .2s;
+            font-family: inherit;
+            line-height: 1;
+        }
 
-#hub-fab:hover {
-  border-color: var(--acc);
-  color: var(--acc);
-  transform: translateY(-2px);
-}
+        #hub-fab:hover {
+            border-color: var(--acc);
+            color: var(--acc);
+            transform: translateY(-2px);
+        }
 
         #topic-section {
             margin-top: var(--gap-lg);
@@ -396,9 +457,6 @@
             transform: translateY(-3px);
         }
 
-        /* ═══════════════════════════════════════
-           MODAL — redesigned to match topics.html
-        ════════════════════════════════════════ */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -443,7 +501,6 @@
             margin-bottom: 20px;
         }
 
-        /* Individual topic card inside modal */
         .modal-topic-card {
             border-radius: var(--card-radius);
             cursor: pointer;
@@ -530,7 +587,6 @@
             opacity: 0.9;
         }
 
-        /* Accordion body */
         .modal-accordion-body {
             display: none;
             padding: 0 18px 16px;
@@ -577,7 +633,6 @@
             flex-shrink: 0;
         }
 
-        /* Badge on card */
         .modal-card-badge {
             position: absolute;
             top: 12px;
@@ -612,67 +667,42 @@
             color: var(--acc);
         }
 
-        /* ── Individual modal card colour overrides ── */
         #modal-card-phraseosphere {
             background: linear-gradient(135deg, var(--t1-fill) 0%, #e07000 100%);
             color: var(--t1-dark);
         }
-        #modal-card-phraseosphere .modal-card-title {
-            color: #0d0d1a;
-        }
-        #modal-card-phraseosphere .modal-card-desc {
-            color: #3a1800;
-        }
-        #modal-card-phraseosphere .sub-lesson-btn {
-            color: #1a0a00;
-        }
-        #modal-card-phraseosphere .sub-lesson-btn:hover {
-            background: rgba(0, 0, 0, 0.15);
-        }
+        #modal-card-phraseosphere .modal-card-title { color: #0d0d1a; }
+        #modal-card-phraseosphere .modal-card-desc { color: #3a1800; }
+        #modal-card-phraseosphere .sub-lesson-btn { color: #1a0a00; }
+        #modal-card-phraseosphere .sub-lesson-btn:hover { background: rgba(0, 0, 0, 0.15); }
 
         #modal-card-zoosphere {
             background: linear-gradient(135deg, var(--t2-fill) 0%, #04b887 100%);
             color: var(--t2-dark);
         }
-        #modal-card-zoosphere .modal-card-title {
-            color: #001a14;
-        }
-        #modal-card-zoosphere .modal-card-desc {
-            color: #003326;
-        }
+        #modal-card-zoosphere .modal-card-title { color: #001a14; }
+        #modal-card-zoosphere .modal-card-desc { color: #003326; }
 
         #modal-card-time {
             background: linear-gradient(135deg, var(--t3-fill) 0%, #2288d8 100%);
             color: var(--t3-dark);
         }
-        #modal-card-time .modal-card-title {
-            color: #001929;
-        }
-        #modal-card-time .modal-card-desc {
-            color: #002a40;
-        }
+        #modal-card-time .modal-card-title { color: #001929; }
+        #modal-card-time .modal-card-desc { color: #002a40; }
 
         #modal-card-collocations {
             background: linear-gradient(135deg, var(--t4-fill) 0%, #7a52b0 100%);
             color: var(--t4-dark);
         }
-        #modal-card-collocations .modal-card-title {
-            color: #0e0020;
-        }
-        #modal-card-collocations .modal-card-desc {
-            color: #260b50;
-        }
+        #modal-card-collocations .modal-card-title { color: #0e0020; }
+        #modal-card-collocations .modal-card-desc { color: #260b50; }
 
         #modal-card-conversation {
             background: linear-gradient(135deg, var(--t5-fill) 0%, #e0a800 100%);
             color: var(--t5-dark);
         }
-        #modal-card-conversation .modal-card-title {
-            color: #1a1000;
-        }
-        #modal-card-conversation .modal-card-desc {
-            color: #3a2800;
-        }
+        #modal-card-conversation .modal-card-title { color: #1a1000; }
+        #modal-card-conversation .modal-card-desc { color: #3a2800; }
 
         #page-footer {
             width: 100%;
@@ -687,54 +717,14 @@
             gap: 10px;
         }
 
-        #footer-brand-name {
-            font-size: var(--fs-lg);
-            font-weight: 900;
-            color: var(--acc);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+        #footer-brand-name { font-size: var(--fs-lg); font-weight: 900; color: var(--acc); letter-spacing: 2px; text-transform: uppercase; }
+        #footer-brand-by { font-size: var(--fs-xs); color: var(--mut); font-weight: 700; letter-spacing: .5px; }
+        #footer-tagline { font-size: var(--fs-xs); color: var(--mut); max-width: 300px; line-height: 1.6; }
+        #footer-divider { width: 40px; border: none; border-top: 1px solid var(--brd); }
+        #footer-mail { font-size: var(--fs-xs); color: var(--mut); text-decoration: none; transition: color .2s; display: flex; align-items: center; gap: 6px; }
+        #footer-mail:hover { color: var(--acc); }
+        #footer-copy { font-size: var(--fs-xs); color: var(--brd); }
 
-        #footer-brand-by {
-            font-size: var(--fs-xs);
-            color: var(--mut);
-            font-weight: 700;
-            letter-spacing: .5px;
-        }
-
-        #footer-tagline {
-            font-size: var(--fs-xs);
-            color: var(--mut);
-            max-width: 300px;
-            line-height: 1.6;
-        }
-
-        #footer-divider {
-            width: 40px;
-            border: none;
-            border-top: 1px solid var(--brd);
-        }
-
-        #footer-mail {
-            font-size: var(--fs-xs);
-            color: var(--mut);
-            text-decoration: none;
-            transition: color .2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        #footer-mail:hover {
-            color: var(--acc);
-        }
-
-        #footer-copy {
-            font-size: var(--fs-xs);
-            color: var(--brd);
-        }
-
-        /* Toast */
         #toast {
             position: fixed;
             bottom: 28px;
@@ -758,81 +748,30 @@
         }
 
         @media (min-width: 768px) {
-            #page-wrapper {
-                padding: 0 32px;
-            }
-            #page-header {
-                padding: 56px 0 var(--gap-md);
-            }
-            #header-visual {
-                width: 100px;
-                height: 100px;
-                font-size: 3.2rem;
-            }
-            #header-title {
-                font-size: var(--fs-2xl);
-            }
-            #header-subtitle {
-                font-size: var(--fs-base);
-            }
-            .section-heading {
-                font-size: var(--fs-lg);
-            }
-            .example-card {
-                padding: 24px 28px;
-            }
-            .example-card .example-phrase {
-                font-size: var(--fs-lg);
-            }
-            .desktop-table-wrapper {
-                display: block;
-            }
-            .mobile-cards {
-                display: none;
-            }
-            .desktop-table th,
-            .desktop-table td {
-                padding: 20px 22px;
-                font-size: var(--fs-base);
-            }
-            .modal-card-header {
-                padding: 22px 20px;
-            }
-            .modal-card-icon {
-                width: 52px;
-                height: 52px;
-                font-size: 1.6rem;
-            }
-            .modal-card-title {
-                font-size: 1.05rem;
-            }
-            .modal-card-desc {
-                font-size: 0.7rem;
-            }
+            #page-wrapper { padding: 0 32px; }
+            #page-header { padding: 56px 0 var(--gap-md); }
+            #header-visual { width: 100px; height: 100px; font-size: 3.2rem; }
+            #header-title { font-size: var(--fs-2xl); }
+            #header-subtitle { font-size: var(--fs-base); }
+            .section-heading { font-size: var(--fs-lg); }
+            .example-card { padding: 24px 28px; }
+            .example-card .example-phrase { font-size: var(--fs-lg); }
+            .desktop-table-wrapper { display: block; }
+            .mobile-cards { display: none; }
+            .desktop-table th, .desktop-table td { padding: 20px 22px; font-size: var(--fs-base); }
+            .modal-card-header { padding: 22px 20px; }
+            .modal-card-icon { width: 52px; height: 52px; font-size: 1.6rem; }
+            .modal-card-title { font-size: 1.05rem; }
+            .modal-card-desc { font-size: 0.7rem; }
         }
 
         @media (min-width: 1024px) {
-            :root {
-                --max-w: 800px;
-            }
-            #page-header {
-                padding: 64px 0 var(--gap-md);
-            }
-            #header-title {
-                font-size: 3rem;
-            }
-            .modal-content {
-                max-width: 600px;
-                padding: 36px 28px 28px;
-            }
-            .modal-card-header {
-                padding: 24px 22px;
-            }
-            .modal-card-icon {
-                width: 56px;
-                height: 56px;
-                font-size: 1.7rem;
-            }
+            :root { --max-w: 800px; }
+            #page-header { padding: 64px 0 var(--gap-md); }
+            #header-title { font-size: 3rem; }
+            .modal-content { max-width: 600px; padding: 36px 28px 28px; }
+            .modal-card-header { padding: 24px 22px; }
+            .modal-card-icon { width: 56px; height: 56px; font-size: 1.7rem; }
         }
     </style>
 </head>
@@ -846,9 +785,7 @@
         </div>
     </nav>
 
-    <button id="hub-fab" onclick="goToHub()" title="Back to Hub">
-  🏠 Hub
-</button>
+    <button id="hub-fab" onclick="goToHub()" title="Back to Hub">🏠 Hub</button>
 
     <div id="page-wrapper">
         <header id="page-header">
@@ -860,8 +797,13 @@
         </header>
 
         <main id="content-body">
+            <!-- ── FILTER PILLS & STATS ── -->
+            <div id="stats-bar"></div>
+            <div id="filter-pills"></div>
+
             <div id="desktop-table" class="desktop-table-wrapper"></div>
             <div id="mobile-cards" class="mobile-cards"></div>
+
             <section id="topic-section" style="display: none;">
                 <button class="btn-topic-choose" onclick="openModal()">
                     📂 Choose Another Topic
@@ -870,15 +812,10 @@
         </main>
     </div>
 
-    <!-- ═══════════════════════════════════════
-         MODAL — matches topics.html card design
-    ════════════════════════════════════════ -->
     <div class="modal-overlay" id="topic-modal">
         <div class="modal-content">
             <h2>Explore Topics</h2>
             <div class="modal-topics-list">
-
-                <!-- ── The Phraseosphere (expandable, current topic) ── -->
                 <div class="modal-topic-card expanded" id="modal-card-phraseosphere">
                     <div class="modal-card-header" onclick="toggleModalCard('modal-card-phraseosphere')">
                         <div class="modal-card-icon">🌐</div>
@@ -889,11 +826,9 @@
                         <div class="modal-card-arrow">▶</div>
                     </div>
                     <div class="modal-accordion-body" id="accordion-phraseosphere">
-                        <!-- populated dynamically from _index -->
+                        <!-- dynamically populated -->
                     </div>
                 </div>
-
-                <!-- ── The Zoosphere ── -->
                 <div class="modal-topic-card" id="modal-card-zoosphere" onclick="showComingSoon('The Zoosphere')">
                     <div class="modal-card-header">
                         <div class="modal-card-icon">🦁</div>
@@ -905,8 +840,6 @@
                     </div>
                     <div class="modal-card-badge">Soon</div>
                 </div>
-
-                <!-- ── Time Expression Triplets ── -->
                 <div class="modal-topic-card" id="modal-card-time" onclick="showComingSoon('Time Expression Triplets')">
                     <div class="modal-card-header">
                         <div class="modal-card-icon">⏱️</div>
@@ -918,8 +851,6 @@
                     </div>
                     <div class="modal-card-badge">Soon</div>
                 </div>
-
-                <!-- ── Collocations ── -->
                 <div class="modal-topic-card" id="modal-card-collocations" onclick="showComingSoon('Collocations')">
                     <div class="modal-card-header">
                         <div class="modal-card-icon">🔗</div>
@@ -931,8 +862,6 @@
                     </div>
                     <div class="modal-card-badge">Soon</div>
                 </div>
-
-                <!-- ── Conversation 101 ── -->
                 <div class="modal-topic-card" id="modal-card-conversation" onclick="showComingSoon('Conversation 101')">
                     <div class="modal-card-header">
                         <div class="modal-card-icon">💬</div>
@@ -944,7 +873,6 @@
                     </div>
                     <div class="modal-card-badge">Soon</div>
                 </div>
-
             </div>
             <button class="modal-close" onclick="closeModal()">✕ Close</button>
         </div>
@@ -959,402 +887,434 @@
         <p id="footer-copy">© 2026 Fluent by Amrit</p>
     </footer>
 
-   <script>
-(function() {
-    const BASE_CSV =
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vRf3J6Gr15efJH6zt_mEJcFf-gfjOmSYYXSAsFGJXoKZp89w3lRz72wnvRo6pwN6E_h2hdhlZb6swPc/pub?output=csv';
+    <script>
+        (function() {
+            const BASE_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRf3J6Gr15efJH6zt_mEJcFf-gfjOmSYYXSAsFGJXoKZp89w3lRz72wnvRo6pwN6E_h2hdhlZb6swPc/pub?output=csv';
 
-    let allLessons = [];
-    let currentLesson = null;
-    let currentIndex = -1;
+            let allLessons = [];
+            let currentLesson = null;
+            let currentIndex = -1;
+            let allGroups = [];   // keep for filter logic
 
-    // ── Helpers ──────────────────────────────────
-    function getPlayerName() {
-        if (typeof playerName !== 'undefined' && playerName) return playerName;
-        return decodeURIComponent(
-            new URLSearchParams(window.location.search).get('name') || ''
-        );
-    }
+            function getPlayerName() {
+                if (typeof playerName !== 'undefined' && playerName) return playerName;
+                return decodeURIComponent(new URLSearchParams(window.location.search).get('name') || '');
+            }
 
-    function getSheetParam() {
-        return new URLSearchParams(window.location.search).get('sheet') || '';
-    }
+            function getSheetParam() {
+                return new URLSearchParams(window.location.search).get('sheet') || '';
+            }
 
-    function getSectionParam() {
-        return new URLSearchParams(window.location.search).get('section') || '';
-    }
+            function getSectionParam() {
+                return new URLSearchParams(window.location.search).get('section') || '';
+            }
 
-    function goToHub() {
-        const name = getPlayerName();
-        window.location.href = 'hub.html' + (name ? '?name=' + encodeURIComponent(name) : '');
-    }
+            function goToHub() {
+                const name = getPlayerName();
+                window.location.href = 'hub.html' + (name ? '?name=' + encodeURIComponent(name) : '');
+            }
 
-    function goToLesson(sheetName, section = '') {
-        const name = getPlayerName();
-        let url = 'phraseosphere.html?sheet=' + encodeURIComponent(sheetName);
-        if (section) url += '&section=' + encodeURIComponent(section);
-        if (name) url += '&name=' + encodeURIComponent(name);
-        window.location.href = url;
-    }
+            function goToLesson(sheetName, section = '') {
+                const name = getPlayerName();
+                let url = 'phraseosphere.html?sheet=' + encodeURIComponent(sheetName);
+                if (section) url += '&section=' + encodeURIComponent(section);
+                if (name) url += '&name=' + encodeURIComponent(name);
+                window.location.href = url;
+            }
 
-    function goToNext() {
-        if (currentIndex >= 0 && currentIndex < allLessons.length - 1) {
-            goToLesson(allLessons[currentIndex + 1].sheet_name);
-        }
-    }
-
-    function goToPrev() {
-        if (currentIndex > 0) {
-            goToLesson(allLessons[currentIndex - 1].sheet_name);
-        }
-    }
-
-    function scrollToSection(sectionName) {
-        const id = sectionName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        const el = document.getElementById(id);
-        if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }
-
-    function formatMeaning(text) {
-        return text.replace(/\(([^)]+)\)/g,
-            '<span class="example-bengali">($1)</span>'
-        );
-    }
-
-    function showToast(message) {
-        const existing = document.getElementById('toast');
-        if (existing) existing.remove();
-        const toast = document.createElement('div');
-        toast.id = 'toast';
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                toast.style.opacity = '1';
-                toast.style.transform = 'translateX(-50%) translateY(0)';
-            });
-        });
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(-50%) translateY(10px)';
-            setTimeout(() => toast.remove(), 300);
-        }, 2500);
-    }
-
-    // ── CSV parsing & fetching ────────────────────
-    function parseCSV(text) {
-        const rows = [];
-        const lines = text.split(/\r?\n/);
-        for (const line of lines) {
-            if (!line.trim()) continue;
-            const cols = [];
-            let current = '';
-            let inQuotes = false;
-            for (const char of line) {
-                if (char === '"') {
-                    inQuotes = !inQuotes;
-                } else if (char === ',' && !inQuotes) {
-                    cols.push(current.trim());
-                    current = '';
-                } else {
-                    current += char;
+            function goToNext() {
+                if (currentIndex >= 0 && currentIndex < allLessons.length - 1) {
+                    goToLesson(allLessons[currentIndex + 1].sheet_name);
                 }
             }
-            cols.push(current.trim());
-            rows.push(cols);
-        }
-        return rows;
-    }
 
-    async function fetchCSV(url) {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Failed to fetch ' + url);
-        const text = await res.text();
-        return parseCSV(text);
-    }
+            function goToPrev() {
+                if (currentIndex > 0) {
+                    goToLesson(allLessons[currentIndex - 1].sheet_name);
+                }
+            }
 
-    // ── Index loading with localStorage cache ─────
-    const INDEX_CACHE_KEY = 'phraseosphere_index_v1';
-    const INDEX_CACHE_TIME = 30 * 60 * 1000; // 30 minutes
+            function scrollToSection(sectionName) {
+                const id = sectionName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                const el = document.getElementById(id);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
 
-    async function loadIndex(forceRefresh = false) {
-        // Try cache first
-        if (!forceRefresh) {
-            try {
-                const cached = localStorage.getItem(INDEX_CACHE_KEY);
-                if (cached) {
-                    const data = JSON.parse(cached);
-                    if (data.timestamp && Date.now() - data.timestamp < INDEX_CACHE_TIME) {
-                        allLessons = data.lessons;
-                        return; // success from cache
+            function formatMeaning(text) {
+                return text.replace(/\(([^)]+)\)/g, '<span class="example-bengali">($1)</span>');
+            }
+
+            function showToast(message) {
+                const existing = document.getElementById('toast');
+                if (existing) existing.remove();
+                const toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        toast.style.opacity = '1';
+                        toast.style.transform = 'translateX(-50%) translateY(0)';
+                    });
+                });
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(-50%) translateY(10px)';
+                    setTimeout(() => toast.remove(), 300);
+                }, 2500);
+            }
+
+            function parseCSV(text) {
+                const rows = [];
+                const lines = text.split(/\r?\n/);
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+                    const cols = [];
+                    let current = '';
+                    let inQuotes = false;
+                    for (const char of line) {
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            cols.push(current.trim());
+                            current = '';
+                        } else {
+                            current += char;
+                        }
+                    }
+                    cols.push(current.trim());
+                    rows.push(cols);
+                }
+                return rows;
+            }
+
+            async function fetchCSV(url) {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('Failed to fetch ' + url);
+                const text = await res.text();
+                return parseCSV(text);
+            }
+
+            const INDEX_CACHE_KEY = 'phraseosphere_index_v1';
+            const INDEX_CACHE_TIME = 30 * 60 * 1000;
+
+            async function loadIndex(forceRefresh = false) {
+                if (!forceRefresh) {
+                    try {
+                        const cached = localStorage.getItem(INDEX_CACHE_KEY);
+                        if (cached) {
+                            const data = JSON.parse(cached);
+                            if (data.timestamp && Date.now() - data.timestamp < INDEX_CACHE_TIME) {
+                                allLessons = data.lessons;
+                                return;
+                            }
+                        }
+                    } catch (e) { /* ignore */ }
+                }
+
+                const rows = await fetchCSV(BASE_CSV);
+                let headerIdx = -1;
+                for (let i = 0; i < rows.length; i++) {
+                    if (rows[i].length >= 7 &&
+                        rows[i][0].toLowerCase().includes('order') &&
+                        rows[i][1].toLowerCase().includes('sheet')) {
+                        headerIdx = i;
+                        break;
                     }
                 }
-            } catch (e) { /* ignore */ }
-        }
+                if (headerIdx === -1) throw new Error('_index header not found');
 
-        // Fetch from network
-        const rows = await fetchCSV(BASE_CSV);
-        let headerIdx = -1;
-        for (let i = 0; i < rows.length; i++) {
-            if (rows[i].length >= 7 &&
-                rows[i][0].toLowerCase().includes('order') &&
-                rows[i][1].toLowerCase().includes('sheet')) {
-                headerIdx = i;
-                break;
+                allLessons = [];
+                for (let i = headerIdx + 1; i < rows.length; i++) {
+                    const r = rows[i];
+                    if (!r[0] || r[0].trim() === '') continue;
+                    if (r.length < 7) continue;
+                    allLessons.push({
+                        order: parseInt(r[0].trim(), 10),
+                        sheet_name: r[1].trim(),
+                        gid: r[2].trim(),
+                        title: r[3].trim(),
+                        format: r[4].trim(),
+                        icon: r[5].trim(),
+                        meta_visual: r[6].trim(),
+                        meta_badges: r[7] ? r[7].trim() : '',
+                        description: r[8] ? r[8].trim() : ''
+                    });
+                }
+                allLessons.sort((a, b) => a.order - b.order);
+
+                try {
+                    localStorage.setItem(INDEX_CACHE_KEY, JSON.stringify({
+                        timestamp: Date.now(),
+                        lessons: allLessons
+                    }));
+                } catch (e) { /* storage full */ }
             }
-        }
-        if (headerIdx === -1) throw new Error('_index header not found');
 
-        allLessons = [];
-        for (let i = headerIdx + 1; i < rows.length; i++) {
-            const r = rows[i];
-            if (!r[0] || r[0].trim() === '') continue;
-            if (r.length < 7) continue;
-            allLessons.push({
-                order: parseInt(r[0].trim(), 10),
-                sheet_name: r[1].trim(),
-                gid: r[2].trim(),
-                title: r[3].trim(),
-                format: r[4].trim(),
-                icon: r[5].trim(),
-                meta_visual: r[6].trim(),
-                meta_badges: r[7] ? r[7].trim() : '',
-                description: r[8] ? r[8].trim() : ''
-            });
-        }
-        allLessons.sort((a, b) => a.order - b.order);
-
-        // Save to cache
-        try {
-            localStorage.setItem(INDEX_CACHE_KEY, JSON.stringify({
-                timestamp: Date.now(),
-                lessons: allLessons
-            }));
-        } catch (e) { /* storage full */ }
-    }
-
-    // ── Fetch lesson data by sheet name ───────────
-    async function fetchLessonSheet(sheetName) {
-        const lesson = allLessons.find(l => l.sheet_name === sheetName);
-        if (!lesson) return null;
-        const csvUrl =
-            `https://docs.google.com/spreadsheets/d/e/2PACX-1vRf3J6Gr15efJH6zt_mEJcFf-gfjOmSYYXSAsFGJXoKZp89w3lRz72wnvRo6pwN6E_h2hdhlZb6swPc/pub?gid=${lesson.gid}&single=true&output=csv`;
-        return await fetchCSV(csvUrl);
-    }
-
-    // ── Render lesson content ─────────────────────
-    function renderLesson(lesson, dataRows) {
-        // Header
-        document.getElementById('header-visual').textContent = lesson.meta_visual || '💬';
-        document.getElementById('header-title').textContent = lesson.title;
-        document.getElementById('header-subtitle').textContent = lesson.description || '';
-        const metaDiv = document.getElementById('header-meta');
-        metaDiv.innerHTML = '';
-        if (lesson.meta_badges) {
-            lesson.meta_badges.split(',').forEach(b => {
-                const span = document.createElement('span');
-                span.className = 'meta-badge';
-                span.textContent = b.trim();
-                metaDiv.appendChild(span);
-            });
-        }
-
-        // Show the "Choose Another Topic" button
-        document.getElementById('topic-section').style.display = 'block';
-
-        // Group rows by Category (first column)
-        const groups = [];
-        let currentGroup = null;
-        for (const row of dataRows) {
-            if (row.length < 4) continue;
-            const category = row[0].trim();
-            const phrase = row[1].trim();
-            const meaning = row[2].trim();
-            const example = row[3].trim();
-            if (!category || !phrase || !meaning) continue;
-
-            if (!currentGroup || currentGroup.name !== category) {
-                currentGroup = { name: category, items: [] };
-                groups.push(currentGroup);
+            async function fetchLessonSheet(sheetName) {
+                const lesson = allLessons.find(l => l.sheet_name === sheetName);
+                if (!lesson) return null;
+                const csvUrl = `https://docs.google.com/spreadsheets/d/e/2PACX-1vRf3J6Gr15efJH6zt_mEJcFf-gfjOmSYYXSAsFGJXoKZp89w3lRz72wnvRo6pwN6E_h2hdhlZb6swPc/pub?gid=${lesson.gid}&single=true&output=csv`;
+                return await fetchCSV(csvUrl);
             }
-            currentGroup.items.push({ phrase, meaning, example });
-        }
 
-        // Desktop table – three columns (Category removed)
-        const tableDiv = document.getElementById('desktop-table');
-        tableDiv.innerHTML = '';
-        if (groups.length > 0) {
-            const table = document.createElement('table');
-            table.className = 'desktop-table';
-            table.innerHTML = `
-                <thead><tr>
-                    <th>Phrase</th><th>Meaning</th><th>Example</th>
-                </tr></thead><tbody></tbody>`;
-            const tbody = table.querySelector('tbody');
-            groups.forEach(group => {
-                group.items.forEach(item => {
-                    const tr = document.createElement('tr');
-                    const tdPhrase = document.createElement('td');
-                    tdPhrase.className = 'phrase-cell';
-                    tdPhrase.textContent = item.phrase;
-                    const tdMeaning = document.createElement('td');
-                    tdMeaning.innerHTML = formatMeaning(item.meaning);
-                    const tdExample = document.createElement('td');
-                    tdExample.textContent = item.example;
-                    tdExample.style.fontStyle = 'italic';
-                    tdExample.style.color = 'var(--ex-usage)';
-                    tr.appendChild(tdPhrase);
-                    tr.appendChild(tdMeaning);
-                    tr.appendChild(tdExample);
-                    tbody.appendChild(tr);
+            // ── FILTER FUNCTIONS ──
+            function setActiveFilter(category) {
+                document.querySelectorAll('#filter-pills .pill-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.category === category);
                 });
-            });
-            tableDiv.appendChild(table);
-        }
-
-        // Mobile cards with section headings
-        const mobileDiv = document.getElementById('mobile-cards');
-        mobileDiv.innerHTML = '';
-        groups.forEach(group => {
-            const section = document.createElement('section');
-            section.className = 'content-section';
-            const slug = group.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-            section.innerHTML = `
-                <h2 class="section-heading" id="${slug}">
-                    <span class="section-icon">📌</span> ${group.name}
-                </h2>`;
-            group.items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'example-card';
-                card.innerHTML = `
-                    <div class="example-phrase">${item.phrase}</div>
-                    <div class="example-meaning">${formatMeaning(item.meaning)}</div>
-                    <div class="example-usage">"${item.example}"</div>`;
-                section.appendChild(card);
-            });
-            mobileDiv.appendChild(section);
-        });
-
-        // Scroll to a specific category if `section` param exists
-        const sectionParam = getSectionParam();
-        if (sectionParam) {
-            setTimeout(() => scrollToSection(sectionParam), 300);
-        }
-    }
-
-    // ── Navigation button states ──────────────────
-    function updateNavButtons() {
-        const prevBtn = document.getElementById('btn-prev');
-        const nextBtn = document.getElementById('btn-next');
-        prevBtn.disabled = currentIndex <= 0;
-        nextBtn.disabled = currentIndex >= allLessons.length - 1;
-    }
-
-    // ── Modal accordion for Phraseosphere subtopics ──
-    function populatePhraseosphereAccordion() {
-        const container = document.getElementById('accordion-phraseosphere');
-        if (!container) return;
-        container.innerHTML = '';
-        if (allLessons.length === 0) {
-            container.innerHTML = '<p style="font-size:0.7rem;opacity:0.6;padding:8px 0;">Loading…</p>';
-            return;
-        }
-        allLessons.forEach(lesson => {
-            const btn = document.createElement('button');
-            btn.className = 'sub-lesson-btn';
-            if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) {
-                btn.classList.add('current');
-            }
-            btn.innerHTML = `<span class="sub-icon">${lesson.icon || '📄'}</span> ${lesson.title}`;
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                closeModal();
-                if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) return;
-                goToLesson(lesson.sheet_name);
-            });
-            container.appendChild(btn);
-        });
-    }
-
-    function openModal() {
-        document.getElementById('topic-modal').classList.add('active');
-        populatePhraseosphereAccordion();
-        document.getElementById('modal-card-phraseosphere').classList.add('expanded');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal() {
-        document.getElementById('topic-modal').classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    function toggleModalCard(cardId) {
-        const card = document.getElementById(cardId);
-        if (!card) return;
-        const isOpen = card.classList.contains('expanded');
-        // close all
-        document.querySelectorAll('.modal-topic-card.expanded').forEach(c => c.classList.remove('expanded'));
-        if (!isOpen) card.classList.add('expanded');
-    }
-
-    function showComingSoon(topicName) {
-        showToast(topicName + ' is coming soon! 🌟');
-    }
-
-    // ── Init – load index then lesson ──────────────
-    async function init() {
-        try {
-            const sheetName = getSheetParam();
-
-            // Load index (with cache) first – always.
-            await loadIndex();
-
-            // If no sheet requested, redirect to first lesson
-            if (!sheetName && allLessons.length > 0) {
-                goToLesson(allLessons[0].sheet_name);
-                return;
+                applyFilter(category);
             }
 
-            // Find the lesson metadata
-            currentLesson = allLessons.find(l => l.sheet_name === sheetName);
-            if (!currentLesson) {
-                document.getElementById('header-title').textContent = 'Lesson not found';
-                return;
+            function applyFilter(category) {
+                // Desktop table rows
+                document.querySelectorAll('#desktop-table tbody tr').forEach(row => {
+                    if (category === 'all' || row.dataset.category === category) {
+                        row.classList.remove('filtered');
+                    } else {
+                        row.classList.add('filtered');
+                    }
+                });
+                // Mobile card sections
+                document.querySelectorAll('#mobile-cards .content-section').forEach(sec => {
+                    if (category === 'all' || sec.dataset.category === category) {
+                        sec.classList.remove('filtered');
+                    } else {
+                        sec.classList.add('filtered');
+                    }
+                });
             }
-            currentIndex = allLessons.indexOf(currentLesson);
-            updateNavButtons();
 
-            // Fetch the lesson data (table rows)
-            const dataRows = await fetchLessonSheet(sheetName);
-            if (dataRows) {
-                renderLesson(currentLesson, dataRows);
-            } else {
-                document.getElementById('header-title').textContent = 'No data found for this lesson';
+            // ── RENDER LESSON (extended with pills) ──
+            function renderLesson(lesson, dataRows) {
+                // Header
+                document.getElementById('header-visual').textContent = lesson.meta_visual || '💬';
+                document.getElementById('header-title').textContent = lesson.title;
+                document.getElementById('header-subtitle').textContent = lesson.description || '';
+                const metaDiv = document.getElementById('header-meta');
+                metaDiv.innerHTML = '';
+                if (lesson.meta_badges) {
+                    lesson.meta_badges.split(',').forEach(b => {
+                        const span = document.createElement('span');
+                        span.className = 'meta-badge';
+                        span.textContent = b.trim();
+                        metaDiv.appendChild(span);
+                    });
+                }
+
+                document.getElementById('topic-section').style.display = 'block';
+
+                // Group rows by category
+                const groups = [];
+                let currentGroup = null;
+                for (const row of dataRows) {
+                    if (row.length < 4) continue;
+                    const category = row[0].trim();
+                    const phrase = row[1].trim();
+                    const meaning = row[2].trim();
+                    const example = row[3].trim();
+                    if (!category || !phrase || !meaning) continue;
+
+                    if (!currentGroup || currentGroup.name !== category) {
+                        currentGroup = { name: category, items: [] };
+                        groups.push(currentGroup);
+                    }
+                    currentGroup.items.push({ phrase, meaning, example });
+                }
+                allGroups = groups;
+
+                // ── BUILD STATS & PILLS ──
+                const totalIdioms = groups.reduce((sum, g) => sum + g.items.length, 0);
+                const totalCats = groups.length;
+                document.getElementById('stats-bar').innerHTML = `<span>📊 Total Idioms: <strong>${totalIdioms}</strong></span> <span>📂 Categories: <strong>${totalCats}</strong></span>`;
+
+                const pillContainer = document.getElementById('filter-pills');
+                pillContainer.innerHTML = '';
+                // "All" pill
+                const allPill = document.createElement('button');
+                allPill.className = 'pill-btn active';
+                allPill.textContent = 'All';
+                allPill.dataset.category = 'all';
+                allPill.addEventListener('click', () => setActiveFilter('all'));
+                pillContainer.appendChild(allPill);
+
+                // category pills
+                groups.forEach(g => {
+                    const pill = document.createElement('button');
+                    pill.className = 'pill-btn';
+                    pill.textContent = g.name;
+                    pill.dataset.category = g.name;
+                    pill.addEventListener('click', () => setActiveFilter(g.name));
+                    pillContainer.appendChild(pill);
+                });
+
+                // Desktop table with data-category
+                const tableDiv = document.getElementById('desktop-table');
+                tableDiv.innerHTML = '';
+                if (groups.length > 0) {
+                    const table = document.createElement('table');
+                    table.className = 'desktop-table';
+                    table.innerHTML = `
+                        <thead><tr>
+                            <th>Phrase</th><th>Meaning</th><th>Example</th>
+                        </tr></thead><tbody></tbody>`;
+                    const tbody = table.querySelector('tbody');
+                    groups.forEach(group => {
+                        group.items.forEach(item => {
+                            const tr = document.createElement('tr');
+                            tr.dataset.category = group.name;
+                            const tdPhrase = document.createElement('td');
+                            tdPhrase.className = 'phrase-cell';
+                            tdPhrase.textContent = item.phrase;
+                            const tdMeaning = document.createElement('td');
+                            tdMeaning.innerHTML = formatMeaning(item.meaning);
+                            const tdExample = document.createElement('td');
+                            tdExample.textContent = item.example;
+                            tdExample.style.fontStyle = 'italic';
+                            tdExample.style.color = 'var(--ex-usage)';
+                            tr.appendChild(tdPhrase);
+                            tr.appendChild(tdMeaning);
+                            tr.appendChild(tdExample);
+                            tbody.appendChild(tr);
+                        });
+                    });
+                    tableDiv.appendChild(table);
+                }
+
+                // Mobile cards with data-category on sections
+                const mobileDiv = document.getElementById('mobile-cards');
+                mobileDiv.innerHTML = '';
+                groups.forEach(group => {
+                    const section = document.createElement('section');
+                    section.className = 'content-section';
+                    section.dataset.category = group.name;
+                    const slug = group.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                    section.innerHTML = `
+                        <h2 class="section-heading" id="${slug}">
+                            <span class="section-icon">📌</span> ${group.name}
+                        </h2>`;
+                    group.items.forEach(item => {
+                        const card = document.createElement('div');
+                        card.className = 'example-card';
+                        card.innerHTML = `
+                            <div class="example-phrase">${item.phrase}</div>
+                            <div class="example-meaning">${formatMeaning(item.meaning)}</div>
+                            <div class="example-usage">"${item.example}"</div>`;
+                        section.appendChild(card);
+                    });
+                    mobileDiv.appendChild(section);
+                });
+
+                // apply initial 'all' filter
+                applyFilter('all');
+
+                // scroll to section if param present
+                const sectionParam = getSectionParam();
+                if (sectionParam) {
+                    setTimeout(() => scrollToSection(sectionParam), 300);
+                }
             }
 
-            // Populate the modal accordion
-            populatePhraseosphereAccordion();
+            function updateNavButtons() {
+                const prevBtn = document.getElementById('btn-prev');
+                const nextBtn = document.getElementById('btn-next');
+                prevBtn.disabled = currentIndex <= 0;
+                nextBtn.disabled = currentIndex >= allLessons.length - 1;
+            }
 
-        } catch (err) {
-            console.error(err);
-            document.getElementById('header-title').textContent = 'Error loading lesson';
-        }
-    }
+            function populatePhraseosphereAccordion() {
+                const container = document.getElementById('accordion-phraseosphere');
+                if (!container) return;
+                container.innerHTML = '';
+                if (allLessons.length === 0) {
+                    container.innerHTML = '<p style="font-size:0.7rem;opacity:0.6;padding:8px 0;">Loading…</p>';
+                    return;
+                }
+                allLessons.forEach(lesson => {
+                    const btn = document.createElement('button');
+                    btn.className = 'sub-lesson-btn';
+                    if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) {
+                        btn.classList.add('current');
+                    }
+                    btn.innerHTML = `<span class="sub-icon">${lesson.icon || '📄'}</span> ${lesson.title}`;
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        closeModal();
+                        if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) return;
+                        goToLesson(lesson.sheet_name);
+                    });
+                    container.appendChild(btn);
+                });
+            }
 
-    // ── Expose functions to global scope ──────────
-    window.goToHub = goToHub;
-    window.goToNext = goToNext;
-    window.goToPrev = goToPrev;
-    window.openModal = openModal;
-    window.closeModal = closeModal;
-    window.toggleModalCard = toggleModalCard;
-    window.showComingSoon = showComingSoon;
+            function openModal() {
+                document.getElementById('topic-modal').classList.add('active');
+                populatePhraseosphereAccordion();
+                document.getElementById('modal-card-phraseosphere').classList.add('expanded');
+                document.body.style.overflow = 'hidden';
+            }
 
-    // Kick off
-    init();
-})();
-</script>
+            function closeModal() {
+                document.getElementById('topic-modal').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            function toggleModalCard(cardId) {
+                const card = document.getElementById(cardId);
+                if (!card) return;
+                const isOpen = card.classList.contains('expanded');
+                document.querySelectorAll('.modal-topic-card.expanded').forEach(c => c.classList.remove('expanded'));
+                if (!isOpen) card.classList.add('expanded');
+            }
+
+            function showComingSoon(topicName) {
+                showToast(topicName + ' is coming soon! 🌟');
+            }
+
+            async function init() {
+                try {
+                    const sheetName = getSheetParam();
+                    await loadIndex();
+
+                    if (!sheetName && allLessons.length > 0) {
+                        goToLesson(allLessons[0].sheet_name);
+                        return;
+                    }
+
+                    currentLesson = allLessons.find(l => l.sheet_name === sheetName);
+                    if (!currentLesson) {
+                        document.getElementById('header-title').textContent = 'Lesson not found';
+                        return;
+                    }
+                    currentIndex = allLessons.indexOf(currentLesson);
+                    updateNavButtons();
+
+                    const dataRows = await fetchLessonSheet(sheetName);
+                    if (dataRows) {
+                        renderLesson(currentLesson, dataRows);
+                    } else {
+                        document.getElementById('header-title').textContent = 'No data found for this lesson';
+                    }
+
+                    populatePhraseosphereAccordion();
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById('header-title').textContent = 'Error loading lesson';
+                }
+            }
+
+            window.goToHub = goToHub;
+            window.goToNext = goToNext;
+            window.goToPrev = goToPrev;
+            window.openModal = openModal;
+            window.closeModal = closeModal;
+            window.toggleModalCard = toggleModalCard;
+            window.showComingSoon = showComingSoon;
+
+            init();
+        })();
+    </script>
 </body>
 </html>
