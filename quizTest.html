@@ -679,6 +679,7 @@ function selectOption(key){
 
   if(key === q.correct){
     // CORRECT
+    showCorrect(); 
     selected.classList.add('correct');
     lockOptions();
 
@@ -993,6 +994,123 @@ function resetQuiz(){
 
 
   
+</script>
+  <!-- ═══════════════════════════════════════
+     CORRECT ANSWER CELEBRATION
+     ─────────────────────────────────────
+     HOW TO USE:
+     Call  showCorrect()  at the exact moment
+     a correct answer is confirmed in your game.
+
+     The overlay appears, holds for 900ms,
+     then fades out automatically. No cleanup
+     needed — it handles itself entirely.
+
+     TRIGGER POINTS:
+     puzzle.html → inside doCheck(), in the if(correct){ block
+     quiz.html   → inside selectOption(), in the if(key===q.correct){ block
+     Any other game → wherever correct answer is detected
+════════════════════════════════════════ -->
+
+<div id="correct-overlay" aria-live="assertive" aria-label="Correct!">
+  <div id="correct-card">
+    <div id="correct-icon">✓</div>
+    <div id="correct-word">CORRECT</div>
+  </div>
+</div>
+
+<style>
+/* ── Overlay — full screen, sits above everything ── */
+#correct-overlay {
+  position: fixed;
+  inset: 0;                        /* covers top, right, bottom, left */
+  z-index: 99999;                  /* above all game UI */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;            /* never blocks taps/clicks */
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Active state — JS adds this class to show it */
+#correct-overlay.active {
+  opacity: 1;
+  pointer-events: none;            /* still never blocks interaction */
+}
+
+/* ── Green card in the centre ── */
+#correct-card {
+  background: linear-gradient(145deg, #06d6a0 0%, #04b887 100%);
+  border-radius: 28px;
+  padding: 48px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow:
+    0 0 0 9999px rgba(6, 214, 160, 0.22),   /* full-screen green tint */
+    0 24px 64px rgba(6, 214, 160, 0.55),     /* card glow */
+    0 8px 24px rgba(0, 0, 0, 0.4);           /* card shadow */
+  transform: scale(0.75);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  min-width: 260px;
+  max-width: 88vw;
+  text-align: center;
+}
+
+/* Card pops into position when overlay is active */
+#correct-overlay.active #correct-card {
+  transform: scale(1);
+}
+
+/* ── Tick icon ── */
+#correct-icon {
+  font-size: clamp(2.8rem, 10vw, 4.5rem);
+  font-weight: 900;
+  color: #0d0d1a;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25));
+}
+
+/* ── CORRECT text ── */
+#correct-word {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: clamp(1.6rem, 6vw, 3rem);
+  font-weight: 900;
+  color: #0d0d1a;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+/* ── Responsive tweaks ── */
+@media (max-width: 380px) {
+  #correct-card { padding: 36px 32px; border-radius: 22px; }
+}
+@media (min-width: 1024px) {
+  #correct-card { padding: 56px 72px; border-radius: 32px; }
+}
+</style>
+
+<script>
+/* ── showCorrect() ──
+   Call this function the moment a correct
+   answer is confirmed. It runs entirely by
+   itself — no arguments, no cleanup needed. */
+function showCorrect(){
+  const overlay = document.getElementById('correct-overlay');
+
+  // Show
+  overlay.classList.add('active');
+
+  // Hide after 900ms — fades out over 150ms
+  setTimeout(() => {
+    overlay.classList.remove('active');
+  }, 900);
+}
 </script>
 </body>
 </html>
