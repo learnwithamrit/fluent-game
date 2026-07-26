@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fluent Stories</title>
-    <meta name="description" content="Interactive vocabulary stories">
+    <meta name="description" content="Interactive vocabulary stories with audio">
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
     <meta name="theme-color" content="#ff8906">
     <style>
@@ -60,23 +60,24 @@
         }
 
         /* ═══════════════════════════════════════
-           FLOATING HUB BUTTON (global)
+           FLOATING HUB BUTTON (icon + label)
         ════════════════════════════════════════ */
         #floatingHubBtn {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 8px;
             position: fixed;
             bottom: 25px;
             right: 25px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
+            height: 48px;
+            padding: 0 20px;
+            border-radius: 40px;
             background: var(--acc);
             color: #0d0d1a;
             border: none;
             box-shadow: 0 6px 18px rgba(0,0,0,0.4);
-            font-size: 1.4em;
+            font-size: 1em;
+            font-weight: 800;
             cursor: pointer;
             z-index: 200;
             transition: transform 0.2s;
@@ -84,13 +85,18 @@
         #floatingHubBtn:hover { transform: scale(1.05); }
 
         /* ═══════════════════════════════════════
-           SCREENS (hide/show)
+           SCREENS
         ════════════════════════════════════════ */
-        .screen { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
         .screen.active { display: flex; }
 
         /* ═══════════════════════════════════════
-           LEVEL SELECTION SCREEN
+           LEVEL SELECTION
         ════════════════════════════════════════ */
         #levelScreen {
             padding: 60px 20px 40px;
@@ -136,7 +142,7 @@
         }
 
         /* ═══════════════════════════════════════
-           STORY LIST SCREEN (cards)
+           STORY LIST (cards)
         ════════════════════════════════════════ */
         #listScreen {
             padding: 40px 20px 30px;
@@ -213,7 +219,7 @@
             gap: 15px;
             margin-top: 8px;
             position: relative;
-            z-index: 1; /* ensure clicks on player don't propagate to card */
+            z-index: 1;
         }
         .play-btn {
             width: 0;
@@ -246,7 +252,7 @@
         }
 
         /* ═══════════════════════════════════════
-           STORY READING SCREEN (Fluent template)
+           STORY READING SCREEN
         ════════════════════════════════════════ */
         #storyScreen {
             width: 100%;
@@ -256,7 +262,6 @@
         }
         #storyScreen.active { display: flex; }
 
-        /* Top nav */
         #top-nav {
             width: 100%;
             background: var(--sur);
@@ -297,18 +302,15 @@
             color: var(--acc);
         }
 
-        /* Hero banner */
         .hero-banner {
             width: 100%;
-            background: linear-gradient(115deg, #60be3e 0%, #89d35a 40%, #ffffff 90%);
             padding: 50px 20px 70px;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            position: relative;
-            border-radius: 0 0 32px 32px;
             color: #000;
+            border-radius: 0 0 32px 32px;
         }
         .hero-banner .badge { margin-bottom: 20px; }
         .hero-title {
@@ -322,7 +324,6 @@
             max-width: 400px;
         }
 
-        /* Audio capsule */
         .audio-capsule {
             background: #fff;
             width: 90%;
@@ -339,13 +340,12 @@
             position: relative;
         }
         .audio-capsule .play-btn {
-            border-left-color: #ff8906;
+            border-left-color: var(--acc);
         }
         .audio-capsule .play-btn.pause {
-            background: #ff8906;
+            background: var(--acc);
         }
 
-        /* Content body */
         #content-body {
             width: 100%;
             max-width: var(--max-w);
@@ -366,7 +366,6 @@
         }
         .pill:active { transform: scale(0.95); }
 
-        /* Story buttons */
         .story-buttons {
             display: flex;
             flex-wrap: wrap;
@@ -403,7 +402,6 @@
         }
         .cta-btn:hover { background: #ffaa30; }
 
-        /* Footer (story page) */
         #page-footer {
             width: 100%;
             background: var(--sur);
@@ -426,7 +424,6 @@
             font-size: var(--fs-xs);
             color: var(--mut);
             font-weight: 700;
-            letter-spacing: .5px;
         }
         #footer-tagline {
             font-size: var(--fs-xs);
@@ -448,7 +445,7 @@
         }
 
         /* ═══════════════════════════════════════
-           MODALS (definition & all-done)
+           MODALS
         ════════════════════════════════════════ */
         .modal {
             position: fixed;
@@ -499,7 +496,7 @@
 <body>
 
     <!-- Floating Hub Button -->
-    <button id="floatingHubBtn" title="Back to Hub">🏠</button>
+    <button id="floatingHubBtn">🏠 Hub</button>
 
     <!-- Screen: Level Selection -->
     <div id="levelScreen" class="screen active">
@@ -517,20 +514,22 @@
         <div id="storyCards" class="cards-container"></div>
     </div>
 
-    <!-- Screen: Story Reading (template style) -->
+    <!-- Screen: Story Reading (Fluent template) -->
     <div id="storyScreen" class="screen">
         <nav id="top-nav">
-            <a class="nav-brand" href="#" onclick="return false;">Fluent</a>
+            <a class="nav-brand" href="#">Fluent</a>
             <button class="nav-back" id="backToLevels">← Hub</button>
         </nav>
         <header class="hero-banner" id="heroBanner">
-            <div class="badge" id="heroLevelBadge">Intermediate</div>
+            <div class="badge" id="heroLevelBadge">Beginner</div>
             <h1 class="hero-title" id="heroTitle"></h1>
             <p class="hero-description" id="heroDescription"></p>
         </header>
         <div class="audio-capsule" id="heroAudioCapsule">
             <div class="play-btn" id="heroPlayBtn"></div>
-            <div class="wave-container" id="heroWaveContainer"><canvas id="heroWaveCanvas"></canvas></div>
+            <div class="wave-container" id="heroWaveContainer">
+                <canvas id="heroWaveCanvas"></canvas>
+            </div>
         </div>
         <main id="content-body"></main>
         <div class="story-buttons">
@@ -547,14 +546,14 @@
     </div>
 
     <!-- Screen: Summary -->
-    <div id="summaryScreen" class="screen" style="padding: 40px 20px; max-width: var(--max-w); margin: 0 auto;">
+    <div id="summaryScreen" class="screen" style="padding: 40px 20px; max-width: var(--max-w); margin: 0 auto; text-align: center;">
         <h1 style="font-size:var(--fs-2xl); color:var(--acc);">🎉 Great Job!</h1>
         <p style="color:var(--mut); margin:20px 0;">Words you learned this session:</p>
-        <ul id="summaryList" style="list-style:none; display:flex; flex-direction:column; gap:12px;"></ul>
+        <ul id="summaryList" style="list-style:none; display:flex; flex-direction:column; gap:12px; text-align:left;"></ul>
         <button class="cta-btn secondary" id="backToMenu" style="margin-top:20px;">🔙 Back to Menu</button>
     </div>
 
-    <!-- Screen: Mega Stories -->
+    <!-- Screen: Mega Stories (placeholder) -->
     <div id="megaScreen" class="screen" style="padding: 40px 20px; text-align:center; max-width: var(--max-w); margin:0 auto;">
         <h1 style="font-size:var(--fs-2xl);">🚀 Mega Stories</h1>
         <p style="margin:40px 0; color:var(--mut);">Novel‑length adventures are on their way!<br>We’re crafting multi‑part tales with rich vocabulary.</p>
@@ -590,6 +589,7 @@
         const VOCAB_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47-snxzaPFRnl4_nzuPgOXiw9leZApJ5zQ7OFaER6tNPy7LKa1qJxJGECvEKyo-MKp8Xb47EsNWLd/pub?gid=1607542814&single=true&output=tsv';
         // ===================================
 
+        // Global data
         let allStories = [];
         let vocabMap = new Map();
         let currentLevel = null;
@@ -597,8 +597,10 @@
         let currentStoryIndex = 0;
         let learnedWords = {};
         let learntCount = 0;
-        let audioCtx = null; // shared AudioContext
+        let activeAudio = null; // currently playing audio object { source, gainNode, context, buffer, startTime, offset }
+        let audioCtx = null;
 
+        // UI elements
         const levelScreen = document.getElementById('levelScreen');
         const listScreen = document.getElementById('listScreen');
         const storyScreen = document.getElementById('storyScreen');
@@ -611,66 +613,500 @@
 
         // ========== ANIMATED MODAL (pill definition) ==========
         let currentPillRect = null;
-        function showModal(pillElement, word, vocab) { /* same as before */ }
-        function hideModal() { /* same as before */ }
+        function showModal(pillElement, word, vocab) {
+            currentPillRect = pillElement.getBoundingClientRect();
+            const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
+            const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
+            const viewportW = window.innerWidth;
+            const viewportH = window.innerHeight;
 
-        // ... (I'll need to include the full animated modal logic, but I'll condense for brevity. In final code it's fully included.)
-        // I'll include complete functions, but to save space here I'll describe: I'll include the exact modal code from earlier in the conversation, just with updated classes. The full code block will be placed.
+            modalWord.textContent = word;
+            modalDefinition.textContent = vocab.definition;
+            modalExample.textContent = vocab.example;
+            wordModal.dataset.currentWord = word;
 
-        // ========== DATA LOADING & SORTING ==========
-        function parseTSV(tsv) { /* same as before */ }
-        async function loadData() { /* fetch and parse, plus sorting logic */ }
+            const content = document.querySelector('#wordModal .modal-content');
+            const offsetX = pillCenterX - viewportW / 2;
+            const offsetY = pillCenterY - viewportH / 2;
+            content.style.transition = 'none';
+            content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
+            content.style.opacity = '0';
 
-        // Sorting: new stories first by Date desc, then rest in order
+            wordModal.classList.add('show');
+            content.getBoundingClientRect();
+            content.style.transition = '';
+            content.style.transform = 'translate(0, 0) scale(1)';
+            content.style.opacity = '1';
+        }
+
+        function hideModal() {
+            if (!currentPillRect) {
+                wordModal.classList.remove('show');
+                return;
+            }
+            const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
+            const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
+            const viewportW = window.innerWidth;
+            const viewportH = window.innerHeight;
+            const offsetX = pillCenterX - viewportW / 2;
+            const offsetY = pillCenterY - viewportH / 2;
+
+            const content = document.querySelector('#wordModal .modal-content');
+            content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
+            content.style.opacity = '0';
+
+            setTimeout(() => {
+                wordModal.classList.remove('show');
+                content.style.transition = 'none';
+                content.style.transform = 'translate(0, 0) scale(1)';
+                content.style.opacity = '1';
+                currentPillRect = null;
+            }, 350);
+        }
+
+        // ========== PILL CLICK & GOT IT ==========
+        document.addEventListener('click', (e) => {
+            const pill = e.target.closest('.pill');
+            if (!pill) return;
+            const word = pill.dataset.word;
+            const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
+            const vocab = vocabMap.get(lookupKey);
+            if (!vocab) {
+                alert(`Definition not found for "${word}" in level ${currentLevel}.`);
+                return;
+            }
+            showModal(pill, word, vocab);
+        });
+
+        document.getElementById('gotItBtn').addEventListener('click', () => {
+            const word = wordModal.dataset.currentWord;
+            if (!word) return;
+            const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
+            const vocab = vocabMap.get(lookupKey);
+            if (!learnedWords[word.toLowerCase()]) {
+                learnedWords[word.toLowerCase()] = {
+                    word: word,
+                    definition: vocab ? vocab.definition : '',
+                    example: vocab ? vocab.example : ''
+                };
+                learntCount++;
+                updateCounter();
+            }
+            hideModal();
+        });
+
+        wordModal.addEventListener('click', (e) => {
+            if (e.target === wordModal) hideModal();
+        });
+
+        // ========== DATA LOADING ==========
+        function parseTSV(tsvText) {
+            const lines = tsvText.trim().split('\n');
+            if (lines.length < 2) return [];
+            const headers = lines[0].split('\t');
+            const result = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split('\t');
+                const obj = {};
+                headers.forEach((header, idx) => {
+                    obj[header.trim()] = (values[idx] || '').trim();
+                });
+                result.push(obj);
+            }
+            return result;
+        }
+
+        async function loadData() {
+            try {
+                const [storiesResp, vocabResp] = await Promise.all([
+                    fetch(STORIES_URL),
+                    fetch(VOCAB_URL)
+                ]);
+                const storiesTSV = await storiesResp.text();
+                const vocabTSV = await vocabResp.text();
+                allStories = parseTSV(storiesTSV);
+                const vocabRows = parseTSV(vocabTSV);
+                vocabRows.forEach(row => {
+                    const key = `${row.Word.toLowerCase()}::${row.Level}`;
+                    vocabMap.set(key, { definition: row.Definition, example: row.Example });
+                });
+                console.log(`Loaded ${allStories.length} stories, ${vocabRows.length} vocab entries.`);
+            } catch (err) {
+                alert('Oops! Could not load story data. Check your internet and the Google Sheet links.');
+                console.error(err);
+            }
+        }
+
+        // ========== SORTING ==========
         function sortStories(stories) {
             const newStories = stories.filter(s => s.New && s.New.toLowerCase() === 'new');
             const oldStories = stories.filter(s => !s.New || s.New.toLowerCase() !== 'new');
             newStories.sort((a,b) => (b.Date || '').localeCompare(a.Date || ''));
+            // keep old stories in sheet order
             return [...newStories, ...oldStories];
         }
 
         // ========== AUDIO PLAYER ==========
-        function createAudioPlayer(container, audioUrl, playBtn, canvas) {
-            // Uses Web Audio API: fetch audio, decode, draw waveform on canvas
-            // Returns controls: play(), pause(), seek()
+        async function getAudioContext() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
+            return audioCtx;
         }
 
-        // ========== SCREEN MANAGEMENT ==========
+        // Stop any currently playing audio and clean up
+        function stopActiveAudio() {
+            if (activeAudio) {
+                try { activeAudio.source.stop(); } catch(e) {}
+                activeAudio = null;
+            }
+        }
+
+        // Draw waveform on canvas from an AudioBuffer
+        function drawWaveform(canvas, buffer) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.clientWidth;
+            const height = canvas.height = canvas.clientHeight;
+            const data = buffer.getChannelData(0);
+            const step = Math.ceil(data.length / width);
+            const amp = height / 2;
+            ctx.clearRect(0, 0, width, height);
+            ctx.beginPath();
+            ctx.moveTo(0, amp);
+            for (let i = 0; i < width; i++) {
+                let min = 1.0, max = -1.0;
+                for (let j = 0; j < step; j++) {
+                    const idx = i * step + j;
+                    if (idx < data.length) {
+                        const val = data[idx];
+                        if (val < min) min = val;
+                        if (val > max) max = val;
+                    }
+                }
+                ctx.lineTo(i, (1 + min) * amp);
+                ctx.lineTo(i, (1 + max) * amp);
+            }
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        }
+
+        // Create an audio player inside a given container, with play button and canvas
+        function createAudioPlayer({ audioUrl, playBtn, canvas, onPlaybackStart }) {
+            let buffer = null;
+            let isPlaying = false;
+            let startTime = 0, offset = 0;
+            let sourceNode = null;
+            let animationFrame = null;
+
+            const ctx = canvas.getContext('2d');
+            const canvasParent = canvas.parentElement;
+            const progressCanvas = document.createElement('canvas');
+            progressCanvas.className = 'progress-canvas';
+            progressCanvas.width = canvas.width;
+            progressCanvas.height = canvas.height;
+            progressCanvas.style.position = 'absolute';
+            progressCanvas.style.left = '0';
+            progressCanvas.style.top = '0';
+            progressCanvas.style.pointerEvents = 'none';
+            canvasParent.appendChild(progressCanvas);
+
+            async function loadAudio() {
+                if (buffer) return;
+                const response = await fetch(audioUrl);
+                const arrayBuffer = await response.arrayBuffer();
+                const actx = await getAudioContext();
+                buffer = await actx.decodeAudioData(arrayBuffer);
+                drawWaveform(canvas, buffer);
+            }
+
+            function updateProgress() {
+                if (!isPlaying || !buffer) return;
+                const now = (await getAudioContext()).currentTime;
+                const elapsed = now - startTime + offset;
+                const duration = buffer.duration;
+                const progress = Math.min(elapsed / duration, 1);
+                const width = canvas.width;
+                const height = canvas.height;
+                const pctx = progressCanvas.getContext('2d');
+                pctx.clearRect(0, 0, width, height);
+                pctx.fillStyle = '#ff8906';
+                pctx.fillRect(0, 0, width * progress, height);
+                animationFrame = requestAnimationFrame(updateProgress);
+            }
+
+            async function play() {
+                if (!buffer) await loadAudio();
+                stopActiveAudio();
+                const actx = await getAudioContext();
+                sourceNode = actx.createBufferSource();
+                sourceNode.buffer = buffer;
+                sourceNode.connect(actx.destination);
+                startTime = actx.currentTime;
+                sourceNode.start(0, offset);
+                isPlaying = true;
+                activeAudio = { source: sourceNode, context: actx, buffer, startTime, offset };
+                if (onPlaybackStart) onPlaybackStart();
+                playBtn.classList.add('pause');
+                updateProgress();
+                sourceNode.onended = () => {
+                    if (isPlaying) {
+                        isPlaying = false;
+                        offset = 0;
+                        playBtn.classList.remove('pause');
+                        cancelAnimationFrame(animationFrame);
+                        progressCanvas.getContext('2d').clearRect(0,0,progressCanvas.width, progressCanvas.height);
+                        activeAudio = null;
+                    }
+                };
+            }
+
+            function pause() {
+                if (!isPlaying) return;
+                const actx = audioCtx;
+                offset += actx.currentTime - startTime;
+                sourceNode.stop();
+                isPlaying = false;
+                playBtn.classList.remove('pause');
+                cancelAnimationFrame(animationFrame);
+                activeAudio = null;
+            }
+
+            playBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // prevent card click
+                if (isPlaying) pause();
+                else play();
+            });
+
+            // Seek by clicking on waveform
+            canvas.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (!buffer) await loadAudio();
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const ratio = x / rect.width;
+                offset = ratio * buffer.duration;
+                if (isPlaying) {
+                    sourceNode.stop();
+                    isPlaying = false;
+                    playBtn.classList.remove('pause');
+                    cancelAnimationFrame(animationFrame);
+                    // restart from new offset
+                    play();
+                }
+            });
+
+            return { loadAudio, play, pause };
+        }
+
+        // ========== HELPERS ==========
         function showScreen(screen) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             screen.classList.add('active');
             floatingHubBtn.style.display = (screen === levelScreen) ? 'none' : 'flex';
         }
 
-        // ========== BUILD STORY CARDS ==========
-        function buildCards(stories) { /* loops stories, creates card elements, attaches audio player */ }
+        function updateCounter() {
+            // counter not visible anymore, but we keep the variable for summary
+        }
 
-        // ========== START STORY (reading) ==========
+        // ========== BUILD STORY CARDS ==========
+        function buildCards(stories) {
+            const container = document.getElementById('storyCards');
+            container.innerHTML = '';
+            if (stories.length === 0) {
+                container.innerHTML = '<p style="color:var(--mut); text-align:center;">No stories in this level yet.</p>';
+                return;
+            }
+            stories.forEach((story, idx) => {
+                const card = document.createElement('div');
+                card.className = 'story-card';
+                card.style.background = `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
+
+                const badgeRow = document.createElement('div');
+                badgeRow.className = 'card-badge-row';
+                const levelBadge = document.createElement('span');
+                levelBadge.className = 'badge';
+                levelBadge.textContent = story.Level;
+                badgeRow.appendChild(levelBadge);
+                if (story.New && story.New.toLowerCase() === 'new') {
+                    const newBadge = document.createElement('span');
+                    newBadge.className = 'badge new-badge';
+                    newBadge.textContent = 'NEW';
+                    badgeRow.appendChild(newBadge);
+                }
+                card.appendChild(badgeRow);
+
+                const title = document.createElement('div');
+                title.className = 'card-title';
+                title.textContent = story.Title;
+                card.appendChild(title);
+
+                const desc = document.createElement('div');
+                desc.className = 'card-description';
+                desc.textContent = story.Description || '';
+                card.appendChild(desc);
+
+                if (story.AudioURL) {
+                    const audioContainer = document.createElement('div');
+                    audioContainer.className = 'audio-player-mini';
+                    const playBtn = document.createElement('div');
+                    playBtn.className = 'play-btn';
+                    const waveContainer = document.createElement('div');
+                    waveContainer.className = 'wave-container';
+                    const canvas = document.createElement('canvas');
+                    waveContainer.appendChild(canvas);
+                    audioContainer.appendChild(playBtn);
+                    audioContainer.appendChild(waveContainer);
+                    card.appendChild(audioContainer);
+
+                    createAudioPlayer({
+                        audioUrl: story.AudioURL,
+                        playBtn,
+                        canvas
+                    });
+                }
+
+                card.addEventListener('click', (e) => {
+                    // if the click was on audio controls, don't navigate
+                    if (e.target.closest('.audio-player-mini')) return;
+                    startStory(idx);
+                });
+                container.appendChild(card);
+            });
+        }
+
+        // ========== LEVEL SELECTION ==========
+        document.querySelectorAll('.level-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentLevel = btn.dataset.level;
+                document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
+                currentStories = sortStories(allStories.filter(s => s.Level === currentLevel));
+                buildCards(currentStories);
+                showScreen(listScreen);
+            });
+        });
+
+        document.getElementById('megaStoriesBtn').addEventListener('click', () => {
+            showScreen(document.getElementById('megaScreen'));
+        });
+        document.getElementById('megaBackToLevels').addEventListener('click', () => showScreen(levelScreen));
+        document.getElementById('backToLevels').addEventListener('click', () => showScreen(levelScreen));
+
+        // ========== START A STORY ==========
         function startStory(index) {
+            currentStoryIndex = index;
             const story = currentStories[index];
-            // Set hero banner gradient from story
-            document.getElementById('heroBanner').style.background = `linear-gradient(115deg, ${story.GradientStart} 0%, ${story.GradientEnd} 40%, #ffffff 90%)`;
+            // Hero banner gradient
+            document.getElementById('heroBanner').style.background =
+                `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
             document.getElementById('heroTitle').textContent = story.Title;
             document.getElementById('heroDescription').textContent = story.Description || '';
             document.getElementById('heroLevelBadge').textContent = story.Level;
-            // Clear previous audio and create new
-            // Set content body with pill words
+
+            // Clear previous audio player in hero
+            const heroPlayBtn = document.getElementById('heroPlayBtn');
+            heroPlayBtn.className = 'play-btn';
+            const heroCanvas = document.getElementById('heroWaveCanvas');
+            heroCanvas.getContext('2d').clearRect(0, 0, heroCanvas.width, heroCanvas.height);
+            stopActiveAudio();
+
+            if (story.AudioURL) {
+                createAudioPlayer({
+                    audioUrl: story.AudioURL,
+                    playBtn: heroPlayBtn,
+                    canvas: heroCanvas
+                });
+            }
+
+            // Set content with pill words
             const content = document.getElementById('content-body');
-            content.innerHTML = story.StoryText.replace(/\[([^\]]+)\]/g, (m,w) => `<span class="pill" data-word="${w}">${w}</span>`);
+            content.innerHTML = story.StoryText.replace(/\[([^\]]+)\]/g, (match, word) => {
+                return `<span class="pill" data-word="${word}">${word}</span>`;
+            });
+
             showScreen(storyScreen);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ... (rest of the game logic: finish reading, next story, all-done modal, etc.)
+        // ========== STORY SCREEN BUTTONS ==========
+        document.getElementById('finishStory').addEventListener('click', () => {
+            const summaryList = document.getElementById('summaryList');
+            summaryList.innerHTML = '';
+            if (Object.keys(learnedWords).length === 0) {
+                summaryList.innerHTML = '<li style="color:var(--mut);">You haven’t collected any words yet. Keep reading!</li>';
+            } else {
+                for (let key in learnedWords) {
+                    const lw = learnedWords[key];
+                    const li = document.createElement('li');
+                    li.style.background = 'var(--sur)';
+                    li.style.border = '1px solid var(--brd)';
+                    li.style.borderRadius = '12px';
+                    li.style.padding = '12px 16px';
+                    li.innerHTML = `<strong style="color:var(--acc);">${lw.word}</strong> – ${lw.definition}<br><em style="color:var(--mut);">${lw.example}</em>`;
+                    summaryList.appendChild(li);
+                }
+            }
+            showScreen(summaryScreen);
+        });
 
-        // I'll integrate the entire working script from previous conversations, adapted to new layout.
+        document.getElementById('nextStory').addEventListener('click', () => {
+            if (currentStories.length === 0) return;
+            const nextIndex = currentStoryIndex + 1;
+            if (nextIndex < currentStories.length) {
+                startStory(nextIndex);
+            } else {
+                showAllDoneModal();
+            }
+        });
 
-        // Initialize
+        // ========== ALL-DONE MODAL ==========
+        function showAllDoneModal() {
+            const levelNames = ['Beginner', 'Intermediate', 'Advanced'];
+            const currentIdx = levelNames.indexOf(currentLevel);
+            const nextLevel = (currentIdx >= 0 && currentIdx < levelNames.length - 1) ? levelNames[currentIdx + 1] : null;
+
+            document.getElementById('allDoneMessage').textContent =
+                `You’ve finished every story in the ${currentLevel} level. What would you like to do next?`;
+
+            const nextBtn = document.getElementById('goNextLevel');
+            if (nextLevel) {
+                nextBtn.style.display = 'inline-flex';
+                nextBtn.textContent = `➡ Go to ${nextLevel}`;
+                nextBtn.onclick = () => {
+                    document.getElementById('allDoneModal').classList.remove('show');
+                    currentLevel = nextLevel;
+                    document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
+                    currentStories = sortStories(allStories.filter(s => s.Level === currentLevel));
+                    buildCards(currentStories);
+                    showScreen(listScreen);
+                };
+            } else {
+                nextBtn.style.display = 'none';
+            }
+
+            document.getElementById('reReadStories').onclick = () => {
+                document.getElementById('allDoneModal').classList.remove('show');
+                currentStories = sortStories(currentStories);
+                startStory(0);
+            };
+            document.getElementById('allDoneModal').classList.add('show');
+        }
+
+        document.getElementById('allDoneModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('allDoneModal')) {
+                document.getElementById('allDoneModal').classList.remove('show');
+            }
+        });
+
+        document.getElementById('backToMenu').addEventListener('click', () => showScreen(levelScreen));
+        floatingHubBtn.addEventListener('click', () => showScreen(levelScreen));
+
+        // ========== INIT ==========
         window.addEventListener('DOMContentLoaded', async () => {
             await loadData();
             if (allStories.length === 0) {
-                levelScreen.innerHTML = '<h1>🌟 Choose Your Level</h1><p style="color:var(--mut);">No stories loaded. Check sheet.</p>';
+                levelScreen.innerHTML = '<h1>🌟 Choose Your Level</h1><p style="color:var(--mut);">No stories loaded. Check Google Sheet links.</p>';
             }
-            // other init
         });
     </script>
 </body>
