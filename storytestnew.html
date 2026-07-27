@@ -819,20 +819,20 @@
                 drawWaveform(canvas, buffer);
             }
 
-            function updateProgress() {
-                if (!isPlaying || !buffer) return;
-                const now = (await getAudioContext()).currentTime;
-                const elapsed = now - startTime + offset;
-                const duration = buffer.duration;
-                const progress = Math.min(elapsed / duration, 1);
-                const width = canvas.width;
-                const height = canvas.height;
-                const pctx = progressCanvas.getContext('2d');
-                pctx.clearRect(0, 0, width, height);
-                pctx.fillStyle = '#ff8906';
-                pctx.fillRect(0, 0, width * progress, height);
-                animationFrame = requestAnimationFrame(updateProgress);
-            }
+            async function updateProgress() {
+    if (!isPlaying || !buffer) return;
+    const now = (await getAudioContext()).currentTime;
+    const elapsed = now - startTime + offset;
+    const duration = buffer.duration;
+    const progress = Math.min(elapsed / duration, 1);
+    const width = canvas.width;
+    const height = canvas.height;
+    const pctx = progressCanvas.getContext('2d');
+    pctx.clearRect(0, 0, width, height);
+    pctx.fillStyle = '#ff8906';
+    pctx.fillRect(0, 0, width * progress, height);
+    animationFrame = requestAnimationFrame(updateProgress);
+}
 
             async function play() {
                 if (!buffer) await loadAudio();
