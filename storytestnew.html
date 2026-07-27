@@ -144,73 +144,109 @@
         /* ═══════════════════════════════════════
            STORY LIST (cards)
         ════════════════════════════════════════ */
-        #listScreen {
-            padding: 40px 20px 30px;
-            width: 100%;
-            max-width: var(--max-w);
-        }
-        #listScreen h2 {
-            font-size: var(--fs-xl);
-            font-weight: 900;
-            margin-bottom: var(--gap-sm);
-            color: var(--txt);
-        }
-        .list-subtitle {
-            font-size: var(--fs-sm);
-            color: var(--mut);
-            margin-bottom: var(--gap-lg);
-        }
-        .cards-container {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+/* Story card wrapper (gap between the two cards) */
+.story-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.story-wrapper:active { transform: scale(0.98); }
 
-        .story-card {
-            border-radius: 32px;
-            padding: 32px 24px 24px;
-            color: #000;
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.2s;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .story-card:active { transform: scale(0.98); }
+/* Top info card */
+.story-info-card {
+    border-radius: 32px;
+    padding: 28px 24px;
+    color: #000;
+    background: linear-gradient(115deg, #60be3e 0%, #89d35a 40%, #ffffff 90%);
+    /* gradient will be overridden inline by JS */
+}
 
-        .card-badge-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.9);
-            color: #000;
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: var(--fs-xs);
-            letter-spacing: 0.5px;
-        }
-        .badge.new-badge {
-            background: var(--acc);
-            color: #0d0d1a;
-            font-weight: 900;
-        }
-        .card-title {
-            font-size: var(--fs-xl);
-            font-weight: 900;
-            line-height: 1.2;
-            margin: 4px 0;
-        }
-        .card-description {
-            font-size: var(--fs-sm);
-            opacity: 0.8;
-            line-height: 1.5;
-        }
+/* Badges row */
+.card-badge-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.9);
+    color: #000;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+}
+.badge.new-badge {
+    background: var(--acc);
+    color: #0d0d1a;
+    font-weight: 900;
+}
+
+/* Story title */
+.card-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    color: #000;
+}
+
+/* Story description */
+.card-description {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    line-height: 1.5;
+    color: #1a1a1a;
+}
+
+/* Bottom audio card */
+.audio-card {
+    border-radius: 32px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: linear-gradient(115deg, #60be3e 0%, #89d35a 40%, #ffffff 90%);
+    /* gradient will be overridden inline by JS */
+}
+
+/* Play button (triangle) */
+.play-btn {
+    width: 0;
+    height: 0;
+    border-top: 14px solid transparent;
+    border-bottom: 14px solid transparent;
+    border-left: 22px solid #fff;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+.play-btn.pause {
+    border: none;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 3px;
+}
+
+/* Wave container */
+.wave-container {
+    flex: 1;
+    height: 50px;
+    position: relative;
+    cursor: pointer;
+}
+.wave-container canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
 
         /* Audio player inside card */
         .audio-player-mini {
@@ -951,70 +987,99 @@ function showScreen(screen) {
         }
 
         // ========== BUILD STORY CARDS ==========
-        function buildCards(stories) {
-            const container = document.getElementById('storyCards');
-            container.innerHTML = '';
-            if (stories.length === 0) {
-                container.innerHTML = '<p style="color:var(--mut); text-align:center;">No stories in this level yet.</p>';
-                return;
-            }
-            stories.forEach((story, idx) => {
-                const card = document.createElement('div');
-                card.className = 'story-card';
-                card.style.background = `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
+function buildCards(stories) {
+    const container = document.getElementById('storyCards');
+    container.innerHTML = '';
+    if (stories.length === 0) {
+        container.innerHTML = '<p style="color:var(--mut); text-align:center;">No stories in this level yet.</p>';
+        return;
+    }
 
-                const badgeRow = document.createElement('div');
-                badgeRow.className = 'card-badge-row';
-                const levelBadge = document.createElement('span');
-                levelBadge.className = 'badge';
-                levelBadge.textContent = story.Level;
-                badgeRow.appendChild(levelBadge);
-                if (story.New && story.New.toLowerCase() === 'new') {
-                    const newBadge = document.createElement('span');
-                    newBadge.className = 'badge new-badge';
-                    newBadge.textContent = 'NEW';
-                    badgeRow.appendChild(newBadge);
-                }
-                card.appendChild(badgeRow);
+    stories.forEach((story, idx) => {
+        // ---- wrapper ----
+        const wrapper = document.createElement('div');
+        wrapper.className = 'story-wrapper';
+        wrapper.addEventListener('click', (e) => {
+            // don't navigate if the click was on the audio card
+            if (e.target.closest('.audio-card')) return;
+            startStory(idx);
+        });
 
-                const title = document.createElement('div');
-                title.className = 'card-title';
-                title.textContent = story.Title;
-                card.appendChild(title);
+        // ---- info card ----
+        const infoCard = document.createElement('div');
+        infoCard.className = 'story-info-card';
+        infoCard.style.background = `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
 
-                const desc = document.createElement('div');
-                desc.className = 'card-description';
-                desc.textContent = story.Description || '';
-                card.appendChild(desc);
-
-                if (story.AudioURL) {
-                    const audioContainer = document.createElement('div');
-                    audioContainer.className = 'audio-player-mini';
-                    const playBtn = document.createElement('div');
-                    playBtn.className = 'play-btn';
-                    const waveContainer = document.createElement('div');
-                    waveContainer.className = 'wave-container';
-                    const canvas = document.createElement('canvas');
-                    waveContainer.appendChild(canvas);
-                    audioContainer.appendChild(playBtn);
-                    audioContainer.appendChild(waveContainer);
-                    card.appendChild(audioContainer);
-
-                    createAudioPlayer({
-                        audioUrl: story.AudioURL,
-                        playBtn,
-                        canvas
-                    });
-                }
-
-                card.addEventListener('click', (e) => {
-                    // if the click was on audio controls, don't navigate
-                    if (e.target.closest('.audio-player-mini')) return;
-                    startStory(idx);
-                });
-                container.appendChild(card);
-            });
+        const badgeRow = document.createElement('div');
+        badgeRow.className = 'card-badge-row';
+        const levelBadge = document.createElement('span');
+        levelBadge.className = 'badge';
+        levelBadge.textContent = story.Level;
+        badgeRow.appendChild(levelBadge);
+        if (story.New && story.New.toLowerCase() === 'new') {
+            const newBadge = document.createElement('span');
+            newBadge.className = 'badge new-badge';
+            newBadge.textContent = 'NEW';
+            badgeRow.appendChild(newBadge);
         }
+        infoCard.appendChild(badgeRow);
+
+        const title = document.createElement('div');
+        title.className = 'card-title';
+        title.textContent = story.Title;
+        infoCard.appendChild(title);
+
+        if (story.Description) {
+            const desc = document.createElement('div');
+            desc.className = 'card-description';
+            desc.textContent = story.Description;
+            infoCard.appendChild(desc);
+        }
+
+        // ---- audio card (only if audio URL exists) ----
+        if (story.AudioURL) {
+            const audioCard = document.createElement('div');
+            audioCard.className = 'audio-card';
+            audioCard.style.background = `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
+
+            const playBtn = document.createElement('div');
+            playBtn.className = 'play-btn';
+            const waveContainer = document.createElement('div');
+            waveContainer.className = 'wave-container';
+            const canvas = document.createElement('canvas');
+            waveContainer.appendChild(canvas);
+            audioCard.appendChild(playBtn);
+            audioCard.appendChild(waveContainer);
+
+            // attach audio player
+            createAudioPlayer({
+                audioUrl: story.AudioURL,
+                playBtn: playBtn,
+                canvas: canvas
+            });
+
+            wrapper.appendChild(infoCard);
+            wrapper.appendChild(audioCard);
+        } else {
+            // if no audio, just show the info card
+            wrapper.appendChild(infoCard);
+        }
+
+        container.appendChild(wrapper);
+    });
+}
+        async function loadAudio() {
+    if (buffer) return;
+    console.log('Fetching audio:', audioUrl);
+    const response = await fetch(audioUrl);
+    console.log('Response status:', response.status);
+    if (!response.ok) throw new Error('Failed to fetch audio: ' + response.statusText);
+    const arrayBuffer = await response.arrayBuffer();
+    const actx = await getAudioContext();
+    buffer = await actx.decodeAudioData(arrayBuffer);
+    console.log('Audio decoded, duration:', buffer.duration);
+    drawWaveform(canvas, buffer);
+}
 
         // ========== LEVEL SELECTION ==========
         document.querySelectorAll('.level-btn').forEach(btn => {
