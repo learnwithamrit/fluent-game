@@ -402,6 +402,34 @@
         }
         .cta-btn:hover { background: #ffaa30; }
 
+
+#floatingBackBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: fixed;
+    bottom: 85px;          /* 85px from bottom, above the hub (25px + 48px height + 12px gap) */
+    right: 25px;
+    height: 48px;
+    padding: 0 20px;
+    border-radius: 40px;
+    background: var(--sur2);
+    color: var(--txt);
+    border: 1.5px solid var(--brd);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    font-size: 0.9em;
+    font-weight: 800;
+    cursor: pointer;
+    z-index: 199;          /* just below the hub button's 200 */
+    transition: transform 0.2s;
+}
+#floatingBackBtn:hover {
+    transform: scale(1.05);
+    border-color: var(--acc);
+    color: var(--acc);
+}
+
+        
         #page-footer {
             width: 100%;
             background: var(--sur);
@@ -494,7 +522,9 @@
     </style>
 </head>
 <body>
-
+    <!-- Floating Back to Level button (above Hub) -->
+<button id="floatingBackBtn" style="display:none;">← Levels</button>
+<button id="floatingHubBtn">🏠 Hub</button>
     <!-- Floating Hub Button -->
     <button id="floatingHubBtn">🏠 Hub</button>
 
@@ -899,11 +929,21 @@
         }
 
         // ========== HELPERS ==========
-        function showScreen(screen) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            screen.classList.add('active');
-            floatingHubBtn.style.display = (screen === levelScreen) ? 'none' : 'flex';
-        }
+function showScreen(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    screen.classList.add('active');
+
+    // Hub button is always visible (even on level screen)
+    floatingHubBtn.style.display = 'flex';
+
+    // Back button only on story list and story reading screens
+    const backBtn = document.getElementById('floatingBackBtn');
+    if (screen === listScreen || screen === storyScreen) {
+        backBtn.style.display = 'flex';
+    } else {
+        backBtn.style.display = 'none';
+    }
+}
 
         function updateCounter() {
             // counter not visible anymore, but we keep the variable for summary
@@ -1099,7 +1139,12 @@
         });
 
         document.getElementById('backToMenu').addEventListener('click', () => showScreen(levelScreen));
-        floatingHubBtn.addEventListener('click', () => showScreen(levelScreen));
+        floatingHubBtn.addEventListener('click', () => {
+    window.location.href = 'hub.html';
+});
+        document.getElementById('floatingBackBtn').addEventListener('click', () => {
+    showScreen(levelScreen);
+});
 
         // ========== INIT ==========
         window.addEventListener('DOMContentLoaded', async () => {
