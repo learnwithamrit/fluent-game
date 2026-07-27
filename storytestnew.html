@@ -933,8 +933,8 @@ async function loadAudio() {
 }
 
             async function play() {
-                if (!buffer) await loadAudio();
                 stopActiveAudio();
+                if (!buffer) await loadAudio();
                 const actx = await getAudioContext();
                 sourceNode = actx.createBufferSource();
                 sourceNode.buffer = buffer;
@@ -976,22 +976,25 @@ async function loadAudio() {
             });
 
             // Seek by clicking on waveform
-            canvas.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                if (!buffer) await loadAudio();
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const ratio = x / rect.width;
-                offset = ratio * buffer.duration;
-                if (isPlaying) {
-                    sourceNode.stop();
-                    isPlaying = false;
-                    playBtn.classList.remove('pause');
-                    cancelAnimationFrame(animationFrame);
-                    // restart from new offset
-                    play();
-                }
-            });
+canvas.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    if (!buffer) await loadAudio();
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, x / rect.width));  // clamp 0–1
+    offset = ratio * buffer.duration;
+
+    if (isPlaying) {
+        // Stop current playback
+        try { sourceNode.stop(); } catch (err) {}
+        isPlaying = false;
+        playBtn.classList.remove('pause');
+        cancelAnimationFrame(animationFrame);
+        // Immediately restart from new offset
+        play();
+    }
+    // If not playing, just set offset – next play will start from here
+});
             loadAudio();
             return { loadAudio, play, pause };
         }
