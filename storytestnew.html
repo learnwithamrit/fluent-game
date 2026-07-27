@@ -241,6 +241,7 @@
     height: 50px;
     position: relative;
     cursor: pointer;
+    overflow: hidden;
 }
 .wave-container canvas {
     width: 100%;
@@ -280,6 +281,7 @@
             height: 50px;
             position: relative;
             cursor: pointer;
+            overflow: hidden;
         }
         .wave-container canvas {
             width: 100%;
@@ -829,36 +831,43 @@
         }
 
         // Draw waveform on canvas from an AudioBuffer
-        function drawWaveform(canvas, buffer) {
-            const ctx = canvas.getContext('2d');
-            const width = canvas.width = canvas.clientWidth;
-            const height = canvas.height = canvas.clientHeight;
-            const data = buffer.getChannelData(0);
-            const step = Math.ceil(data.length / width);
-            const amp = height / 2;
-            ctx.clearRect(0, 0, width, height);
-            ctx.beginPath();
-            ctx.moveTo(0, amp);
-            for (let i = 0; i < width; i++) {
-                let min = 1.0, max = -1.0;
-                for (let j = 0; j < step; j++) {
-                    const idx = i * step + j;
-                    if (idx < data.length) {
-                        const val = data[idx];
-                        if (val < min) min = val;
-                        if (val > max) max = val;
-                    }
-                }
-                ctx.lineTo(i, (1 + min) * amp);
-                ctx.lineTo(i, (1 + max) * amp);
+        function drawWaveform(canvas, buffer, container, color = '#ffffff') {
+    // container is the parent wave-container div
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    if (!width || !height) return;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext('2d');
+    const data = buffer.getChannelData(0);
+    const step = Math.ceil(data.length / width);
+    const amp = height / 2;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.beginPath();
+    ctx.moveTo(0, amp);
+    for (let i = 0; i < width; i++) {
+        let min = 1.0, max = -1.0;
+        for (let j = 0; j < step; j++) {
+            const idx = i * step + j;
+            if (idx < data.length) {
+                const val = data[idx];
+                if (val < min) min = val;
+                if (val > max) max = val;
             }
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
         }
+        ctx.lineTo(i, (1 + min) * amp);
+        ctx.lineTo(i, (1 + max) * amp);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+}
 
         // Create an audio player inside a given container, with play button and canvas
-        function createAudioPlayer({ audioUrl, playBtn, canvas, onPlaybackStart }) {
+        function createAudioPlayer({ audioUrl, playBtn, canvas, onPlaybackStart, waveColor = '#ffffff' }) {
             let buffer = null;
             let isPlaying = false;
             let startTime = 0, offset = 0;
@@ -877,14 +886,36 @@
             progressCanvas.style.pointerEvents = 'none';
             canvasParent.appendChild(progressCanvas);
 
-            async function loadAudio() {
-                if (buffer) return;
-                const response = await fetch(audioUrl);
-                const arrayBuffer = await response.arrayBuffer();
-                const actx = await getAudioContext();
-                buffer = await actx.decodeAudioData(arrayBuffer);
-                drawWaveform(canvas, buffer);
+async function loadAudio() {
+    if (buffer) return;
+    const response = await fetch(audioUrl);
+    const arrayBuffer = await response.arrayBuffer();
+    const actx = await getAudioContext();
+    buffer = await actx.decodeAudioData(arrayBuffer);
+
+    const waveContainer = canvas.parentElement;   // the .wave-container div
+
+    // draw the waveform at the correct container size
+    drawWaveform(canvas, buffer, waveContainer, waveColor);
+
+    // make the progress overlay match the new canvas size
+    if (progressCanvas) {
+        progressCanvas.width = canvas.width;
+        progressCanvas.height = canvas.height;
+    }
+
+    // keep the waveform sized correctly when the container resizes
+    const resizeObserver = new ResizeObserver(() => {
+        if (buffer) {
+            drawWaveform(canvas, buffer, waveContainer, waveColor);
+            if (progressCanvas) {
+                progressCanvas.width = canvas.width;
+                progressCanvas.height = canvas.height;
             }
+        }
+    });
+    resizeObserver.observe(waveContainer);
+}
 
             async function updateProgress() {
     if (!isPlaying || !buffer) return;
@@ -1120,7 +1151,8 @@ function buildCards(stories) {
                 createAudioPlayer({
                     audioUrl: story.AudioURL,
                     playBtn: heroPlayBtn,
-                    canvas: heroCanvas
+                    canvas: heroCanvas,
+                    waveColor: '#000000'
                 });
             }
 
