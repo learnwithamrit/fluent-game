@@ -580,6 +580,7 @@
         <h1 style="font-size:var(--fs-2xl); color:var(--acc);">🎉 Great Job!</h1>
         <p style="color:var(--mut); margin:20px 0;">Words you learned this session:</p>
         <ul id="summaryList" style="list-style:none; display:flex; flex-direction:column; gap:12px; text-align:left;"></ul>
+        <button class="cta-btn" id="readAnotherStory" style="margin-top:20px;">📖 Read another story</button>
         <button class="cta-btn secondary" id="backToMenu" style="margin-top:20px;">🔙 Back to Menu</button>
     </div>
 
@@ -588,7 +589,6 @@
         <h1 style="font-size:var(--fs-2xl);">🚀 Mega Stories</h1>
         <p style="margin:40px 0; color:var(--mut);">Novel‑length adventures are on their way!<br>We’re crafting multi‑part tales with rich vocabulary.</p>
         <p style="opacity:0.8; color:var(--mut);">✨ Check back soon for the first saga ✨</p>
-        <button class="cta-btn secondary" id="megaBackToLevels" style="margin-top:30px;">⬅ Back to Levels</button>
     </div>
 
     <!-- Modal: Word Definition -->
@@ -938,7 +938,7 @@ function showScreen(screen) {
 
     // Back button only on story list and story reading screens
     const backBtn = document.getElementById('floatingBackBtn');
-    if (screen === listScreen || screen === storyScreen) {
+    if (screen === listScreen || screen === storyScreen || screen === summaryScreen) {
         backBtn.style.display = 'flex';
     } else {
         backBtn.style.display = 'none';
@@ -1138,11 +1138,15 @@ function showScreen(screen) {
             }
         });
 
-        document.getElementById('backToMenu').addEventListener('click', () => showScreen(levelScreen));
-        floatingHubBtn.addEventListener('click', () => {
+// Read another story → go back to the current level's story list
+document.getElementById('readAnotherStory').addEventListener('click', () => {
+    showScreen(listScreen);
+});
+
+floatingHubBtn.addEventListener('click', () => {
     window.location.href = 'hub.html';
 });
-        document.getElementById('floatingBackBtn').addEventListener('click', () => {
+document.getElementById('floatingBackBtn').addEventListener('click', () => {
     showScreen(levelScreen);
 });
 
