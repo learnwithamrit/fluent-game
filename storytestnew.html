@@ -441,6 +441,28 @@
         .cta-btn:hover { background: #ffaa30; }
 
 
+
+.playhead {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    background: #ff8906;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    pointer-events: auto;
+    cursor: pointer;
+    z-index: 10;
+}
+.story-word.highlight {
+    background: rgba(255, 137, 6, 0.5);
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+
+        
 #floatingBackBtn {
     display: flex;
     align-items: center;
@@ -653,186 +675,190 @@
     </div>
 
     <script>
-        // ========== CONFIGURATION ==========
-        const STORIES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47-snxzaPFRnl4_nzuPgOXiw9leZApJ5zQ7OFaER6tNPy7LKa1qJxJGECvEKyo-MKp8Xb47EsNWLd/pub?gid=0&single=true&output=tsv';
-        const VOCAB_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47-snxzaPFRnl4_nzuPgOXiw9leZApJ5zQ7OFaER6tNPy7LKa1qJxJGECvEKyo-MKp8Xb47EsNWLd/pub?gid=1607542814&single=true&output=tsv';
-        // ===================================
+      // ═══════════════════════════════════════
+//  CONFIGURATION – replace with your sheet links
+// ═══════════════════════════════════════
+const STORIES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47-snxzaPFRnl4_nzuPgOXiw9leZApJ5zQ7OFaER6tNPy7LKa1qJxJGECvEKyo-MKp8Xb47EsNWLd/pub?gid=0&single=true&output=tsv';
+const VOCAB_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47-snxzaPFRnl4_nzuPgOXiw9leZApJ5zQ7OFaER6tNPy7LKa1qJxJGECvEKyo-MKp8Xb47EsNWLd/pub?gid=1607542814&single=true&output=tsv';
 
-        // Global data
-        let allStories = [];
-        let vocabMap = new Map();
-        let currentLevel = null;
-        let currentStories = [];
-        let currentStoryIndex = 0;
-        let learnedWords = {};
-        let learntCount = 0;
-        let activeAudio = null; // currently playing audio object { source, gainNode, context, buffer, startTime, offset }
-        let audioCtx = null;
+// ═══════════════════════════════════════
+//  GLOBAL STATE
+// ═══════════════════════════════════════
+let allStories = [];
+let vocabMap = new Map();
+let currentLevel = null;
+let currentStories = [];
+let currentStoryIndex = 0;
+let learnedWords = {};
+let learntCount = 0;
+let activeAudio = null;          // { source, context, buffer, startTime, offset }
+let audioCtx = null;
 
-        // UI elements
-        const levelScreen = document.getElementById('levelScreen');
-        const listScreen = document.getElementById('listScreen');
-        const storyScreen = document.getElementById('storyScreen');
-        const summaryScreen = document.getElementById('summaryScreen');
-        const wordModal = document.getElementById('wordModal');
-        const modalWord = document.getElementById('modalWord');
-        const modalDefinition = document.getElementById('modalDefinition');
-        const modalExample = document.getElementById('modalExample');
-        const floatingHubBtn = document.getElementById('floatingHubBtn');
+// UI elements
+const levelScreen = document.getElementById('levelScreen');
+const listScreen = document.getElementById('listScreen');
+const storyScreen = document.getElementById('storyScreen');
+const summaryScreen = document.getElementById('summaryScreen');
+const wordModal = document.getElementById('wordModal');
+const modalWord = document.getElementById('modalWord');
+const modalDefinition = document.getElementById('modalDefinition');
+const modalExample = document.getElementById('modalExample');
+const floatingHubBtn = document.getElementById('floatingHubBtn');
 
-        // ========== ANIMATED MODAL (pill definition) ==========
-        let currentPillRect = null;
-        function showModal(pillElement, word, vocab) {
-            currentPillRect = pillElement.getBoundingClientRect();
-            const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
-            const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
-            const viewportW = window.innerWidth;
-            const viewportH = window.innerHeight;
+// ═══════════════════════════════════════
+//  MODAL ANIMATION (pill definition)
+// ═══════════════════════════════════════
+let currentPillRect = null;
 
-            modalWord.textContent = word;
-            modalDefinition.textContent = vocab.definition;
-            modalExample.textContent = vocab.example;
-            wordModal.dataset.currentWord = word;
+function showModal(pillElement, word, vocab) {
+    currentPillRect = pillElement.getBoundingClientRect();
+    const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
+    const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
 
-            const content = document.querySelector('#wordModal .modal-content');
-            const offsetX = pillCenterX - viewportW / 2;
-            const offsetY = pillCenterY - viewportH / 2;
-            content.style.transition = 'none';
-            content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
-            content.style.opacity = '0';
+    modalWord.textContent = word;
+    modalDefinition.textContent = vocab.definition;
+    modalExample.textContent = vocab.example;
+    wordModal.dataset.currentWord = word;
 
-            wordModal.classList.add('show');
-            content.getBoundingClientRect();
-            content.style.transition = '';
-            content.style.transform = 'translate(0, 0) scale(1)';
-            content.style.opacity = '1';
-        }
+    const content = document.querySelector('#wordModal .modal-content');
+    const offsetX = pillCenterX - viewportW / 2;
+    const offsetY = pillCenterY - viewportH / 2;
+    content.style.transition = 'none';
+    content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
+    content.style.opacity = '0';
 
-        function hideModal() {
-            if (!currentPillRect) {
-                wordModal.classList.remove('show');
-                return;
-            }
-            const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
-            const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
-            const viewportW = window.innerWidth;
-            const viewportH = window.innerHeight;
-            const offsetX = pillCenterX - viewportW / 2;
-            const offsetY = pillCenterY - viewportH / 2;
+    wordModal.classList.add('show');
+    content.getBoundingClientRect();
+    content.style.transition = '';
+    content.style.transform = 'translate(0, 0) scale(1)';
+    content.style.opacity = '1';
+}
 
-            const content = document.querySelector('#wordModal .modal-content');
-            content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
-            content.style.opacity = '0';
+function hideModal() {
+    if (!currentPillRect) {
+        wordModal.classList.remove('show');
+        return;
+    }
+    const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
+    const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+    const offsetX = pillCenterX - viewportW / 2;
+    const offsetY = pillCenterY - viewportH / 2;
 
-            setTimeout(() => {
-                wordModal.classList.remove('show');
-                content.style.transition = 'none';
-                content.style.transform = 'translate(0, 0) scale(1)';
-                content.style.opacity = '1';
-                currentPillRect = null;
-            }, 350);
-        }
+    const content = document.querySelector('#wordModal .modal-content');
+    content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
+    content.style.opacity = '0';
 
-        // ========== PILL CLICK & GOT IT ==========
-        document.addEventListener('click', (e) => {
-            const pill = e.target.closest('.pill');
-            if (!pill) return;
-            const word = pill.dataset.word;
-            const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
-            const vocab = vocabMap.get(lookupKey);
-            if (!vocab) {
-                alert(`Definition not found for "${word}" in level ${currentLevel}.`);
-                return;
-            }
-            showModal(pill, word, vocab);
+    setTimeout(() => {
+        wordModal.classList.remove('show');
+        content.style.transition = 'none';
+        content.style.transform = 'translate(0, 0) scale(1)';
+        content.style.opacity = '1';
+        currentPillRect = null;
+    }, 350);
+}
+
+// pill click & got-it
+document.addEventListener('click', (e) => {
+    const pill = e.target.closest('.pill');
+    if (!pill) return;
+    const word = pill.dataset.word;
+    const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
+    const vocab = vocabMap.get(lookupKey);
+    if (!vocab) {
+        alert(`Definition not found for "${word}" in level ${currentLevel}.`);
+        return;
+    }
+    showModal(pill, word, vocab);
+});
+
+document.getElementById('gotItBtn').addEventListener('click', () => {
+    const word = wordModal.dataset.currentWord;
+    if (!word) return;
+    const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
+    const vocab = vocabMap.get(lookupKey);
+    if (!learnedWords[word.toLowerCase()]) {
+        learnedWords[word.toLowerCase()] = {
+            word: word,
+            definition: vocab ? vocab.definition : '',
+            example: vocab ? vocab.example : ''
+        };
+        learntCount++;
+    }
+    hideModal();
+});
+
+wordModal.addEventListener('click', (e) => {
+    if (e.target === wordModal) hideModal();
+});
+
+// ═══════════════════════════════════════
+//  DATA LOADING & SORTING
+// ═══════════════════════════════════════
+function parseTSV(tsvText) {
+    const lines = tsvText.trim().split('\n');
+    if (lines.length < 2) return [];
+    const headers = lines[0].split('\t');
+    const result = [];
+    for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split('\t');
+        const obj = {};
+        headers.forEach((header, idx) => {
+            obj[header.trim()] = (values[idx] || '').trim();
         });
+        result.push(obj);
+    }
+    return result;
+}
 
-        document.getElementById('gotItBtn').addEventListener('click', () => {
-            const word = wordModal.dataset.currentWord;
-            if (!word) return;
-            const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
-            const vocab = vocabMap.get(lookupKey);
-            if (!learnedWords[word.toLowerCase()]) {
-                learnedWords[word.toLowerCase()] = {
-                    word: word,
-                    definition: vocab ? vocab.definition : '',
-                    example: vocab ? vocab.example : ''
-                };
-                learntCount++;
-                updateCounter();
-            }
-            hideModal();
+async function loadData() {
+    try {
+        const [storiesResp, vocabResp] = await Promise.all([
+            fetch(STORIES_URL),
+            fetch(VOCAB_URL)
+        ]);
+        const storiesTSV = await storiesResp.text();
+        const vocabTSV = await vocabResp.text();
+        allStories = parseTSV(storiesTSV);
+        const vocabRows = parseTSV(vocabTSV);
+        vocabRows.forEach(row => {
+            const key = `${row.Word.toLowerCase()}::${row.Level}`;
+            vocabMap.set(key, { definition: row.Definition, example: row.Example });
         });
+        console.log(`Loaded ${allStories.length} stories, ${vocabRows.length} vocab entries.`);
+    } catch (err) {
+        alert('Oops! Could not load story data. Check your internet and the sheet links.');
+        console.error(err);
+    }
+}
 
-        wordModal.addEventListener('click', (e) => {
-            if (e.target === wordModal) hideModal();
-        });
+function sortStories(stories) {
+    const newStories = stories.filter(s => s.New && s.New.toLowerCase() === 'new');
+    const oldStories = stories.filter(s => !s.New || s.New.toLowerCase() !== 'new');
+    newStories.sort((a, b) => (b.Date || '').localeCompare(a.Date || ''));
+    return [...newStories, ...oldStories];
+}
 
-        // ========== DATA LOADING ==========
-        function parseTSV(tsvText) {
-            const lines = tsvText.trim().split('\n');
-            if (lines.length < 2) return [];
-            const headers = lines[0].split('\t');
-            const result = [];
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split('\t');
-                const obj = {};
-                headers.forEach((header, idx) => {
-                    obj[header.trim()] = (values[idx] || '').trim();
-                });
-                result.push(obj);
-            }
-            return result;
-        }
+// ═══════════════════════════════════════
+//  AUDIO PLAYER FACTORY
+// ═══════════════════════════════════════
+async function getAudioContext() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+    return audioCtx;
+}
 
-        async function loadData() {
-            try {
-                const [storiesResp, vocabResp] = await Promise.all([
-                    fetch(STORIES_URL),
-                    fetch(VOCAB_URL)
-                ]);
-                const storiesTSV = await storiesResp.text();
-                const vocabTSV = await vocabResp.text();
-                allStories = parseTSV(storiesTSV);
-                const vocabRows = parseTSV(vocabTSV);
-                vocabRows.forEach(row => {
-                    const key = `${row.Word.toLowerCase()}::${row.Level}`;
-                    vocabMap.set(key, { definition: row.Definition, example: row.Example });
-                });
-                console.log(`Loaded ${allStories.length} stories, ${vocabRows.length} vocab entries.`);
-            } catch (err) {
-                alert('Oops! Could not load story data. Check your internet and the Google Sheet links.');
-                console.error(err);
-            }
-        }
+function stopActiveAudio() {
+    if (activeAudio) {
+        try { activeAudio.source.stop(); } catch(e) {}
+        activeAudio = null;
+    }
+}
 
-        // ========== SORTING ==========
-        function sortStories(stories) {
-            const newStories = stories.filter(s => s.New && s.New.toLowerCase() === 'new');
-            const oldStories = stories.filter(s => !s.New || s.New.toLowerCase() !== 'new');
-            newStories.sort((a,b) => (b.Date || '').localeCompare(a.Date || ''));
-            // keep old stories in sheet order
-            return [...newStories, ...oldStories];
-        }
-
-        // ========== AUDIO PLAYER ==========
-        async function getAudioContext() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') await audioCtx.resume();
-            return audioCtx;
-        }
-
-        // Stop any currently playing audio and clean up
-        function stopActiveAudio() {
-            if (activeAudio) {
-                try { activeAudio.source.stop(); } catch(e) {}
-                activeAudio = null;
-            }
-        }
-
-        // Draw waveform on canvas from an AudioBuffer
-        function drawWaveform(canvas, buffer, container, color = '#ffffff') {
-    // container is the parent wave-container div
+function drawWaveform(canvas, buffer, container, color = '#ffffff') {
     const width = container.clientWidth;
     const height = container.clientHeight;
     if (!width || !height) return;
@@ -866,161 +892,194 @@
     ctx.stroke();
 }
 
-        // Create an audio player inside a given container, with play button and canvas
-        function createAudioPlayer({ audioUrl, playBtn, canvas, onPlaybackStart, waveColor = '#ffffff' }) {
-            let buffer = null;
-            let isPlaying = false;
-            let startTime = 0, offset = 0;
-            let sourceNode = null;
-            let animationFrame = null;
+function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', onTimeUpdate = null, sentences = [] }) {
+    let buffer = null;
+    let isPlaying = false;
+    let startTime = 0, offset = 0;
+    let sourceNode = null;
+    let animationFrame = null;
+    const waveContainer = canvas.parentElement;   // .wave-container
 
-            const ctx = canvas.getContext('2d');
-            const canvasParent = canvas.parentElement;
-            const progressCanvas = document.createElement('canvas');
-            progressCanvas.className = 'progress-canvas';
-            progressCanvas.width = canvas.width;
-            progressCanvas.height = canvas.height;
-            progressCanvas.style.position = 'absolute';
-            progressCanvas.style.left = '0';
-            progressCanvas.style.top = '0';
-            progressCanvas.style.pointerEvents = 'none';
-            canvasParent.appendChild(progressCanvas);
+    // progress overlay (optional)
+    const progressCanvas = document.createElement('canvas');
+    progressCanvas.className = 'progress-canvas';
+    progressCanvas.width = canvas.width;
+    progressCanvas.height = canvas.height;
+    progressCanvas.style.position = 'absolute';
+    progressCanvas.style.left = '0';
+    progressCanvas.style.top = '0';
+    progressCanvas.style.pointerEvents = 'none';
+    waveContainer.appendChild(progressCanvas);
 
-async function loadAudio() {
-    if (buffer) return;
-    const response = await fetch(audioUrl);
-    const arrayBuffer = await response.arrayBuffer();
-    const actx = await getAudioContext();
-    buffer = await actx.decodeAudioData(arrayBuffer);
+    // playhead knob
+    const playhead = document.createElement('div');
+    playhead.className = 'playhead';
+    waveContainer.appendChild(playhead);
 
-    const waveContainer = canvas.parentElement;   // the .wave-container div
-
-    // draw the waveform at the correct container size
-    drawWaveform(canvas, buffer, waveContainer, waveColor);
-
-    // make the progress overlay match the new canvas size
-    if (progressCanvas) {
-        progressCanvas.width = canvas.width;
-        progressCanvas.height = canvas.height;
+    function updatePlayhead(progress) {
+        const percent = Math.max(0, Math.min(1, progress)) * 100;
+        playhead.style.left = percent + '%';
     }
 
-    // keep the waveform sized correctly when the container resizes
-    const resizeObserver = new ResizeObserver(() => {
-        if (buffer) {
-            drawWaveform(canvas, buffer, waveContainer, waveColor);
-            if (progressCanvas) {
-                progressCanvas.width = canvas.width;
-                progressCanvas.height = canvas.height;
-            }
+    // drag handling
+    let isDragging = false;
+    function onDrag(e) {
+        if (!isDragging || !buffer) return;
+        e.preventDefault();
+        const rect = waveContainer.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const x = clientX - rect.left;
+        const ratio = Math.max(0, Math.min(1, x / rect.width));
+        offset = ratio * buffer.duration;
+        updatePlayhead(ratio);
+    }
+    function onDragEnd(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        document.removeEventListener('mousemove', onDrag);
+        document.removeEventListener('mouseup', onDragEnd);
+        document.removeEventListener('touchmove', onDrag);
+        document.removeEventListener('touchend', onDragEnd);
+        // if was playing, restart from new offset
+        if (isPlaying) {
+            try { sourceNode.stop(); } catch(e) {}
+            isPlaying = false;
+            playBtn.classList.remove('pause');
+            cancelAnimationFrame(animationFrame);
+            play();
         }
+    }
+    playhead.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        document.addEventListener('mousemove', onDrag);
+        document.addEventListener('mouseup', onDragEnd);
     });
-    resizeObserver.observe(waveContainer);
-}
+    playhead.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        document.addEventListener('touchmove', onDrag, { passive: false });
+        document.addEventListener('touchend', onDragEnd);
+    });
 
-            async function updateProgress() {
-    if (!isPlaying || !buffer) return;
-    const now = (await getAudioContext()).currentTime;
-    const elapsed = now - startTime + offset;
-    const duration = buffer.duration;
-    const progress = Math.min(elapsed / duration, 1);
-    const width = canvas.width;
-    const height = canvas.height;
-    const pctx = progressCanvas.getContext('2d');
-    pctx.clearRect(0, 0, width, height);
-    pctx.fillStyle = '#ff8906';
-    pctx.fillRect(0, 0, width * progress, height);
-    animationFrame = requestAnimationFrame(updateProgress);
-}
+    async function loadAudio() {
+        if (buffer) return;
+        const response = await fetch(audioUrl);
+        const arrayBuffer = await response.arrayBuffer();
+        const actx = await getAudioContext();
+        buffer = await actx.decodeAudioData(arrayBuffer);
 
-            async function play() {
-                stopActiveAudio();
-                if (!buffer) await loadAudio();
-                const actx = await getAudioContext();
-                sourceNode = actx.createBufferSource();
-                sourceNode.buffer = buffer;
-                sourceNode.connect(actx.destination);
-                startTime = actx.currentTime;
-                sourceNode.start(0, offset);
-                isPlaying = true;
-                activeAudio = { source: sourceNode, context: actx, buffer, startTime, offset };
-                if (onPlaybackStart) onPlaybackStart();
-                playBtn.classList.add('pause');
-                updateProgress();
-                sourceNode.onended = () => {
-                    if (isPlaying) {
-                        isPlaying = false;
-                        offset = 0;
-                        playBtn.classList.remove('pause');
-                        cancelAnimationFrame(animationFrame);
-                        progressCanvas.getContext('2d').clearRect(0,0,progressCanvas.width, progressCanvas.height);
-                        activeAudio = null;
-                    }
-                };
+        drawWaveform(canvas, buffer, waveContainer, waveColor);
+        if (progressCanvas) {
+            progressCanvas.width = canvas.width;
+            progressCanvas.height = canvas.height;
+        }
+        // auto-redraw on resize
+        const resizeObserver = new ResizeObserver(() => {
+            if (buffer) {
+                drawWaveform(canvas, buffer, waveContainer, waveColor);
+                if (progressCanvas) {
+                    progressCanvas.width = canvas.width;
+                    progressCanvas.height = canvas.height;
+                }
             }
+        });
+        resizeObserver.observe(waveContainer);
+    }
 
-            function pause() {
-                if (!isPlaying) return;
-                const actx = audioCtx;
-                offset += actx.currentTime - startTime;
-                sourceNode.stop();
+    async function play() {
+        stopActiveAudio();
+        if (!buffer) await loadAudio();
+        const actx = await getAudioContext();
+        sourceNode = actx.createBufferSource();
+        sourceNode.buffer = buffer;
+        sourceNode.connect(actx.destination);
+        startTime = actx.currentTime;
+        sourceNode.start(0, offset);
+        isPlaying = true;
+        playBtn.classList.add('pause');
+        activeAudio = { source: sourceNode, context: actx, buffer, startTime, offset };
+        updateProgress();
+        sourceNode.onended = () => {
+            if (isPlaying) {
                 isPlaying = false;
+                offset = 0;
                 playBtn.classList.remove('pause');
                 cancelAnimationFrame(animationFrame);
+                updatePlayhead(0);
                 activeAudio = null;
             }
+        };
+    }
 
-            playBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // prevent card click
-                if (isPlaying) pause();
-                else play();
-            });
-
-            // Seek by clicking on waveform
-canvas.addEventListener('click', async (e) => {
-    e.stopPropagation();
-    if (!buffer) await loadAudio();
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const ratio = Math.max(0, Math.min(1, x / rect.width));  // clamp 0–1
-    offset = ratio * buffer.duration;
-
-    if (isPlaying) {
-        // Stop current playback
-        try { sourceNode.stop(); } catch (err) {}
+    function pause() {
+        if (!isPlaying) return;
+        const actx = audioCtx;
+        offset += actx.currentTime - startTime;
+        try { sourceNode.stop(); } catch(e) {}
         isPlaying = false;
         playBtn.classList.remove('pause');
         cancelAnimationFrame(animationFrame);
-        // Immediately restart from new offset
-        play();
+        activeAudio = null;
+        updatePlayhead(offset / buffer.duration);
     }
-    // If not playing, just set offset – next play will start from here
-});
-            loadAudio();
-            return { loadAudio, play, pause };
+
+    async function updateProgress() {
+        if (!isPlaying || !buffer) return;
+        const now = (await getAudioContext()).currentTime;
+        const elapsed = now - startTime + offset;
+        const progress = Math.min(elapsed / buffer.duration, 1);
+        // update progress canvas
+        const pctx = progressCanvas.getContext('2d');
+        pctx.clearRect(0, 0, progressCanvas.width, progressCanvas.height);
+        pctx.fillStyle = '#ff8906';
+        pctx.fillRect(0, 0, progressCanvas.width * progress, progressCanvas.height);
+        // move playhead
+        updatePlayhead(progress);
+        // sentence highlight (if sentences provided)
+        if (sentences.length > 0) {
+            const currentTime = elapsed;
+            const totalDuration = buffer.duration;
+            const idx = Math.min(Math.floor((currentTime / totalDuration) * sentences.length), sentences.length - 1);
+            sentences.forEach(s => s.classList.remove('highlight'));
+            if (sentences[idx]) sentences[idx].classList.add('highlight');
         }
-
-        // ========== HELPERS ==========
-function showScreen(screen) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    screen.classList.add('active');
-
-    // Hub button is always visible (even on level screen)
-    floatingHubBtn.style.display = 'flex';
-
-    // Back button only on story list and story reading screens
-    const backBtn = document.getElementById('floatingBackBtn');
-    if (screen === listScreen || screen === storyScreen || screen === summaryScreen) {
-        backBtn.style.display = 'flex';
-    } else {
-        backBtn.style.display = 'none';
+        animationFrame = requestAnimationFrame(updateProgress);
     }
+
+    // canvas click scrub
+    canvas.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!buffer) await loadAudio();
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const ratio = Math.max(0, Math.min(1, x / rect.width));
+        offset = ratio * buffer.duration;
+        updatePlayhead(ratio);
+        if (isPlaying) {
+            try { sourceNode.stop(); } catch(e) {}
+            isPlaying = false;
+            playBtn.classList.remove('pause');
+            cancelAnimationFrame(animationFrame);
+        }
+        play();
+    });
+
+    playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isPlaying) pause();
+        else play();
+    });
+
+    // auto-load waveform
+    loadAudio();
+
+    return { loadAudio, play, pause };
 }
 
-        function updateCounter() {
-            // counter not visible anymore, but we keep the variable for summary
-        }
-
-        // ========== BUILD STORY CARDS ==========
+// ═══════════════════════════════════════
+//  BUILD STORY CARDS (two‑card layout)
+// ═══════════════════════════════════════
 function buildCards(stories) {
     const container = document.getElementById('storyCards');
     container.innerHTML = '';
@@ -1030,16 +1089,14 @@ function buildCards(stories) {
     }
 
     stories.forEach((story, idx) => {
-        // ---- wrapper ----
         const wrapper = document.createElement('div');
         wrapper.className = 'story-wrapper';
         wrapper.addEventListener('click', (e) => {
-            // don't navigate if the click was on the audio card
             if (e.target.closest('.audio-card')) return;
             startStory(idx);
         });
 
-        // ---- info card ----
+        // info card
         const infoCard = document.createElement('div');
         infoCard.className = 'story-info-card';
         infoCard.style.background = `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
@@ -1070,7 +1127,9 @@ function buildCards(stories) {
             infoCard.appendChild(desc);
         }
 
-        // ---- audio card (only if audio URL exists) ----
+        wrapper.appendChild(infoCard);
+
+        // audio card (if URL exists)
         if (story.AudioURL) {
             const audioCard = document.createElement('div');
             audioCard.className = 'audio-card';
@@ -1085,165 +1144,172 @@ function buildCards(stories) {
             audioCard.appendChild(playBtn);
             audioCard.appendChild(waveContainer);
 
-            // attach audio player
             createAudioPlayer({
                 audioUrl: story.AudioURL,
-                playBtn: playBtn,
-                canvas: canvas
+                playBtn,
+                canvas,
+                waveColor: '#ffffff'
             });
 
-            wrapper.appendChild(infoCard);
             wrapper.appendChild(audioCard);
-        } else {
-            // if no audio, just show the info card
-            wrapper.appendChild(infoCard);
         }
 
         container.appendChild(wrapper);
     });
 }
-        async function loadAudio() {
-    if (buffer) return;
-    console.log('Fetching audio:', audioUrl);
-    const response = await fetch(audioUrl);
-    console.log('Response status:', response.status);
-    if (!response.ok) throw new Error('Failed to fetch audio: ' + response.statusText);
-    const arrayBuffer = await response.arrayBuffer();
-    const actx = await getAudioContext();
-    buffer = await actx.decodeAudioData(arrayBuffer);
-    console.log('Audio decoded, duration:', buffer.duration);
-    drawWaveform(canvas, buffer);
+
+// ═══════════════════════════════════════
+//  START A STORY
+// ═══════════════════════════════════════
+function startStory(index) {
+    currentStoryIndex = index;
+    const story = currentStories[index];
+    document.getElementById('heroBanner').style.background = `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
+    document.getElementById('heroTitle').textContent = story.Title;
+    document.getElementById('heroDescription').textContent = story.Description || '';
+    document.getElementById('heroLevelBadge').textContent = story.Level;
+
+    // clear previous audio in hero
+    const heroPlayBtn = document.getElementById('heroPlayBtn');
+    heroPlayBtn.className = 'play-btn';
+    const heroCanvas = document.getElementById('heroWaveCanvas');
+    heroCanvas.getContext('2d').clearRect(0, 0, heroCanvas.width, heroCanvas.height);
+    stopActiveAudio();
+
+    // set story text with pill words
+    const content = document.getElementById('content-body');
+    const replaced = story.StoryText.replace(/\[([^\]]+)\]/g, (match, word) => {
+        return `<span class="pill" data-word="${word}">${word}</span>`;
+    });
+    content.innerHTML = replaced;
+
+    // wrap sentences for potential future sync (but not used yet)
+    const sentences = Array.from(content.querySelectorAll('.sentence')) || [];
+    // if you had sentence highlighting, you'd pass sentences; for now just pass empty
+
+    if (story.AudioURL) {
+        createAudioPlayer({
+            audioUrl: story.AudioURL,
+            playBtn: heroPlayBtn,
+            canvas: heroCanvas,
+            waveColor: '#000000',
+            sentences: sentences   // optional, can be empty
+        });
+    }
+
+    showScreen(storyScreen);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-        // ========== LEVEL SELECTION ==========
-        document.querySelectorAll('.level-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                currentLevel = btn.dataset.level;
-                document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
-                currentStories = sortStories(allStories.filter(s => s.Level === currentLevel));
-                buildCards(currentStories);
-                showScreen(listScreen);
-            });
-        });
+// ═══════════════════════════════════════
+//  SCREENS & NAVIGATION
+// ═══════════════════════════════════════
+function showScreen(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    screen.classList.add('active');
 
-        document.getElementById('megaStoriesBtn').addEventListener('click', () => {
-            showScreen(document.getElementById('megaScreen'));
-        });
-        document.getElementById('megaBackToLevels').addEventListener('click', () => showScreen(levelScreen));
-        document.getElementById('backToLevels').addEventListener('click', () => showScreen(levelScreen));
+    floatingHubBtn.style.display = 'flex';
+    const backBtn = document.getElementById('floatingBackBtn');
+    if (screen === listScreen || screen === storyScreen || screen === summaryScreen) {
+        backBtn.style.display = 'flex';
+    } else {
+        backBtn.style.display = 'none';
+    }
+}
 
-        // ========== START A STORY ==========
-        function startStory(index) {
-            currentStoryIndex = index;
-            const story = currentStories[index];
-            // Hero banner gradient
-            document.getElementById('heroBanner').style.background =
-                `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
-            document.getElementById('heroTitle').textContent = story.Title;
-            document.getElementById('heroDescription').textContent = story.Description || '';
-            document.getElementById('heroLevelBadge').textContent = story.Level;
+// Level selection
+document.querySelectorAll('.level-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        currentLevel = btn.dataset.level;
+        document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
+        currentStories = sortStories(allStories.filter(s => s.Level === currentLevel));
+        buildCards(currentStories);
+        showScreen(listScreen);
+    });
+});
 
-            // Clear previous audio player in hero
-            const heroPlayBtn = document.getElementById('heroPlayBtn');
-            heroPlayBtn.className = 'play-btn';
-            const heroCanvas = document.getElementById('heroWaveCanvas');
-            heroCanvas.getContext('2d').clearRect(0, 0, heroCanvas.width, heroCanvas.height);
-            stopActiveAudio();
+document.getElementById('megaStoriesBtn').addEventListener('click', () => {
+    showScreen(document.getElementById('megaScreen'));
+});
+document.getElementById('megaBackToLevels').addEventListener('click', () => showScreen(levelScreen));
+document.getElementById('backToLevels').addEventListener('click', () => showScreen(levelScreen));
 
-            if (story.AudioURL) {
-                createAudioPlayer({
-                    audioUrl: story.AudioURL,
-                    playBtn: heroPlayBtn,
-                    canvas: heroCanvas,
-                    waveColor: '#000000'
-                });
-            }
-
-            // Set content with pill words
-            const content = document.getElementById('content-body');
-            content.innerHTML = story.StoryText.replace(/\[([^\]]+)\]/g, (match, word) => {
-                return `<span class="pill" data-word="${word}">${word}</span>`;
-            });
-
-            showScreen(storyScreen);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+// Finish reading → summary
+document.getElementById('finishStory').addEventListener('click', () => {
+    const summaryList = document.getElementById('summaryList');
+    summaryList.innerHTML = '';
+    if (Object.keys(learnedWords).length === 0) {
+        summaryList.innerHTML = '<li style="color:var(--mut);">You haven’t collected any words yet.</li>';
+    } else {
+        for (let key in learnedWords) {
+            const lw = learnedWords[key];
+            const li = document.createElement('li');
+            li.style.background = 'var(--sur)';
+            li.style.border = '1px solid var(--brd)';
+            li.style.borderRadius = '12px';
+            li.style.padding = '12px 16px';
+            li.innerHTML = `<strong style="color:var(--acc);">${lw.word}</strong> – ${lw.definition}<br><em style="color:var(--mut);">${lw.example}</em>`;
+            summaryList.appendChild(li);
         }
+    }
+    showScreen(summaryScreen);
+});
 
-        // ========== STORY SCREEN BUTTONS ==========
-        document.getElementById('finishStory').addEventListener('click', () => {
-            const summaryList = document.getElementById('summaryList');
-            summaryList.innerHTML = '';
-            if (Object.keys(learnedWords).length === 0) {
-                summaryList.innerHTML = '<li style="color:var(--mut);">You haven’t collected any words yet. Keep reading!</li>';
-            } else {
-                for (let key in learnedWords) {
-                    const lw = learnedWords[key];
-                    const li = document.createElement('li');
-                    li.style.background = 'var(--sur)';
-                    li.style.border = '1px solid var(--brd)';
-                    li.style.borderRadius = '12px';
-                    li.style.padding = '12px 16px';
-                    li.innerHTML = `<strong style="color:var(--acc);">${lw.word}</strong> – ${lw.definition}<br><em style="color:var(--mut);">${lw.example}</em>`;
-                    summaryList.appendChild(li);
-                }
-            }
-            showScreen(summaryScreen);
-        });
+// Next story
+document.getElementById('nextStory').addEventListener('click', () => {
+    if (currentStories.length === 0) return;
+    const nextIndex = currentStoryIndex + 1;
+    if (nextIndex < currentStories.length) {
+        startStory(nextIndex);
+    } else {
+        showAllDoneModal();
+    }
+});
 
-        document.getElementById('nextStory').addEventListener('click', () => {
-            if (currentStories.length === 0) return;
-            const nextIndex = currentStoryIndex + 1;
-            if (nextIndex < currentStories.length) {
-                startStory(nextIndex);
-            } else {
-                showAllDoneModal();
-            }
-        });
-
-        // ========== ALL-DONE MODAL ==========
-        function showAllDoneModal() {
-            const levelNames = ['Beginner', 'Intermediate', 'Advanced'];
-            const currentIdx = levelNames.indexOf(currentLevel);
-            const nextLevel = (currentIdx >= 0 && currentIdx < levelNames.length - 1) ? levelNames[currentIdx + 1] : null;
-
-            document.getElementById('allDoneMessage').textContent =
-                `You’ve finished every story in the ${currentLevel} level. What would you like to do next?`;
-
-            const nextBtn = document.getElementById('goNextLevel');
-            if (nextLevel) {
-                nextBtn.style.display = 'inline-flex';
-                nextBtn.textContent = `➡ Go to ${nextLevel}`;
-                nextBtn.onclick = () => {
-                    document.getElementById('allDoneModal').classList.remove('show');
-                    currentLevel = nextLevel;
-                    document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
-                    currentStories = sortStories(allStories.filter(s => s.Level === currentLevel));
-                    buildCards(currentStories);
-                    showScreen(listScreen);
-                };
-            } else {
-                nextBtn.style.display = 'none';
-            }
-
-            document.getElementById('reReadStories').onclick = () => {
-                document.getElementById('allDoneModal').classList.remove('show');
-                currentStories = sortStories(currentStories);
-                startStory(0);
-            };
-            document.getElementById('allDoneModal').classList.add('show');
-        }
-
-        document.getElementById('allDoneModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('allDoneModal')) {
-                document.getElementById('allDoneModal').classList.remove('show');
-            }
-        });
-
-// Read another story → go back to the current level's story list
+// Read another story (summary screen)
 document.getElementById('readAnotherStory').addEventListener('click', () => {
     showScreen(listScreen);
 });
 
+// All-done modal
+function showAllDoneModal() {
+    const levelNames = ['Beginner', 'Intermediate', 'Advanced'];
+    const currentIdx = levelNames.indexOf(currentLevel);
+    const nextLevel = (currentIdx >= 0 && currentIdx < levelNames.length - 1) ? levelNames[currentIdx + 1] : null;
+
+    document.getElementById('allDoneMessage').textContent = `You’ve finished every story in the ${currentLevel} level. What would you like to do next?`;
+
+    const nextBtn = document.getElementById('goNextLevel');
+    if (nextLevel) {
+        nextBtn.style.display = 'inline-flex';
+        nextBtn.textContent = `➡ Go to ${nextLevel}`;
+        nextBtn.onclick = () => {
+            document.getElementById('allDoneModal').classList.remove('show');
+            currentLevel = nextLevel;
+            document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
+            currentStories = sortStories(allStories.filter(s => s.Level === currentLevel));
+            buildCards(currentStories);
+            showScreen(listScreen);
+        };
+    } else {
+        nextBtn.style.display = 'none';
+    }
+
+    document.getElementById('reReadStories').onclick = () => {
+        document.getElementById('allDoneModal').classList.remove('show');
+        currentStories = sortStories(currentStories);
+        startStory(0);
+    };
+    document.getElementById('allDoneModal').classList.add('show');
+}
+
+document.getElementById('allDoneModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('allDoneModal')) {
+        document.getElementById('allDoneModal').classList.remove('show');
+    }
+});
+
+// Floating buttons
 floatingHubBtn.addEventListener('click', () => {
     window.location.href = 'hub.html';
 });
@@ -1251,13 +1317,15 @@ document.getElementById('floatingBackBtn').addEventListener('click', () => {
     showScreen(levelScreen);
 });
 
-        // ========== INIT ==========
-        window.addEventListener('DOMContentLoaded', async () => {
-            await loadData();
-            if (allStories.length === 0) {
-                levelScreen.innerHTML = '<h1>🌟 Choose Your Level</h1><p style="color:var(--mut);">No stories loaded. Check Google Sheet links.</p>';
-            }
-        });
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+    await loadData();
+    if (allStories.length === 0) {
+        levelScreen.innerHTML = '<h1>🌟 Choose Your Level</h1><p style="color:var(--mut);">No stories loaded. Check Google Sheet links.</p>';
+    }
+});
     </script>
 </body>
 </html>
