@@ -693,6 +693,7 @@ let learnedWords = {};
 let learntCount = 0;
 let activeAudio = null;          // { source, context, buffer, startTime, offset }
 let audioCtx = null;
+const allPlayers = [];   // every active player instance will be stored here
 
 // UI elements
 const levelScreen = document.getElementById('levelScreen');
@@ -892,26 +893,43 @@ function drawWaveform(canvas, buffer, container, color = '#ffffff') {
     ctx.stroke();
 }
 
+
+function stopAllOtherPlayers(currentPlayerId) {
+    allPlayers.forEach(player => {
+        if (player.id !== currentPlayerId && player.stop) {
+            player.stop();
+        }
+    });
+    // Also stop any lingering global activeAudio just in case
+    stopActiveAudio();
+}
+
+        
 function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', onTimeUpdate = null, sentences = [] }) {
+    // ─── Per‑player state ─────────────────────
     let buffer = null;
     let isPlaying = false;
-    let startTime = 0, offset = 0;
+    let startTime = 0;
+    let offset = 0;
     let sourceNode = null;
     let animationFrame = null;
     const waveContainer = canvas.parentElement;   // .wave-container
 
-    // progress overlay (optional)
+    // ─── Register this player globally ─────────
+    const playerId = Date.now() + Math.random();
+    const thisPlayer = { id: playerId, stop: null };
+    allPlayers.push(thisPlayer);
+
+    // ─── Progress overlay (optional) ─────────
     const progressCanvas = document.createElement('canvas');
     progressCanvas.className = 'progress-canvas';
-    progressCanvas.width = canvas.width;
-    progressCanvas.height = canvas.height;
     progressCanvas.style.position = 'absolute';
     progressCanvas.style.left = '0';
     progressCanvas.style.top = '0';
     progressCanvas.style.pointerEvents = 'none';
     waveContainer.appendChild(progressCanvas);
 
-    // playhead knob
+    // ─── Playhead knob ────────────────────────
     const playhead = document.createElement('div');
     playhead.className = 'playhead';
     waveContainer.appendChild(playhead);
@@ -921,7 +939,7 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
         playhead.style.left = percent + '%';
     }
 
-    // drag handling
+    // ─── Drag‑to‑scrub for the playhead ──────
     let isDragging = false;
     function onDrag(e) {
         if (!isDragging || !buffer) return;
@@ -940,9 +958,9 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
         document.removeEventListener('mouseup', onDragEnd);
         document.removeEventListener('touchmove', onDrag);
         document.removeEventListener('touchend', onDragEnd);
-        // if was playing, restart from new offset
+        // If it was playing, restart from new position
         if (isPlaying) {
-            try { sourceNode.stop(); } catch(e) {}
+            try { sourceNode.stop(); } catch (e) {}
             isPlaying = false;
             playBtn.classList.remove('pause');
             cancelAnimationFrame(animationFrame);
@@ -962,6 +980,7 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
         document.addEventListener('touchend', onDragEnd);
     });
 
+    // ─── Audio loading & waveform ─────────────
     async function loadAudio() {
         if (buffer) return;
         const response = await fetch(audioUrl);
@@ -974,7 +993,7 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
             progressCanvas.width = canvas.width;
             progressCanvas.height = canvas.height;
         }
-        // auto-redraw on resize
+        // Redraw on container resize
         const resizeObserver = new ResizeObserver(() => {
             if (buffer) {
                 drawWaveform(canvas, buffer, waveContainer, waveColor);
@@ -987,19 +1006,47 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
         resizeObserver.observe(waveContainer);
     }
 
+    // ─── Full stop & reset (used globally) ────
+    function stopAndReset() {
+        if (isPlaying) {
+            try { sourceNode.stop(); } catch (e) {}
+            isPlaying = false;
+            playBtn.classList.remove('pause');
+            cancelAnimationFrame(animationFrame);
+            offset = 0;
+            updatePlayhead(0);
+            if (activeAudio && activeAudio.source === sourceNode) {
+                activeAudio = null;
+            }
+        } else {
+            offset = 0;
+            updatePlayhead(0);
+            playBtn.classList.remove('pause');
+        }
+    }
+    thisPlayer.stop = stopAndReset;   // so global registry can call it
+
+    // ─── Play (only one audio at a time) ─────
     async function play() {
-        stopActiveAudio();
+        // Stop every other player globally
+        stopAllOtherPlayers(playerId);
+
         if (!buffer) await loadAudio();
         const actx = await getAudioContext();
+
+        // Create a fresh source
         sourceNode = actx.createBufferSource();
         sourceNode.buffer = buffer;
         sourceNode.connect(actx.destination);
+
         startTime = actx.currentTime;
         sourceNode.start(0, offset);
         isPlaying = true;
-        playBtn.classList.add('pause');
+        playBtn.classList.add('pause');   // show pause icon
         activeAudio = { source: sourceNode, context: actx, buffer, startTime, offset };
+
         updateProgress();
+
         sourceNode.onended = () => {
             if (isPlaying) {
                 isPlaying = false;
@@ -1007,7 +1054,9 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
                 playBtn.classList.remove('pause');
                 cancelAnimationFrame(animationFrame);
                 updatePlayhead(0);
-                activeAudio = null;
+                if (activeAudio && activeAudio.source === sourceNode) {
+                    activeAudio = null;
+                }
             }
         };
     }
@@ -1016,7 +1065,7 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
         if (!isPlaying) return;
         const actx = audioCtx;
         offset += actx.currentTime - startTime;
-        try { sourceNode.stop(); } catch(e) {}
+        try { sourceNode.stop(); } catch (e) {}
         isPlaying = false;
         playBtn.classList.remove('pause');
         cancelAnimationFrame(animationFrame);
@@ -1029,25 +1078,32 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
         const now = (await getAudioContext()).currentTime;
         const elapsed = now - startTime + offset;
         const progress = Math.min(elapsed / buffer.duration, 1);
-        // update progress canvas
+
+        // Update progress overlay
         const pctx = progressCanvas.getContext('2d');
         pctx.clearRect(0, 0, progressCanvas.width, progressCanvas.height);
         pctx.fillStyle = '#ff8906';
         pctx.fillRect(0, 0, progressCanvas.width * progress, progressCanvas.height);
-        // move playhead
+
+        // Move playhead
         updatePlayhead(progress);
-        // sentence highlight (if sentences provided)
+
+        // Optional sentence highlighting
         if (sentences.length > 0) {
             const currentTime = elapsed;
             const totalDuration = buffer.duration;
-            const idx = Math.min(Math.floor((currentTime / totalDuration) * sentences.length), sentences.length - 1);
+            const idx = Math.min(
+                Math.floor((currentTime / totalDuration) * sentences.length),
+                sentences.length - 1
+            );
             sentences.forEach(s => s.classList.remove('highlight'));
             if (sentences[idx]) sentences[idx].classList.add('highlight');
         }
+
         animationFrame = requestAnimationFrame(updateProgress);
     }
 
-    // canvas click scrub
+    // ─── Canvas click → scrub & restart ─────
     canvas.addEventListener('click', async (e) => {
         e.stopPropagation();
         if (!buffer) await loadAudio();
@@ -1056,27 +1112,34 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
         const ratio = Math.max(0, Math.min(1, x / rect.width));
         offset = ratio * buffer.duration;
         updatePlayhead(ratio);
+
         if (isPlaying) {
-            try { sourceNode.stop(); } catch(e) {}
+            try { sourceNode.stop(); } catch (err) {}
             isPlaying = false;
             playBtn.classList.remove('pause');
             cancelAnimationFrame(animationFrame);
+            if (activeAudio && activeAudio.source === sourceNode) {
+                activeAudio = null;
+            }
         }
-        play();
+        // Always start fresh
+        await play();
     });
 
+    // ─── Play/pause button ─────────────────
     playBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (isPlaying) pause();
         else play();
     });
 
-    // auto-load waveform
+    // ─── Auto‑load waveform ─────────────────
     loadAudio();
 
+    // Expose minimal controls (not used externally, but kept for completeness)
     return { loadAudio, play, pause };
 }
-
+        
 // ═══════════════════════════════════════
 //  BUILD STORY CARDS (two‑card layout)
 // ═══════════════════════════════════════
