@@ -960,11 +960,12 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
         document.removeEventListener('touchend', onDragEnd);
         // If it was playing, restart from new position
         if (isPlaying) {
-            try { sourceNode.stop(); } catch (e) {}
-            isPlaying = false;
-            playBtn.classList.remove('pause');
-            cancelAnimationFrame(animationFrame);
-            play();
+        if (sourceNode) sourceNode.onended = null;
+        try { sourceNode.stop(); } catch (e) {}
+        isPlaying = false;
+        playBtn.classList.remove('pause');
+        cancelAnimationFrame(animationFrame);
+        play();
         }
     }
     playhead.addEventListener('mousedown', (e) => {
@@ -1007,18 +1008,20 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
     }
 
     // ─── Full stop & reset (used globally) ────
-    function stopAndReset() {
-        if (isPlaying) {
-            try { sourceNode.stop(); } catch (e) {}
-            isPlaying = false;
-            playBtn.classList.remove('pause');
-            cancelAnimationFrame(animationFrame);
-            offset = 0;
-            updatePlayhead(0);
-            if (activeAudio && activeAudio.source === sourceNode) {
-                activeAudio = null;
-            }
-        } else {
+function stopAndReset() {
+    if (isPlaying) {
+        if (sourceNode) sourceNode.onended = null;
+        try { sourceNode.stop(); } catch (e) {}
+        isPlaying = false;
+        playBtn.classList.remove('pause');
+        cancelAnimationFrame(animationFrame);
+        offset = 0;
+        updatePlayhead(0);
+        if (activeAudio && activeAudio.source === sourceNode) {
+            activeAudio = null;
+        }
+    }
+    else {
             offset = 0;
             updatePlayhead(0);
             playBtn.classList.remove('pause');
@@ -1034,27 +1037,30 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
         if (!buffer) await loadAudio();
         const actx = await getAudioContext();
 
-        // Create a fresh source
-        sourceNode = actx.createBufferSource();
-        sourceNode.buffer = buffer;
-        sourceNode.connect(actx.destination);
+        // Create a fresh source — keep a LOCAL reference for this specific node
+        const node = actx.createBufferSource();
+        node.buffer = buffer;
+        node.connect(actx.destination);
+        sourceNode = node; // still keep the outer reference for pause()/stop() to use
 
         startTime = actx.currentTime;
-        sourceNode.start(0, offset);
+        node.start(0, offset);
         isPlaying = true;
         playBtn.classList.add('pause');   // show pause icon
-        activeAudio = { source: sourceNode, context: actx, buffer, startTime, offset };
+        activeAudio = { source: node, context: actx, buffer, startTime, offset };
 
         updateProgress();
 
-        sourceNode.onended = () => {
+        node.onended = () => {
+            // Ignore if this node has since been superseded by a newer one
+            if (sourceNode !== node) return;
             if (isPlaying) {
                 isPlaying = false;
                 offset = 0;
                 playBtn.classList.remove('pause');
                 cancelAnimationFrame(animationFrame);
                 updatePlayhead(0);
-                if (activeAudio && activeAudio.source === sourceNode) {
+                if (activeAudio && activeAudio.source === node) {
                     activeAudio = null;
                 }
             }
@@ -1065,6 +1071,7 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
         if (!isPlaying) return;
         const actx = audioCtx;
         offset += actx.currentTime - startTime;
+        if (sourceNode) sourceNode.onended = null;   // don't let the stop() below fire stale logic
         try { sourceNode.stop(); } catch (e) {}
         isPlaying = false;
         playBtn.classList.remove('pause');
@@ -1113,17 +1120,18 @@ function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', o
         offset = ratio * buffer.duration;
         updatePlayhead(ratio);
 
-        if (isPlaying) {
-            try { sourceNode.stop(); } catch (err) {}
-            isPlaying = false;
-            playBtn.classList.remove('pause');
-            cancelAnimationFrame(animationFrame);
-            if (activeAudio && activeAudio.source === sourceNode) {
-                activeAudio = null;
-            }
+if (isPlaying) {
+        if (sourceNode) sourceNode.onended = null;
+        try { sourceNode.stop(); } catch (err) {}
+        isPlaying = false;
+        playBtn.classList.remove('pause');
+        cancelAnimationFrame(animationFrame);
+        if (activeAudio && activeAudio.source === sourceNode) {
+            activeAudio = null;
         }
-        // Always start fresh
-        await play();
+    }
+    // Always start fresh
+    await play();
     });
 
     // ─── Play/pause button ─────────────────
