@@ -6,28 +6,28 @@
     <title>Idiomize — Fluent by Amrit</title>
 
     <!-- Search Engine Optimisation -->
-    <meta name="description" content="Fluent by Amrit — an interactive English idiom game. Learn 10 idioms, then test your knowledge with a multi‑select quiz. Play free online.">
-    <meta name="keywords" content="Fluent game by Amrit, English learning game, idiom game, English vocabulary quiz, learn English online, spoken English game">
+    <meta name="description" content="Fluent by Amrit — quiz yourself on English idioms. Multi‑select quiz, batches of 10‑50. Play free online.">
+    <meta name="keywords" content="Fluent game by Amrit, idiom quiz, English idiom game, multi‑select quiz, learn idioms">
     <meta name="author" content="Amrit">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph -->
     <meta property="og:title" content="Idiomize — Fluent by Amrit">
-    <meta property="og:description" content="Learn English idioms with flashcards and a multi‑select quiz. Part of the Fluent learning suite.">
-    <meta property="og:url" content="https://learnwithamrit.github.io/fluent/idiomize/">
+    <meta property="og:description" content="Test your knowledge of English idioms with a multi‑select quiz. Part of the Fluent learning suite.">
+    <meta property="og:url" content="https://learnwithamrit.github.io/idiomize/">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://learnwithamrit.github.io/fluent/images/icon-512.png">
+    <meta property="og:image" content="https://learnwithamrit.github.io/fluent-game/icon-512.png">
     
     <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="/images/icon-16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/icon-32.png">
-    <link rel="icon" type="image/png" sizes="48x48" href="/images/icon-48.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/images/icon-96.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/icon-180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/images/icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/images/icon-512.png">
-    <meta name="msapplication-TileImage" content="/images/icon-192.png">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="icon-96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <meta name="msapplication-TileImage" content="icon-192.png">
     <meta name="msapplication-TileColor" content="#0d0d1a">
     <meta name="theme-color" content="#10b981">
 
@@ -66,10 +66,6 @@
             position: relative; transition: all 0.3s ease;
         }
 
-        .idiom-modal-panel {
-    /* existing styles */
-    transition: border-color 0.3s;
-}
         @media (min-width: 500px) {
             body { padding: 16px; }
             .idiom-app {
@@ -79,29 +75,14 @@
             }
         }
         @media (min-width: 768px) {
-            .idiom-app { max-width: 620px; min-height: 80vh; max-height: 92vh; border-radius: 36px; }
+            .idiom-app { max-width: 90%; min-height: 80vh; max-height: 92vh; border-radius: 36px; }
         }
-        @media (min-width: 1024px) {
-            body { padding: 24px; }
-            .idiom-app { max-width: 720px; min-height: 75vh; max-height: 90vh; border-radius: 40px; }
+        @media (min-width: 1200px) {
+            .idiom-app { max-width: 1100px; min-height: 75vh; max-height: 90vh; border-radius: 40px; }
         }
-
-        /* Large desktop – almost full width */
-@media (min-width: 1200px) {
-    .idiom-app {
-        max-width: 1100px; /* comfortable reading width */
-        min-height: 75vh;
-        max-height: 90vh;
-        border-radius: 40px;
-    }
-}
-
-/* Ultrawide / 4K screens – expand further */
-@media (min-width: 1600px) {
-    .idiom-app {
-        max-width: 1400px;
-    }
-}
+        @media (min-width: 1600px) {
+            .idiom-app { max-width: 1400px; }
+        }
 
         /* Header */
         .idiom-header {
@@ -143,72 +124,20 @@
         .idiom-btn-primary { background: var(--accent); color: #fff; box-shadow: 0 6px 24px rgba(16,185,129,0.35); }
         .idiom-btn-outline { background: transparent; color: var(--text-primary); border: 2px solid rgba(255,255,255,0.2); }
         .idiom-btn-ghost { background: transparent; color: var(--text-secondary); padding: 12px 20px; font-size: 0.9rem; }
-        .idiom-btn-danger { background: transparent; border: 2px solid var(--error); color: var(--error); font-weight: 600; }
         .idiom-btn-full { width: 100%; max-width: 360px; }
         .idiom-btn-lg { padding: 16px 32px; font-size: 1.1rem; border-radius: 18px; }
 
-        /* Hub */
-        .idiom-hub { display: flex; flex-direction: column; align-items: center; gap: 22px; width: 100%; text-align: center; }
+        /* Batch selection */
+        .idiom-batch-screen { display: flex; flex-direction: column; align-items: center; gap: 24px; width: 100%; }
         .idiom-title { font-size: 1.8rem; font-weight: 700; color: var(--text-primary); }
         .idiom-title .accent { color: var(--accent); }
-        .idiom-subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px; }
-        .idiom-input-group { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 300px; }
-        .idiom-input-group label { color: var(--text-secondary); font-size: 0.8rem; text-align: left; font-weight: 600; }
-        .idiom-input {
+        .idiom-select {
             background: var(--card-bg); border: 2px solid rgba(255,255,255,0.1);
-            border-radius: var(--btn-radius); padding: 14px 16px; color: var(--text-primary);
-            font-size: 1rem; font-family: var(--font-sans); outline: none; width: 100%;
+            border-radius: var(--btn-radius); padding: 12px 16px; color: var(--text-primary);
+            font-size: 1rem; font-family: var(--font-sans); outline: none; width: 200px;
+            text-align: center; cursor: pointer;
         }
-        .idiom-input:focus { border-color: var(--accent); }
-
-        /* Learning card */
-        .idiom-card-wrapper { overflow: hidden; width: 100%; max-width: 380px; position: relative; }
-        /* Increase card size on larger screens */
-@media (min-width: 768px) {
-    .idiom-card-wrapper { max-width: 540px; }
-    .idiom-card-stage { aspect-ratio: 1.7 / 1; }
-}
-
-@media (min-width: 1200px) {
-    .idiom-card-wrapper { max-width: 650px; }
-    .idiom-card-bengali { font-size: 1.8rem; }
-    .idiom-card-english { font-size: 1.4rem; }
-}
-        .idiom-card-stage {
-            perspective: 1000px; width: 100%; aspect-ratio: 1.6/1;
-            cursor: pointer; position: relative; transition: transform 0.3s ease; will-change: transform;
-        }
-        /* Increase card size on larger screens */
-@media (min-width: 768px) {
-    .idiom-card-wrapper { max-width: 540px; }
-    .idiom-card-stage { aspect-ratio: 1.7 / 1; }
-}
-
-@media (min-width: 1200px) {
-    .idiom-card-wrapper { max-width: 650px; }
-    .idiom-card-bengali { font-size: 1.8rem; }
-    .idiom-card-english { font-size: 1.4rem; }
-}
-        .idiom-card-inner {
-            width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
-            transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); will-change: transform;
-        }
-        .idiom-card-inner.flipped { transform: rotateY(180deg); }
-        .idiom-card-face {
-            position: absolute; inset: 0; backface-visibility: hidden;
-            -webkit-backface-visibility: hidden; border-radius: var(--card-radius);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 20px; text-align: center; background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-        }
-        .idiom-card-front { z-index: 2; }
-        .idiom-card-back {
-            transform: rotateY(180deg); z-index: 1;
-            border-color: rgba(16,185,129,0.3); box-shadow: 0 8px 32px rgba(16,185,129,0.15);
-        }
-        .idiom-card-bengali { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); line-height: 1.5; }
-        .idiom-card-english { font-size: 1.1rem; font-weight: 600; color: var(--accent); line-height: 1.5; }
-        .idiom-card-hint { font-size: 0.7rem; color: var(--text-secondary); margin-top: 12px; opacity: 0.7; text-transform: uppercase; }
+        .idiom-select:focus { border-color: var(--accent); }
 
         /* Quiz */
         .idiom-quiz-card {
@@ -236,13 +165,11 @@
         .idiom-option-btn.selected .check-circle {
             background: var(--accent); border-color: var(--accent); color: #fff;
         }
-        .idiom-option-btn .check-circle::after {
-            content: '✓'; font-weight: bold;
-        }
+        .idiom-option-btn .check-circle::after { content: '✓'; font-weight: bold; }
 
         .idiom-hint-text {
             color: var(--error); font-size: 0.85rem; font-weight: 500; text-align: center;
-            margin-top: 8px; min-height: 20px;
+            min-height: 20px; margin-top: 8px;
         }
 
         .idiom-option-btn.correct-flash {
@@ -253,6 +180,16 @@
         @keyframes pulse-green {
             0%,100% { box-shadow: 0 0 8px rgba(16,185,129,0.3); }
             50% { box-shadow: 0 0 28px rgba(16,185,129,0.7); }
+        }
+
+        /* Full‑app correct flash */
+        .idiom-app.correct-flash {
+            animation: appFlashGreen 0.6s ease-out;
+        }
+        @keyframes appFlashGreen {
+            0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.6), inset 0 0 0 0 rgba(16,185,129,0.4); }
+            40%  { box-shadow: 0 0 30px 10px rgba(16,185,129,0.5), inset 0 0 40px 10px rgba(16,185,129,0.25); }
+            100% { box-shadow: 0 0 0 0 rgba(16,185,129,0), inset 0 0 0 0 rgba(16,185,129,0); }
         }
 
         /* Modal */
@@ -269,7 +206,7 @@
         }
         .idiom-modal-bengali { font-size: 1.1rem; color: var(--text-primary); font-weight: 600; margin-bottom: 4px; }
         .idiom-modal-correct { font-size: 1rem; color: var(--success); font-weight: 700; margin-bottom: 20px; }
-        .idiom-modal-label { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+        .idiom-modal-label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; }
 
         /* Results */
         .idiom-results { display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; padding: 12px; }
@@ -290,47 +227,13 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-
-/* Full‑app green flash */
-.idiom-app.correct-flash {
-    animation: appFlashGreen 0.6s ease-out;
-}
-.idiom-hint-text {
-    color: var(--error);
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-align: center;
-    min-height: 20px;
-    margin-top: 4px;
-}
-        /* Quiz – wider options */
-@media (min-width: 768px) {
-    .idiom-quiz-card { max-width: 600px; }
-    .idiom-options-list { max-width: 600px; }
-    .idiom-option-btn { padding: 16px 20px; font-size: 1rem; }
-}
-
-@media (min-width: 1200px) {
-    .idiom-quiz-card { max-width: 750px; }
-    .idiom-options-list { max-width: 750px; }
-    .idiom-option-btn { padding: 18px 24px; font-size: 1.1rem; }
-}
-
-@media (min-width: 1200px) {
-    .idiom-header-item { font-size: 0.85rem; }
-    .idiom-header-item .value { font-size: 0.9rem; }
-    .idiom-btn { padding: 16px 28px; font-size: 1.05rem; }
-}
-
-@keyframes appFlashGreen {
-    0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.6), inset 0 0 0 0 rgba(16,185,129,0.4); }
-    40%  { box-shadow: 0 0 30px 10px rgba(16,185,129,0.5), inset 0 0 40px 10px rgba(16,185,129,0.25); }
-    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0), inset 0 0 0 0 rgba(16,185,129,0); }
-}
-
-        
-
-        
+        /* Refill toast */
+        .idiom-refill-toast {
+            background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.5);
+            color: #fbbf24; padding: 10px 18px; border-radius: 30px;
+            font-size: 0.85rem; font-weight: 500; text-align: center;
+            max-width: 300px; margin: 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -338,9 +241,9 @@
     <header class="idiom-header" id="idiomHeader">
         <div class="idiom-header-item"><span class="icon">👤</span><span class="value" id="headerPlayerName">Player</span></div>
         <div class="idiom-header-divider"></div>
-        <div class="idiom-header-item"><span class="icon">📄</span><span class="value" id="headerCardIndex">1/10</span></div>
+        <div class="idiom-header-item"><span class="icon">📄</span><span class="value" id="headerCardIndex">Ques: 0/0</span></div>
         <div class="idiom-header-divider"></div>
-        <div class="idiom-header-item idiom-score-item muted" id="headerScoreItem"><span class="icon">🏆</span><span class="value" id="headerScore">--/10</span></div>
+        <div class="idiom-header-item idiom-score-item muted" id="headerScoreItem"><span class="icon">🏆</span><span class="value" id="headerScore">--/--</span></div>
         <div class="idiom-header-divider"></div>
         <div class="idiom-header-item"><span class="icon">⏱️</span><span class="value" id="headerTimer">00:00</span></div>
     </header>
@@ -350,48 +253,58 @@
     <div class="idiom-bottom-nav" id="idiomBottomNav"></div>
 
     <div class="idiom-modal-overlay hidden" id="idiomModal"></div>
+
+    <!-- Celebration overlay (same as Proverb Game) -->
+    <div id="correct-overlay" aria-live="assertive" aria-label="Correct!">
+        <div id="correct-card">
+            <div id="correct-icon">✓</div>
+            <div id="correct-word">CORRECT</div>
+        </div>
+    </div>
 </div>
 
 <script>
 (function() {
+    // ---------- CONFIG ----------
     const CONFIG = {
-        cardsPerSession: 10,
-        googleSheetCSVUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSW-l6YsWCVD5POIG-6dbxu8JXthe67i4o4WjyBTBgviAoONp3LnnnVp526u9Vj0zxoIsynmYk1hIMH/pub?gid=0&single=true&output=csv',
+        googleSheetCSVUrl: 'YOUR_GOOGLE_SHEET_CSV_URL_HERE',   // ← Replace with your published CSV URL
         fallbackData: [
-            { bengali: ['বিরক্ত / ক্লান্ত'], english: ['Sick and tired', 'Fed up'], distractors: ['Tired and sick', 'Bored and tired', 'Angry and fed up'] },
-            { bengali: ['অল্প বিদ্যা ভয়ংকরী'], english: ['A little learning is a dangerous thing'], distractors: ['Little knowledge is safe', 'A little wisdom is enough', 'Learning a little is great'] },
-            { bengali: ['চোখের বালি'], english: ['Eyesore', 'A thorn in the flesh'], distractors: ['Eye candy', 'A pain in the neck', 'A sight for sore eyes'] },
-            { bengali: ['মাথা খাটানো'], english: ['Rack one’s brain'], distractors: ['Use one’s head', 'Brainstorm hard', 'Think hardly'] },
-            { bengali: ['গোড়ায় গলদ'], english: ['Something wrong at the root'], distractors: ['Root cause is fine', 'Problem at the top', 'No issue at base'] },
-            { bengali: ['হাতির পাঁচ পা দেখা'], english: ['To see the impossible'], distractors: ['To see an elephant with five legs', 'To witness a miracle', 'To spot a rare animal'] },
-            { bengali: ['নাড়িতে রক্ত থাকা'], english: ['To have blood in one’s veins'], distractors: ['To be cold-blooded', 'To have red blood cells', 'To bleed easily'] },
-            { bengali: ['বাঘের চামড়ায় ঢাকা'], english: ['A wolf in sheep’s clothing'], distractors: ['A tiger in a sheep skin', 'A fox in a hen house', 'A dog in a blanket'] },
-            { bengali: ['আকাশ থেকে পড়া'], english: ['Out of the blue'], distractors: ['Falling from the sky', 'A bolt from the heavens', 'Suddenly from above'] },
-            { bengali: ['কান কাটা'], english: ['Shameless'], distractors: ['Earless', 'Bold', 'Outspoken'] }
-        ]
+            { bengali: ['বিরক্ত / ক্লান্ত'], english: ['Sick and tired', 'Fed up'], distractors: ['Tired and sick', 'Bored and tired', 'Angry and fed up', 'Exhausted and annoyed'] },
+            { bengali: ['অল্প বিদ্যা ভয়ংকরী'], english: ['A little learning is a dangerous thing'], distractors: ['Little knowledge is safe', 'A little wisdom is enough', 'Learning a little is great', 'Small knowledge is power'] },
+            { bengali: ['চোখের বালি'], english: ['Eyesore', 'A thorn in the flesh'], distractors: ['Eye candy', 'A pain in the neck', 'A sight for sore eyes', 'A beautiful view'] },
+            { bengali: ['মাথা খাটানো'], english: ['Rack one’s brain'], distractors: ['Use one’s head', 'Brainstorm hard', 'Think hardly', 'Ponder deeply'] },
+            { bengali: ['গোড়ায় গলদ'], english: ['Something wrong at the root'], distractors: ['Root cause is fine', 'Problem at the top', 'No issue at base', 'A faulty foundation'] },
+            { bengali: ['হাতির পাঁচ পা দেখা'], english: ['To see the impossible'], distractors: ['To see an elephant with five legs', 'To witness a miracle', 'To spot a rare animal', 'To dream big'] },
+            { bengali: ['নাড়িতে রক্ত থাকা'], english: ['To have blood in one’s veins'], distractors: ['To be cold-blooded', 'To have red blood cells', 'To bleed easily', 'To be brave'] },
+            { bengali: ['বাঘের চামড়ায় ঢাকা'], english: ['A wolf in sheep’s clothing'], distractors: ['A tiger in a sheep skin', 'A fox in a hen house', 'A dog in a blanket', 'A cat in a hat'] },
+            { bengali: ['আকাশ থেকে পড়া'], english: ['Out of the blue'], distractors: ['Falling from the sky', 'A bolt from the heavens', 'Suddenly from above', 'A surprise'] },
+            { bengali: ['কান কাটা'], english: ['Shameless'], distractors: ['Earless', 'Bold', 'Outspoken', 'Brazen'] }
+        ],
+        HUB_URL: '../index.html'   // change to your hub page
     };
 
+    // ---------- STATE ----------
     const state = {
-        playerName: 'Player 1',
-        phase: 'hub',
+        playerName: 'Player',
+        phase: 'batch',   // 'batch' | 'quiz' | 'results'
         allProverbs: [],
         remainingPool: [],
         sessionProverbs: [],
-        currentCardIndex: 0,
-        isFlipped: false,
-        isAnimating: false,
         quizOrder: [],
         currentQuizIndex: 0,
         score: 0,
         timerSeconds: 0,
         timerIntervalId: null,
-        totalInSession: CONFIG.cardsPerSession,
-        cardFrontEl: null,
-        cardBackEl: null,
-        cardWrapperEl: null,
-        selectedOptions: new Set(),   // indices of selected options in quiz
+        batchSize: 10,   // default
+        totalInSession: 10,
+        currentOptions: [],
+        correctIndices: new Set(),
+        selectedOptions: new Set(),
+        showRefillMessage: false,
     };
 
+    // ---------- DOM REFS ----------
+    const appContainer = document.getElementById('idiomApp');
     const mainContent = document.getElementById('idiomMain');
     const bottomNav = document.getElementById('idiomBottomNav');
     const modalOverlay = document.getElementById('idiomModal');
@@ -401,6 +314,7 @@
     const headerScoreItem = document.getElementById('headerScoreItem');
     const headerTimer = document.getElementById('headerTimer');
 
+    // ---------- UTILS ----------
     function escapeHTML(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
     function formatVariantList(variants) { return variants.map(v => '• ' + escapeHTML(v)).join('<br>'); }
 
@@ -415,15 +329,15 @@
         const m = Math.floor(state.timerSeconds/60), s = state.timerSeconds%60;
         headerTimer.textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
     }
-    function pauseTimer() { state.isTimerPaused = true; }
-    function resumeTimer() { state.isTimerPaused = false; }
     function formatTime(sec) { const m=Math.floor(sec/60), s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
 
     function updateHeaderPlayerName() { headerPlayerName.textContent = state.playerName; }
     function updateHeaderCardIndex() {
-        if (state.phase === 'learning') headerCardIndex.textContent = `Card: ${state.currentCardIndex+1}/${state.totalInSession}`;
-        else if (state.phase === 'quiz') headerCardIndex.textContent = `Ques: ${state.currentQuizIndex+1}/${state.totalInSession}`;
-        else headerCardIndex.textContent = `--/${state.totalInSession}`;
+        if (state.phase === 'quiz') {
+            headerCardIndex.textContent = `Ques: ${state.currentQuizIndex+1}/${state.totalInSession}`;
+        } else {
+            headerCardIndex.textContent = `--/${state.totalInSession}`;
+        }
     }
     function updateHeaderScore() {
         if (state.phase === 'quiz' || state.phase === 'results') {
@@ -435,60 +349,62 @@
         }
     }
 
-    // ---------- DATA LOADING ----------
-   function parseCSV(txt) {
-    const rows = [];
-    txt.trim().split(/\r?\n/).forEach(line => {
-        if (!line.trim()) return;
-        const cols = [];
-        let cur = '', inQ = false;
-        for (let i = 0; i < line.length; i++) {
-            const ch = line[i];
-            if (ch === '"') {
-                if (inQ && i+1 < line.length && line[i+1] === '"') { cur += '"'; i++; }
-                else inQ = !inQ;
-            } else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-            else cur += ch;
-        }
-        cols.push(cur.trim());
-        // Now expect at least 6 columns (A to F)
-        if (cols.length >= 6) {
-            const bengali = cols[0].split(';').map(s => s.trim()).filter(Boolean);
-            const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
-            const distractors = [cols[2], cols[3], cols[4], cols[5]];
-            rows.push({
-                bengali: bengali.length ? bengali : [cols[0]],
-                english: english.length ? english : [cols[1]],
-                distractors: distractors
-            });
-        }
-    });
-    return rows;
-}
+    // Celebration
+    function showCorrect() {
+        const overlay = document.getElementById('correct-overlay');
+        if (!overlay) return;
+        overlay.classList.add('active');
+        setTimeout(() => overlay.classList.remove('active'), 900);
+    }
 
-    async function loadProverbData() {
+    // ---------- DATA LOADING ----------
+    function parseCSV(txt) {
+        const rows = [];
+        txt.trim().split(/\r?\n/).forEach(line => {
+            if (!line.trim()) return;
+            const cols = [];
+            let cur = '', inQ = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    if (inQ && i+1 < line.length && line[i+1] === '"') { cur += '"'; i++; }
+                    else inQ = !inQ;
+                } else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+                else cur += ch;
+            }
+            cols.push(cur.trim());
+            if (cols.length >= 6) {
+                const bengali = cols[0].split(';').map(s => s.trim()).filter(Boolean);
+                const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
+                const distractors = [cols[2], cols[3], cols[4], cols[5]];
+                rows.push({
+                    bengali: bengali.length ? bengali : [cols[0]],
+                    english: english.length ? english : [cols[1]],
+                    distractors: distractors
+                });
+            }
+        });
+        return rows;
+    }
+
+    async function loadData() {
         if (CONFIG.googleSheetCSVUrl && CONFIG.googleSheetCSVUrl.trim() !== '') {
             try {
-                console.log('📡 Fetching Google Sheet…');
                 const res = await fetch(CONFIG.googleSheetCSVUrl);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const csv = await res.text();
                 const parsed = parseCSV(csv);
                 if (parsed.length > 0) {
                     const firstCell = parsed[0].bengali?.[0]?.toLowerCase();
-                    if (firstCell === 'bengali' || firstCell === 'bengali expression') {
-                        parsed.shift();
-                        console.log('Header row removed');
-                    }
+                    if (firstCell === 'bengali' || firstCell === 'bengali expression') parsed.shift();
                 }
-                if (parsed.length >= CONFIG.cardsPerSession) {
+                if (parsed.length >= 10) {
                     state.allProverbs = parsed;
                     state.remainingPool = [...parsed];
-                    console.log(`✅ Loaded ${parsed.length} idioms from sheet`);
                     return;
                 }
             } catch (e) {
-                console.warn('Google Sheet fetch failed, using fallback:', e.message);
+                console.warn('Sheet fetch failed, using fallback.');
             }
         }
         state.allProverbs = CONFIG.fallbackData.map(item => ({
@@ -499,423 +415,236 @@
         state.remainingPool = [...state.allProverbs];
     }
 
-    // ---------- POOL ----------
-    function selectSessionProverbs() {
-        if (state.remainingPool.length < CONFIG.cardsPerSession) {
+    // ---------- POOL MANAGEMENT ----------
+    function refillPoolIfNeeded() {
+        if (state.remainingPool.length < state.batchSize) {
             state.remainingPool = [...state.allProverbs];
+            state.showRefillMessage = true;
+        } else {
+            state.showRefillMessage = false;
         }
-        const shuffled = [...state.remainingPool];
-        for (let i = shuffled.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; }
-        state.sessionProverbs = shuffled.slice(0, CONFIG.cardsPerSession);
-        state.remainingPool = shuffled.slice(CONFIG.cardsPerSession);
-        state.currentCardIndex = 0; state.isFlipped = false; state.score = 0;
-        state.currentQuizIndex = 0; state.quizOrder = [];
-        state.timerSeconds = 0; updateTimerDisplay(); updateHeaderScore(); updateHeaderCardIndex();
     }
 
-    // ---------- RENDER: HUB ----------
-    function renderHub() {
-        state.phase = 'hub'; stopTimer(); state.timerSeconds = 0; updateTimerDisplay();
-        updateHeaderScore(); updateHeaderCardIndex();
+    function selectSessionProverbs() {
+        refillPoolIfNeeded();
+        const shuffled = [...state.remainingPool];
+        for (let i = shuffled.length-1; i>0; i--) {
+            const j = Math.floor(Math.random()*(i+1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        state.sessionProverbs = shuffled.slice(0, state.batchSize);
+        state.remainingPool = shuffled.slice(state.batchSize);
+        state.quizOrder = [...Array(state.batchSize).keys()];
+        for (let i = state.quizOrder.length-1; i>0; i--) {
+            const j = Math.floor(Math.random()*(i+1));
+            [state.quizOrder[i], state.quizOrder[j]] = [state.quizOrder[j], state.quizOrder[i]];
+        }
+        state.currentQuizIndex = 0;
+        state.score = 0;
+        state.totalInSession = state.batchSize;
+        state.selectedOptions.clear();
+        updateHeaderScore();
+        updateHeaderCardIndex();
+    }
+
+    // ---------- RENDER: BATCH SELECTION ----------
+    function renderBatchSelection() {
+        state.phase = 'batch';
+        stopTimer();
+        updateHeaderScore();
+        updateHeaderCardIndex();
         headerCardIndex.textContent = `--/${state.totalInSession}`;
-        headerScoreItem.classList.add('muted'); headerScore.textContent = `--/${state.totalInSession}`;
+        headerScoreItem.classList.add('muted');
+        headerScore.textContent = `--/${state.totalInSession}`;
+
+        let refillMsgHTML = '';
+        if (state.showRefillMessage) {
+            refillMsgHTML = '<div class="idiom-refill-toast">🔄 You’ve seen all idioms! Starting a fresh set.</div>';
+            state.showRefillMessage = false;
+        }
 
         mainContent.innerHTML = `
-            <div class="idiom-hub">
-                <div><div class="idiom-title">Idio<span class="accent">mize</span></div><div class="idiom-subtitle">Master English Idioms</div></div>
-                <div class="idiom-input-group"><label for="playerNameInput">Player Name</label><input type="text" id="playerNameInput" class="idiom-input" value="${escapeHTML(state.playerName)}" placeholder="Your name" maxlength="30"/></div>
-                <button class="idiom-btn idiom-btn-primary idiom-btn-lg idiom-btn-full" id="btnStartSession">🚀 Start Session</button>
-                <p class="text-muted" style="font-size:0.78rem; max-width:280px;">Learn 10 idioms, then test with a multi‑select quiz.</p>
+            <div class="idiom-batch-screen">
+                <div class="idiom-title">Idio<span class="accent">mize</span></div>
+                <div class="text-muted" style="font-size:0.9rem;">Select your quiz size</div>
+                ${refillMsgHTML}
+                <select id="batchSizeSelect" class="idiom-select">
+                    <option value="10" ${state.batchSize===10?'selected':''}>10 questions</option>
+                    <option value="20" ${state.batchSize===20?'selected':''}>20 questions</option>
+                    <option value="30" ${state.batchSize===30?'selected':''}>30 questions</option>
+                    <option value="50" ${state.batchSize===50?'selected':''}>50 questions</option>
+                </select>
+                <button class="idiom-btn idiom-btn-primary idiom-btn-full idiom-btn-lg" id="btnStartQuiz">🎮 Start Quiz</button>
+                <a href="${CONFIG.HUB_URL}" class="idiom-btn idiom-btn-ghost idiom-btn-full" style="text-decoration:none;">← Back to Hub</a>
             </div>`;
         bottomNav.innerHTML = '';
 
-        document.getElementById('btnStartSession').addEventListener('click', () => {
-            const inp = document.getElementById('playerNameInput');
-            if (inp?.value.trim()) state.playerName = inp.value.trim();
-            updateHeaderPlayerName();
+        document.getElementById('btnStartQuiz').addEventListener('click', () => {
+            const select = document.getElementById('batchSizeSelect');
+            state.batchSize = parseInt(select.value);
             selectSessionProverbs();
-            renderLearning();
+            state.phase = 'quiz';
+            startTimer();
+            renderQuizQuestion();
         });
-        document.getElementById('playerNameInput')?.addEventListener('keydown', e => { if (e.key==='Enter') document.getElementById('btnStartSession').click(); });
-    }
-
-    // ---------- LEARNING ----------
-    function renderLearning() {
-        state.phase = 'learning'; state.isFlipped = false; state.isAnimating = false;
-        updateHeaderScore(); updateHeaderCardIndex(); startTimer();
-
-        const proverb = state.sessionProverbs[state.currentCardIndex];
-        mainContent.innerHTML = `
-            <div class="idiom-card-wrapper" id="idiomCardWrapper">
-                <div class="idiom-card-stage" id="idiomCardStage">
-                    <div class="idiom-card-inner" id="idiomCardInner">
-                        <div class="idiom-card-face idiom-card-front" id="idiomCardFront">
-                            <div class="idiom-card-bengali">${formatVariantList(proverb.bengali)}</div>
-                            <div class="idiom-card-hint">Tap to Reveal English</div>
-                        </div>
-                        <div class="idiom-card-face idiom-card-back" id="idiomCardBack">
-                            <div class="idiom-card-english">${formatVariantList(proverb.english)}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="swipe-indicator" style="color:var(--text-secondary); font-size:0.7rem; opacity:0.6;"><span>◀</span> Swipe <span>▶</span></div>
-            <div class="nav-buttons" style="display:flex; gap:12px;">
-                <button class="idiom-btn idiom-btn-outline" id="btnPrev" ${state.currentCardIndex===0?'disabled style="opacity:0.4;"':''}>← Previous</button>
-                <button class="idiom-btn idiom-btn-outline" id="btnNext">Next →</button>
-            </div>`;
-        bottomNav.innerHTML = `
-            <button class="idiom-btn idiom-btn-danger idiom-btn-full" id="btnFinishSession">🏁 Finish Session</button>
-            <button class="idiom-btn idiom-btn-ghost idiom-btn-full" id="btnBackToHubLearning">← Back to Hub</button>`;
-
-        state.cardFrontEl = document.getElementById('idiomCardFront');
-        state.cardBackEl = document.getElementById('idiomCardBack');
-        state.cardWrapperEl = document.getElementById('idiomCardWrapper');
-
-        attachCardListeners();
-        document.getElementById('btnPrev').addEventListener('click', () => navigateCard(-1));
-        document.getElementById('btnNext').addEventListener('click', () => navigateCard(1));
-        document.getElementById('btnFinishSession').addEventListener('click', finishSessionAndStartQuiz);
-        document.getElementById('btnBackToHubLearning').addEventListener('click', () => { if (confirm('Leave learning?')) { stopTimer(); renderHub(); } });
-    }
-
-    function attachCardListeners() {
-        const card = document.getElementById('idiomCardStage');
-        if (!card) return;
-        card.addEventListener('pointerdown', onPointerDown);
-        card.addEventListener('pointermove', onPointerMove);
-        card.addEventListener('pointerup', onPointerUp);
-        card.addEventListener('pointercancel', onPointerCancel);
-        card.addEventListener('pointerleave', onPointerCancel);
-        card.addEventListener('touchstart', e => { if (e.target.closest('.idiom-card-stage')) e.preventDefault(); }, { passive: false });
-    }
-
-    let swipe = { startX:0, startY:0, moved:false, distanceX:0, swiping:false };
-    function onPointerDown(e) { swipe.startX=e.clientX; swipe.startY=e.clientY; swipe.moved=false; swipe.distanceX=0; swipe.swiping=true; e.target.setPointerCapture(e.pointerId); }
-    function onPointerMove(e) { if(!swipe.swiping) return; const dx=e.clientX-swipe.startX; swipe.distanceX=dx; if(Math.abs(dx)>8) swipe.moved=true; }
-    function onPointerUp(e) {
-        if(!swipe.swiping) return; swipe.swiping=false;
-        const absDx=Math.abs(swipe.distanceX), absDy=Math.abs(e.clientY-swipe.startY);
-        if(swipe.moved && absDx>50 && absDx>absDy*1.5) {
-            if(swipe.distanceX<-40) navigateCard(1); else if(swipe.distanceX>40) navigateCard(-1);
-        } else if(!swipe.moved || (absDx<15 && absDy<15)) flipCard();
-        swipe.distanceX=0; swipe.moved=false; try{e.target.releasePointerCapture(e.pointerId);}catch(ex){}
-    }
-    function onPointerCancel(e){ swipe.swiping=false; try{e.target.releasePointerCapture(e.pointerId);}catch(ex){} }
-
-    function flipCard() {
-        if (state.phase!=='learning' || state.isAnimating) return;
-        const inner = document.getElementById('idiomCardInner');
-        if (inner) { state.isFlipped = !state.isFlipped; inner.classList.toggle('flipped', state.isFlipped); }
-    }
-
-    function navigateCard(direction) {
-        if (state.phase!=='learning' || state.isAnimating) return;
-        const newIdx = state.currentCardIndex + direction;
-        if (newIdx<0) return;
-        if (newIdx>=state.totalInSession) { finishSessionAndStartQuiz(); return; }
-
-        state.isAnimating = true;
-        const card = document.getElementById('idiomCardStage');
-        if (!card) { state.isAnimating=false; return; }
-        const exit = direction>0 ? '-120%' : '120%';
-        const enter = direction>0 ? '120%' : '-120%';
-        card.style.transition = 'transform 0.3s ease';
-        card.style.transform = `translateX(${exit})`;
-
-        let anim = true;
-        const finish = () => {
-            if (!anim) return; anim = false;
-            state.currentCardIndex = newIdx; updateHeaderCardIndex(); updateCardContent();
-            card.style.transition = 'none'; card.style.transform = `translateX(${enter})`;
-            card.offsetHeight;
-            card.style.transition = 'transform 0.3s ease'; card.style.transform = 'translateX(0)';
-            const unlock = () => { state.isAnimating = false; };
-            card.addEventListener('transitionend', unlock, {once:true});
-            setTimeout(unlock, 350);
-        };
-        card.addEventListener('transitionend', finish, {once:true});
-        setTimeout(finish, 350);
-    }
-
-    function updateCardContent() {
-        const p = state.sessionProverbs[state.currentCardIndex];
-        if (state.cardFrontEl) state.cardFrontEl.querySelector('.idiom-card-bengali').innerHTML = formatVariantList(p.bengali);
-        if (state.cardBackEl) state.cardBackEl.querySelector('.idiom-card-english').innerHTML = formatVariantList(p.english);
-        document.getElementById('idiomCardInner')?.classList.remove('flipped');
-        state.isFlipped = false;
-        const prev = document.getElementById('btnPrev'), next = document.getElementById('btnNext');
-        if (prev) { if(state.currentCardIndex===0){ prev.disabled=true; prev.style.opacity='0.4'; } else { prev.disabled=false; prev.style.opacity='1'; } }
-        if (next) next.textContent = state.currentCardIndex >= state.totalInSession-1 ? 'Finish →' : 'Next →';
-    }
-
-    function finishSessionAndStartQuiz() {
-        if (state.phase !== 'learning') return;
-        state.quizOrder = [...Array(state.totalInSession).keys()];
-        for (let i=state.quizOrder.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [state.quizOrder[i], state.quizOrder[j]] = [state.quizOrder[j], state.quizOrder[i]]; }
-        state.currentQuizIndex = 0; state.score = 0; state.phase = 'quiz';
-        updateHeaderScore(); updateHeaderCardIndex(); startTimer();
-        renderQuizQuestion();
     }
 
     // ---------- MULTI‑SELECT QUIZ ----------
-function renderQuizQuestion() {
-    if (state.currentQuizIndex >= state.totalInSession) { finishQuiz(); return; }
-    state.phase = 'quiz'; updateHeaderScore(); updateHeaderCardIndex();
-    state.selectedOptions.clear();
+    function renderQuizQuestion() {
+        if (state.currentQuizIndex >= state.totalInSession) { finishQuiz(); return; }
+        state.phase = 'quiz';
+        updateHeaderScore();
+        updateHeaderCardIndex();
+        state.selectedOptions.clear();
 
-    const sessionIdx = state.quizOrder[state.currentQuizIndex];
-    const proverb = state.sessionProverbs[sessionIdx];
+        const sessionIdx = state.quizOrder[state.currentQuizIndex];
+        const proverb = state.sessionProverbs[sessionIdx];
 
-    const corrects = proverb.english.slice(0, 5);   // max 5 corrects
-    const allDistractors = [...proverb.distractors]; // 4 distractors
-    for (let i = allDistractors.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allDistractors[i], allDistractors[j]] = [allDistractors[j], allDistractors[i]];
-    }
-    const needed = 5 - corrects.length;
-    const chosenDistractors = allDistractors.slice(0, needed);
+        const corrects = proverb.english.slice(0, 5);
+        const allDistractors = [...proverb.distractors];
+        for (let i = allDistractors.length-1; i>0; i--) {
+            const j = Math.floor(Math.random()*(i+1));
+            [allDistractors[i], allDistractors[j]] = [allDistractors[j], allDistractors[i]];
+        }
+        const needed = 5 - corrects.length;
+        const chosenDistractors = allDistractors.slice(0, needed);
 
-    const options = [
-        ...corrects.map(text => ({ text, isCorrect: true })),
-        ...chosenDistractors.map(text => ({ text, isCorrect: false }))
-    ];
-    for (let i = options.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [options[i], options[j]] = [options[j], options[i]];
-    }
+        const options = [
+            ...corrects.map(text => ({ text, isCorrect: true })),
+            ...chosenDistractors.map(text => ({ text, isCorrect: false }))
+        ];
+        for (let i = options.length-1; i>0; i--) {
+            const j = Math.floor(Math.random()*(i+1));
+            [options[i], options[j]] = [options[j], options[i]];
+        }
 
-    state.currentOptions = options;
-    state.correctIndices = new Set(options.reduce((acc, opt, idx) => {
-        if (opt.isCorrect) acc.push(idx);
-        return acc;
-    }, []));
+        state.currentOptions = options;
+        state.correctIndices = new Set(options.reduce((acc, opt, idx) => {
+            if (opt.isCorrect) acc.push(idx);
+            return acc;
+        }, []));
 
-    mainContent.innerHTML = `
-        <div class="idiom-quiz-card">
-            <div class="idiom-quiz-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
-        </div>
-        <div class="idiom-options-list" id="idiomOptionsList">
-            ${options.map((opt, idx) => `
-                <button class="idiom-option-btn" data-index="${idx}">
-                    <span class="check-circle"></span>
-                    <span>${escapeHTML(opt.text)}</span>
-                </button>
-            `).join('')}
-        </div>
-        <div class="idiom-hint-text" id="idiomHintText"></div>
-        <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnSubmitAnswer">Submit</button>
-    `;
+        mainContent.innerHTML = `
+            <div class="idiom-quiz-card">
+                <div class="idiom-quiz-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
+            </div>
+            <div class="idiom-options-list" id="idiomOptionsList">
+                ${options.map((opt, idx) => `
+                    <button class="idiom-option-btn" data-index="${idx}">
+                        <span class="check-circle"></span>
+                        <span>${escapeHTML(opt.text)}</span>
+                    </button>
+                `).join('')}
+            </div>
+            <div class="idiom-hint-text" id="idiomHintText"></div>
+            <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnSubmitAnswer">Submit</button>
+        `;
+        bottomNav.innerHTML = '';
 
-    bottomNav.innerHTML = `
-        <button class="idiom-btn idiom-btn-ghost idiom-btn-full" id="btnBackToHubQuiz">← Back to Hub</button>
-    `;
-
-    document.querySelectorAll('.idiom-option-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const idx = parseInt(this.dataset.index);
-            if (state.selectedOptions.has(idx)) {
-                state.selectedOptions.delete(idx);
-                this.classList.remove('selected');
-            } else {
-                state.selectedOptions.add(idx);
-                this.classList.add('selected');
-            }
-            document.getElementById('idiomHintText').textContent = '';   // ← clear hint
+        document.querySelectorAll('.idiom-option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const idx = parseInt(this.dataset.index);
+                if (state.selectedOptions.has(idx)) {
+                    state.selectedOptions.delete(idx);
+                    this.classList.remove('selected');
+                } else {
+                    state.selectedOptions.add(idx);
+                    this.classList.add('selected');
+                }
+                document.getElementById('idiomHintText').textContent = '';
+            });
         });
-    });
 
-    document.getElementById('btnSubmitAnswer').addEventListener('click', checkQuizAnswer);
-    document.getElementById('btnBackToHubQuiz').addEventListener('click', () => {
-        if (confirm('Leave quiz?')) { stopTimer(); renderHub(); }
-    });
-}
-
-function checkQuizAnswer() {
-    const selected = state.selectedOptions;
-    const correct = state.correctIndices;
-    const allBtns = document.querySelectorAll('.idiom-option-btn');
-    const submitBtn = document.getElementById('btnSubmitAnswer');
-    const hintEl = document.getElementById('idiomHintText');
-    if (!submitBtn) return;
-
-    // ---------- Nothing selected ----------
-    if (selected.size === 0) {
-        hintEl.textContent = 'Please select an option.';
-        return;
+        document.getElementById('btnSubmitAnswer').addEventListener('click', checkQuizAnswer);
     }
 
-    // Clear hint on valid submission
-    hintEl.textContent = '';
+    function checkQuizAnswer() {
+        const selected = state.selectedOptions;
+        const correct = state.correctIndices;
+        const allBtns = document.querySelectorAll('.idiom-option-btn');
+        const submitBtn = document.getElementById('btnSubmitAnswer');
+        const hintEl = document.getElementById('idiomHintText');
+        if (!submitBtn) return;
 
-    // Disable further interaction
-    submitBtn.disabled = true;
-    allBtns.forEach(b => b.style.pointerEvents = 'none');
+        if (selected.size === 0) {
+            hintEl.textContent = 'Please select an option.';
+            return;
+        }
+        hintEl.textContent = '';
 
-    // Determine if any wrong option was chosen
-    let anyWrong = false;
-    for (const idx of selected) {
-        if (!correct.has(idx)) {
-            anyWrong = true;
-            break;
+        submitBtn.disabled = true;
+        allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+        let anyWrong = false;
+        for (const idx of selected) {
+            if (!correct.has(idx)) { anyWrong = true; break; }
+        }
+        const isComplete = selected.size === correct.size && !anyWrong;
+
+        if (isComplete) {
+            state.score++;
+            updateHeaderScore();
+            document.getElementById('idiomApp').classList.add('correct-flash');
+            showCorrect();
+            allBtns.forEach(btn => {
+                const idx = parseInt(btn.dataset.index);
+                if (correct.has(idx)) btn.classList.add('correct-flash');
+            });
+            setTimeout(() => {
+                document.getElementById('idiomApp').classList.remove('correct-flash');
+                state.currentQuizIndex++;
+                if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
+                else renderQuizQuestion();
+            }, 700);
+        } else {
+            if (anyWrong) {
+                showErrorModal('wrong');
+            } else {
+                const missingCount = correct.size - selected.size;
+                showErrorModal('incomplete', missingCount);
+            }
         }
     }
 
-    const isComplete = selected.size === correct.size && !anyWrong;
+    function showErrorModal(type, missingCount = 0) {
+        const proverb = state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
+        let iconHtml = '', message = '', borderColor = '';
+        if (type === 'incomplete') {
+            iconHtml = `<div style="font-size:2.5rem; margin-bottom:10px;">🟡</div>`;
+            message = `Good start! You still need to select all the correct answers. You missed ${missingCount}.`;
+            borderColor = 'rgba(251,191,36,0.4)';
+        } else {
+            iconHtml = '<div style="font-size:2.5rem; margin-bottom:10px;">❌</div>';
+            message = 'That’s incorrect.';
+            borderColor = 'rgba(239,68,68,0.4)';
+        }
 
-    if (isComplete) {
-        // Perfect!
-        state.score++;
-        updateHeaderScore();
-        document.getElementById('idiomApp').classList.add('correct-flash');
-        allBtns.forEach(btn => {
-            const idx = parseInt(btn.dataset.index);
-            if (correct.has(idx)) btn.classList.add('correct-flash');
-        });
-        setTimeout(() => {
-            document.getElementById('idiomApp').classList.remove('correct-flash');
+        modalOverlay.innerHTML = `
+            <div class="idiom-modal-panel" style="border-color:${borderColor};">
+                ${iconHtml}
+                <div class="idiom-modal-label">${message}</div>
+                <div class="idiom-modal-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
+                <div class="idiom-modal-correct">→ ${formatVariantList(proverb.english)}</div>
+                <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnGotIt">👍 Got It</button>
+            </div>`;
+        modalOverlay.classList.remove('hidden');
+
+        document.getElementById('btnGotIt').addEventListener('click', () => {
+            modalOverlay.classList.add('hidden');
+            modalOverlay.innerHTML = '';
             state.currentQuizIndex++;
             if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
             else renderQuizQuestion();
-        }, 700);
-    } else {
-        // Failure – pause timer and show appropriate modal
-        pauseTimer();
-        if (anyWrong) {
-            showErrorModal('wrong');
-        } else {
-            const missingCount = correct.size - selected.size;
-            showErrorModal('incomplete', missingCount);
-        }
+        });
     }
-}
-
-//.................... Show Error Modal Pop-UP-----------------------//
-
-function showErrorModal(type, missingCount = 0) {
-    const proverb = state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
-    
-    // Choose icon and message based on type
-    let iconHtml = '';
-    let message = '';
-    let borderColor = '';
-
-    if (type === 'incomplete') {
-        // The SVG you shared – scaled down
-        iconHtml = `
-            <div style="width: 90px; height: 90px; margin: 0 auto 10px;">
-                <svg xmlns="http://w3.org" viewBox="0 0 500 560" width="100%" height="100%">
-                    <defs>
-                        <radialGradient id="bodyGrad" cx="45%" cy="35%" r="60%">
-                            <stop offset="0%" stop-color="#ff9d3b"/>
-                            <stop offset="70%" stop-color="#ff6a00"/>
-                            <stop offset="100%" stop-color="#cc4400"/>
-                        </radialGradient>
-                        <radialGradient id="cheekGradL" cx="30%" cy="30%" r="50%">
-                            <stop offset="0%" stop-color="#ff8522" stop-opacity="0.6"/>
-                            <stop offset="100%" stop-color="#ff6a00" stop-opacity="0"/>
-                        </radialGradient>
-                        <radialGradient id="cheekGradR" cx="70%" cy="30%" r="50%">
-                            <stop offset="0%" stop-color="#ff8522" stop-opacity="0.6"/>
-                            <stop offset="100%" stop-color="#ff6a00" stop-opacity="0"/>
-                        </radialGradient>
-                        <radialGradient id="eyeGrad" cx="40%" cy="40%" r="65%">
-                            <stop offset="0%" stop-color="#ffffff"/>
-                            <stop offset="85%" stop-color="#f0f0f0"/>
-                            <stop offset="100%" stop-color="#d9d9d9"/>
-                        </radialGradient>
-                        <radialGradient id="pupilGrad" cx="35%" cy="35%" r="60%">
-                            <stop offset="0%" stop-color="#0b5ba1"/>
-                            <stop offset="50%" stop-color="#033266"/>
-                            <stop offset="100%" stop-color="#001126"/>
-                        </radialGradient>
-                        <linearGradient id="handGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="#ffaa4d"/>
-                            <stop offset="100%" stop-color="#e65c00"/>
-                        </linearGradient>
-                        <linearGradient id="toothGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="#ffa347"/>
-                            <stop offset="100%" stop-color="#d65100"/>
-                        </linearGradient>
-                        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-                            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#4d1400" flood-opacity="0.3"/>
-                        </filter>
-                    </defs>
-                    <path d="M150,45 C175,25 210,30 225,48 C210,38 175,35 155,52 Z" fill="#7a2200"/>
-                    <path d="M350,45 C325,25 290,30 275,48 C290,38 325,35 345,52 Z" fill="#7a2200"/>
-                    <circle cx="250" cy="240" r="215" fill="url(#bodyGrad)" stroke="#993300" stroke-width="3"/>
-                    <circle cx="140" cy="210" r="60" fill="url(#cheekGradL)"/>
-                    <circle cx="360" cy="210" r="60" fill="url(#cheekGradR)"/>
-                    <path d="M120,120 C175,110 225,150 225,210 C225,260 175,290 120,275 C75,260 70,180 120,120 Z" fill="url(#eyeGrad)" stroke="#993300" stroke-width="2" filter="url(#shadow)"/>
-                    <path d="M380,120 C325,110 275,150 275,210 C275,260 325,290 380,275 C425,260 430,180 380,120 Z" fill="url(#eyeGrad)" stroke="#993300" stroke-width="2" filter="url(#shadow)"/>
-                    <g transform="translate(170, 200)">
-                        <circle cx="0" cy="0" r="28" fill="url(#pupilGrad)" stroke="#001126" stroke-width="1"/>
-                        <circle cx="0" cy="0" r="14" fill="#000814"/>
-                        <circle cx="-8" cy="-8" r="7" fill="#ffffff"/>
-                        <circle cx="6" cy="6" r="3" fill="#ffffff"/>
-                    </g>
-                    <g transform="translate(300, 200)">
-                        <circle cx="0" cy="0" r="28" fill="url(#pupilGrad)" stroke="#001126" stroke-width="1"/>
-                        <circle cx="0" cy="0" r="14" fill="#000814"/>
-                        <circle cx="-8" cy="-8" r="7" fill="#ffffff"/>
-                        <circle cx="6" cy="6" r="3" fill="#ffffff"/>
-                    </g>
-                    <path d="M75,215 C110,180 170,195 210,235 C160,230 110,240 75,215 Z" fill="#ff801a" opacity="0.4"/>
-                    <path d="M425,215 C390,180 330,195 290,235 C340,230 390,240 425,215 Z" fill="#ff801a" opacity="0.4"/>
-                    <path d="M120,290 C120,240 380,240 380,290 C380,390 120,390 120,290 Z" fill="#661a00" stroke="#4d1400" stroke-width="3"/>
-                    <g filter="url(#shadow)">
-                        <path d="M132,285 C170,270 210,265 250,265 C290,265 330,270 368,285 C360,315 330,325 250,325 C170,325 140,315 132,285 Z" fill="url(#toothGrad)" stroke="#993300" stroke-width="2"/>
-                        <path d="M142,345 C170,360 210,365 250,365 C290,365 330,360 358,345 C350,320 320,315 250,315 C180,315 150,320 142,345 Z" fill="url(#toothGrad)" stroke="#993300" stroke-width="2"/>
-                        <path d="M165,280 L170,323 M205,272 L208,325 M250,265 L250,325 M295,272 L292,325 M335,280 L330,323" stroke="#802000" stroke-width="1.5" opacity="0.7"/>
-                        <path d="M175,348 L180,320 M210,356 L212,320 M250,365 L250,315 M290,356 L288,320 M325,348 L320,320" stroke="#802000" stroke-width="1.5" opacity="0.7"/>
-                    </g>
-                    <g filter="url(#shadow)">
-                        <path d="M170,500 C150,430 220,390 245,460 C255,490 230,550 180,550 C150,550 175,510 170,500 Z" fill="url(#handGrad)" stroke="#993300" stroke-width="2"/>
-                        <path d="M190,425 C195,410 215,415 220,440" fill="none" stroke="#802000" stroke-width="2"/>
-                        <path d="M172,445 C180,430 198,435 202,465" fill="none" stroke="#802000" stroke-width="2"/>
-                        <path d="M162,475 C170,460 185,465 188,495" fill="none" stroke="#802000" stroke-width="2"/>
-                        <path d="M330,500 C350,430 280,390 255,460 C245,490 270,550 320,550 C350,550 325,510 330,500 Z" fill="url(#handGrad)" stroke="#993300" stroke-width="2"/>
-                        <path d="M310,425 C305,410 285,415 280,440" fill="none" stroke="#802000" stroke-width="2"/>
-                        <path d="M328,445 C320,430 302,435 298,465" fill="none" stroke="#802000" stroke-width="2"/>
-                        <path d="M338,475 C330,460 315,465 312,495" fill="none" stroke="#802000" stroke-width="2"/>
-                    </g>
-                </svg>
-            </div>`;
-        message = `Good start! You still need to select all the correct answers. You missed ${missingCount}.`;
-        borderColor = 'rgba(251,191,36,0.4)';   // gold/orange border
-    } else {
-        // Wrong answer
-        iconHtml = '<div style="font-size:2.5rem; margin-bottom:10px;">❌</div>';
-        message = 'That’s incorrect.';
-        borderColor = 'rgba(239,68,68,0.4)';    // red border
-    }
-
-    modalOverlay.innerHTML = `
-        <div class="idiom-modal-panel" style="border-color: ${borderColor};">
-            ${iconHtml}
-            <div class="idiom-modal-label">${message}</div>
-            <div class="idiom-modal-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
-            <div class="idiom-modal-correct">→ ${formatVariantList(proverb.english)}</div>
-            <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnGotIt">👍 Got It</button>
-        </div>`;
-    modalOverlay.classList.remove('hidden');
-
-    document.getElementById('btnGotIt').addEventListener('click', () => {
-        modalOverlay.classList.add('hidden');
-        modalOverlay.innerHTML = '';
-        resumeTimer();
-        state.currentQuizIndex++;
-        if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
-        else renderQuizQuestion();
-    });
-}
-
-
-    
 
     function finishQuiz() {
-        state.phase = 'results'; stopTimer(); updateHeaderScore(); updateHeaderCardIndex();
+        state.phase = 'results';
+        stopTimer();
+        updateHeaderScore();
+        updateHeaderCardIndex();
         headerCardIndex.textContent = 'Complete';
+
         const total = state.totalInSession, score = state.score, time = formatTime(state.timerSeconds), perc = Math.round((score/total)*100);
         let badge='badge-bronze', badgeText='🥉 Keep Practicing', emoji='📚';
         if (perc>=90){ badge='badge-gold'; badgeText='🥇 Excellent!'; emoji='🏆'; }
@@ -929,75 +658,37 @@ function showErrorModal(type, missingCount = 0) {
                 <div class="text-muted"><p>⏱️ Time: <strong>${time}</strong></p><p>📊 Accuracy: <strong>${perc}%</strong></p></div>
             </div>`;
         bottomNav.innerHTML = `
-            <button class="idiom-btn idiom-btn-primary idiom-btn-full idiom-btn-lg" id="btnNewSession">📚 Learn a few more</button>
-            <button class="idiom-btn idiom-btn-ghost idiom-btn-full" id="btnBackToHubResults">← Back to Hub</button>`;
-        document.getElementById('btnNewSession').addEventListener('click', ()=>{ selectSessionProverbs(); renderLearning(); });
-        document.getElementById('btnBackToHubResults').addEventListener('click', renderHub);
+            <button class="idiom-btn idiom-btn-primary idiom-btn-full idiom-btn-lg" id="btnPlayAgain">🔄 Play Another Session</button>
+            <a href="${CONFIG.HUB_URL}" class="idiom-btn idiom-btn-ghost idiom-btn-full" style="text-decoration:none;">← Back to Hub</a>`;
+        document.getElementById('btnPlayAgain').addEventListener('click', () => {
+            state.showRefillMessage = false;   // will be set correctly by next refillIfNeeded
+            renderBatchSelection();
+        });
     }
 
     // ---------- INIT ----------
     async function initApp() {
-        updateHeaderPlayerName(); updateHeaderScore(); updateHeaderCardIndex();
-        headerCardIndex.textContent = `--/${state.totalInSession}`; headerScoreItem.classList.add('muted');
-        headerScore.textContent = `--/${state.totalInSession}`; updateTimerDisplay();
-        mainContent.innerHTML = '<div class="idiom-hub"><p style="color:var(--text-secondary);">⏳ Loading data…</p></div>';
+        // Read player name from URL ?name=...
+        const params = new URLSearchParams(window.location.search);
+        const urlName = params.get('name');
+        if (urlName) state.playerName = decodeURIComponent(urlName.trim());
+        else state.playerName = 'Player';
+        updateHeaderPlayerName();
+
+        mainContent.innerHTML = '<div class="idiom-batch-screen"><p style="color:var(--text-secondary);">⏳ Loading data…</p></div>';
         bottomNav.innerHTML = '';
-        await loadProverbData();
-        if (state.allProverbs.length < CONFIG.cardsPerSession) {
-            mainContent.innerHTML = `<div class="idiom-hub"><p style="color:var(--error);">❌ Need at least ${CONFIG.cardsPerSession} entries.</p></div>`;
+
+        await loadData();
+        if (state.allProverbs.length < 10) {
+            mainContent.innerHTML = `<div class="idiom-batch-screen"><p style="color:var(--error);">❌ Need at least 10 idioms.</p></div>`;
             return;
         }
-        renderHub();
+
+        renderBatchSelection();
     }
+
     initApp();
 })();
 </script>
-    <!-- ═══ BACK TO HUB — paste this in any game page ═══ -->
-<script>
-  // Reads the player name from the URL when the game loaded
-  // Works whether the name came in as ?name=Amrit or was set locally
-  function getPlayerName(){
-    // First try a local variable called playerName if the game has one
-    if(typeof playerName !== 'undefined' && playerName) return playerName;
-    // Otherwise read from the URL param
-    return decodeURIComponent(new URLSearchParams(window.location.search).get('name') || '');
-  }
-
-  function goToHub(){
-    const name = getPlayerName();
-    window.location.href = 'hub.html' + (name ? '?name=' + encodeURIComponent(name) : '');
-  }
-</script>
-
-<button
-  id="backToHubBtn"
-  onclick="goToHub()"
-  style="
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    background:#1e1e38;
-    border:2px solid #2e2e52;
-    color:#7070a0;
-    border-radius:12px;
-    padding:10px 18px;
-    font-size:0.75rem;
-    font-weight:800;
-    cursor:pointer;
-    font-family:'Segoe UI',system-ui,sans-serif;
-    transition:all .2s;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    letter-spacing:.3px;
-    z-index:9999;
-    box-shadow:0 4px 16px #00000044;
-  "
-  onmouseover="this.style.borderColor='#ff8906';this.style.color='#ff8906';"
-  onmouseout="this.style.borderColor='#2e2e52';this.style.color='#7070a0';"
->
-  ⬡ Hub
-</button>
-<!-- ═══ END BACK TO HUB ═══ -->
 </body>
 </html>
