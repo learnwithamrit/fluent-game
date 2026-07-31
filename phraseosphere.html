@@ -679,6 +679,23 @@
     line-height: 1.6;
 }
 
+.jump-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+}
+
+@media (max-width: 640px) {
+    .jump-group {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        margin-left: 0;
+        margin-top: 8px;
+    }
+}
+        
 /* ── INLINE ACCORDION ── */
 #inline-accordion .section-heading {
     background: var(--sur2);
@@ -925,13 +942,15 @@
             <!-- ── BOTTOM FILTER PILLS ── -->
             <div id="filter-pills-bottom"></div>
                     <!-- ── PAGINATION ── -->
-           <div id="pagination-controls" style="display:none; text-align:center; margin: 16px 0;">
+          <div id="pagination-controls" style="display:none; text-align:center; margin: 16px 0;">
                 <button id="btn-prev-page" class="pill-btn" onclick="goToPrevPage()">← Prev</button>
                 <span id="page-info" style="margin:0 12px; color:var(--mut); font-weight:700;">Page 1 of 1</span>
                 <button id="btn-next-page" class="pill-btn" onclick="goToNextPage()">Next →</button>
-                <label for="jump-page-select" style="color:var(--mut); font-size:var(--fs-xs); margin-left:12px;">Jump to</label>
-                <select id="jump-page-select" onchange="jumpToPage(this.value)" style="padding:10px 20px; cursor:pointer;"></select>
-            </div>
+                <span class="jump-group">
+                    <label for="jump-page-select" style="color:var(--mut); font-size:var(--fs-xs);">Jump to</label>
+                    <select id="jump-page-select" onchange="jumpToPage(this.value)"></select>
+                </span>
+        </div>
 
             <section id="topic-section" style="display: none;">
                 <button class="btn-topic-choose" onclick="openModal()">
