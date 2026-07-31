@@ -897,11 +897,11 @@
             <!-- ── BOTTOM FILTER PILLS ── -->
             <div id="filter-pills-bottom"></div>
                     <!-- ── PAGINATION ── -->
-            <div id="pagination-controls" style="display:none; text-align:center; margin: 16px 0;">
-                <button id="btn-prev-page" class="pill-btn" onclick="goToPage(currentPage-1)">← Prev</button>
+           <div id="pagination-controls" style="display:none; text-align:center; margin: 16px 0;">
+                <button id="btn-prev-page" class="pill-btn" onclick="goToPrevPage()">← Prev</button>
                 <span id="page-info" style="margin:0 12px; color:var(--mut); font-weight:700;">Page 1 of 1</span>
-                <button id="btn-next-page" class="pill-btn" onclick="goToPage(currentPage+1)">Next →</button>
-            </div>
+                <button id="btn-next-page" class="pill-btn" onclick="goToNextPage()">Next →</button>
+             </div>
 
             <section id="topic-section" style="display: none;">
                 <button class="btn-topic-choose" onclick="openModal()">
@@ -997,7 +997,7 @@
     let currentFilter = 'all';
     let currentPage = 1;
     let totalPages = 1;
-    const ITEMS_PER_PAGE = 20;   // change as needed
+    const ITEMS_PER_PAGE = 10;   // change as needed
 
     function getPlayerName() {
         if (typeof playerName !== 'undefined' && playerName) return playerName;
@@ -1171,6 +1171,14 @@
         renderFilteredView(currentFilter, currentPage);
         // scroll to top of content
         document.getElementById('content-body').scrollIntoView({ behavior: 'smooth' });
+    }
+
+        function goToPrevPage() {
+        if (currentPage > 1) goToPage(currentPage - 1);
+    }
+
+    function goToNextPage() {
+        if (currentPage < totalPages) goToPage(currentPage + 1);
     }
 
     function updatePaginationControls() {
@@ -1468,6 +1476,8 @@
     window.toggleModalCard = toggleModalCard;
     window.showComingSoon = showComingSoon;
     window.goToPage = goToPage;
+    window.goToPrevPage = goToPrevPage;
+    window.goToNextPage = goToNextPage;
     window.toggleInlineAccordion = toggleInlineAccordion;
 
     init();
