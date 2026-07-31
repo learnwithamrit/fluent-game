@@ -648,6 +648,70 @@
             flex-shrink: 0;
         }
 
+
+
+
+/* ── INLINE ACCORDION ── */
+#inline-accordion .section-heading {
+    background: var(--sur2);
+    border: 1.5px solid var(--brd);
+    border-radius: 16px;
+    padding: 14px 20px;
+    margin-bottom: 4px;
+}
+
+#inline-accordion-body {
+    display: none;
+    padding: 8px 0;
+}
+
+#inline-accordion.open #inline-accordion-body {
+    display: block;
+}
+
+#inline-accordion.open #inline-accordion-arrow {
+    transform: rotate(90deg);
+}
+
+/* Inline accordion topic buttons – same as sub-lesson-btn but dark */
+.inline-topic-btn {
+    width: 100%;
+    background: var(--sur);
+    border: 1px solid var(--brd);
+    color: var(--txt);
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 6px;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+    transition: all .2s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.inline-topic-btn:hover {
+    border-color: var(--acc);
+    background: #ff890612;
+}
+
+.inline-topic-btn.current {
+    border-color: var(--acc);
+    background: rgba(255,137,6,0.1);
+    font-weight: 900;
+}
+
+/* ── PAGINATION ── */
+#pagination-controls .pill-btn {
+    /* same as filter pills, just slightly smaller */
+    padding: 6px 14px;
+    font-size: var(--fs-xs);
+}
+
+        
         .modal-card-badge {
             position: absolute;
             top: 12px;
@@ -811,6 +875,17 @@
             <div id="header-meta"></div>
         </header>
 
+                <!-- INLINE TOPIC ACCORDION (visible from start) -->
+        <section id="inline-accordion" style="margin-bottom: var(--gap-md);">
+            <div class="section-heading" onclick="toggleInlineAccordion()" style="cursor:pointer;">
+                <span class="section-icon">🌐</span> Phraseosphere Topics
+                <span id="inline-accordion-arrow" style="margin-left:auto;transition:transform .2s;">▶</span>
+            </div>
+            <div id="inline-accordion-body">
+                <!-- populated dynamically -->
+            </div>
+        </section>
+
                 <main id="content-body">
             <!-- ── TOP FILTER PILLS & STATS ── -->
             <div id="stats-bar"></div>
@@ -821,6 +896,12 @@
 
             <!-- ── BOTTOM FILTER PILLS ── -->
             <div id="filter-pills-bottom"></div>
+                    <!-- ── PAGINATION ── -->
+            <div id="pagination-controls" style="display:none; text-align:center; margin: 16px 0;">
+                <button id="btn-prev-page" class="pill-btn" onclick="goToPage(currentPage-1)">← Prev</button>
+                <span id="page-info" style="margin:0 12px; color:var(--mut); font-weight:700;">Page 1 of 1</span>
+                <button id="btn-next-page" class="pill-btn" onclick="goToPage(currentPage+1)">Next →</button>
+            </div>
 
             <section id="topic-section" style="display: none;">
                 <button class="btn-topic-choose" onclick="openModal()">
@@ -907,440 +988,491 @@
 
     <script>
         (function() {
-            const BASE_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRf3J6Gr15efJH6zt_mEJcFf-gfjOmSYYXSAsFGJXoKZp89w3lRz72wnvRo6pwN6E_h2hdhlZb6swPc/pub?output=csv';
+    const BASE_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRf3J6Gr15efJH6zt_mEJcFf-gfjOmSYYXSAsFGJXoKZp89w3lRz72wnvRo6pwN6E_h2hdhlZb6swPc/pub?output=csv';
 
-            let allLessons = [];
-            let currentLesson = null;
-            let currentIndex = -1;
-            let allGroups = [];   // keep for filter logic
+    let allLessons = [];
+    let currentLesson = null;
+    let currentIndex = -1;
+    let allItemsFlat = [];        // { category, phrase, meaning, example }
+    let currentFilter = 'all';
+    let currentPage = 1;
+    let totalPages = 1;
+    const ITEMS_PER_PAGE = 20;   // change as needed
 
-            function getPlayerName() {
-                if (typeof playerName !== 'undefined' && playerName) return playerName;
-                return decodeURIComponent(new URLSearchParams(window.location.search).get('name') || '');
-            }
+    function getPlayerName() {
+        if (typeof playerName !== 'undefined' && playerName) return playerName;
+        return decodeURIComponent(new URLSearchParams(window.location.search).get('name') || '');
+    }
 
-            function getSheetParam() {
-                return new URLSearchParams(window.location.search).get('sheet') || '';
-            }
+    function getSheetParam() {
+        return new URLSearchParams(window.location.search).get('sheet') || '';
+    }
 
-            function getSectionParam() {
-                return new URLSearchParams(window.location.search).get('section') || '';
-            }
+    function getSectionParam() {
+        return new URLSearchParams(window.location.search).get('section') || '';
+    }
 
-            function goToHub() {
-                const name = getPlayerName();
-                window.location.href = 'hub.html' + (name ? '?name=' + encodeURIComponent(name) : '');
-            }
+    function goToHub() {
+        const name = getPlayerName();
+        window.location.href = 'hub.html' + (name ? '?name=' + encodeURIComponent(name) : '');
+    }
 
-            function goToLesson(sheetName, section = '') {
-                const name = getPlayerName();
-                let url = 'phraseosphere.html?sheet=' + encodeURIComponent(sheetName);
-                if (section) url += '&section=' + encodeURIComponent(section);
-                if (name) url += '&name=' + encodeURIComponent(name);
-                window.location.href = url;
-            }
+    function goToLesson(sheetName, section = '') {
+        const name = getPlayerName();
+        let url = 'phraseosphere.html?sheet=' + encodeURIComponent(sheetName);
+        if (section) url += '&section=' + encodeURIComponent(section);
+        if (name) url += '&name=' + encodeURIComponent(name);
+        window.location.href = url;
+    }
 
-            function goToNext() {
-                if (currentIndex >= 0 && currentIndex < allLessons.length - 1) {
-                    goToLesson(allLessons[currentIndex + 1].sheet_name);
-                }
-            }
+    function goToNext() {
+        if (currentIndex >= 0 && currentIndex < allLessons.length - 1) {
+            goToLesson(allLessons[currentIndex + 1].sheet_name);
+        }
+    }
 
-            function goToPrev() {
-                if (currentIndex > 0) {
-                    goToLesson(allLessons[currentIndex - 1].sheet_name);
-                }
-            }
+    function goToPrev() {
+        if (currentIndex > 0) {
+            goToLesson(allLessons[currentIndex - 1].sheet_name);
+        }
+    }
 
-            function scrollToSection(sectionName) {
-                const id = sectionName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                const el = document.getElementById(id);
-                if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }
+    function scrollToSection(sectionName) {
+        const id = sectionName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
 
-            function formatMeaning(text) {
-                return text.replace(/\(([^)]+)\)/g, '<span class="example-bengali">($1)</span>');
-            }
+    function formatMeaning(text) {
+        return text.replace(/\(([^)]+)\)/g, '<span class="example-bengali">($1)</span>');
+    }
 
-            function showToast(message) {
-                const existing = document.getElementById('toast');
-                if (existing) existing.remove();
-                const toast = document.createElement('div');
-                toast.id = 'toast';
-                toast.textContent = message;
-                document.body.appendChild(toast);
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        toast.style.opacity = '1';
-                        toast.style.transform = 'translateX(-50%) translateY(0)';
-                    });
-                });
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateX(-50%) translateY(10px)';
-                    setTimeout(() => toast.remove(), 300);
-                }, 2500);
-            }
+    function showToast(message) {
+        const existing = document.getElementById('toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(0)';
+            });
+        });
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(10px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 2500);
+    }
 
-            function parseCSV(text) {
-                const rows = [];
-                const lines = text.split(/\r?\n/);
-                for (const line of lines) {
-                    if (!line.trim()) continue;
-                    const cols = [];
-                    let current = '';
-                    let inQuotes = false;
-                    for (const char of line) {
-                        if (char === '"') {
-                            inQuotes = !inQuotes;
-                        } else if (char === ',' && !inQuotes) {
-                            cols.push(current.trim());
-                            current = '';
-                        } else {
-                            current += char;
-                        }
-                    }
+    // CSV parsing
+    function parseCSV(text) {
+        const rows = [];
+        const lines = text.split(/\r?\n/);
+        for (const line of lines) {
+            if (!line.trim()) continue;
+            const cols = [];
+            let current = '';
+            let inQuotes = false;
+            for (const char of line) {
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
                     cols.push(current.trim());
-                    rows.push(cols);
-                }
-                return rows;
-            }
-
-            async function fetchCSV(url) {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error('Failed to fetch ' + url);
-                const text = await res.text();
-                return parseCSV(text);
-            }
-
-            const INDEX_CACHE_KEY = 'phraseosphere_index_v1';
-            const INDEX_CACHE_TIME = 30 * 60 * 1000;
-
-            async function loadIndex(forceRefresh = false) {
-                if (!forceRefresh) {
-                    try {
-                        const cached = localStorage.getItem(INDEX_CACHE_KEY);
-                        if (cached) {
-                            const data = JSON.parse(cached);
-                            if (data.timestamp && Date.now() - data.timestamp < INDEX_CACHE_TIME) {
-                                allLessons = data.lessons;
-                                return;
-                            }
-                        }
-                    } catch (e) { /* ignore */ }
-                }
-
-                const rows = await fetchCSV(BASE_CSV);
-                let headerIdx = -1;
-                for (let i = 0; i < rows.length; i++) {
-                    if (rows[i].length >= 7 &&
-                        rows[i][0].toLowerCase().includes('order') &&
-                        rows[i][1].toLowerCase().includes('sheet')) {
-                        headerIdx = i;
-                        break;
-                    }
-                }
-                if (headerIdx === -1) throw new Error('_index header not found');
-
-                allLessons = [];
-                for (let i = headerIdx + 1; i < rows.length; i++) {
-                    const r = rows[i];
-                    if (!r[0] || r[0].trim() === '') continue;
-                    if (r.length < 7) continue;
-                    allLessons.push({
-                        order: parseInt(r[0].trim(), 10),
-                        sheet_name: r[1].trim(),
-                        gid: r[2].trim(),
-                        title: r[3].trim(),
-                        format: r[4].trim(),
-                        icon: r[5].trim(),
-                        meta_visual: r[6].trim(),
-                        meta_badges: r[7] ? r[7].trim() : '',
-                        description: r[8] ? r[8].trim() : ''
-                    });
-                }
-                allLessons.sort((a, b) => a.order - b.order);
-
-                try {
-                    localStorage.setItem(INDEX_CACHE_KEY, JSON.stringify({
-                        timestamp: Date.now(),
-                        lessons: allLessons
-                    }));
-                } catch (e) { /* storage full */ }
-            }
-
-            async function fetchLessonSheet(sheetName) {
-                const lesson = allLessons.find(l => l.sheet_name === sheetName);
-                if (!lesson) return null;
-                const csvUrl = `https://docs.google.com/spreadsheets/d/e/2PACX-1vRf3J6Gr15efJH6zt_mEJcFf-gfjOmSYYXSAsFGJXoKZp89w3lRz72wnvRo6pwN6E_h2hdhlZb6swPc/pub?gid=${lesson.gid}&single=true&output=csv`;
-                return await fetchCSV(csvUrl);
-            }
-
-            // ── FILTER FUNCTIONS ──
-                function setActiveFilter(category) {
-                document.querySelectorAll('#filter-pills .pill-btn, #filter-pills-bottom .pill-btn').forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.category === category);
-                });
-                applyFilter(category);
-            }
-
-            function applyFilter(category) {
-                // Desktop table rows
-                document.querySelectorAll('#desktop-table tbody tr').forEach(row => {
-                    if (category === 'all' || row.dataset.category === category) {
-                        row.classList.remove('filtered');
-                    } else {
-                        row.classList.add('filtered');
-                    }
-                });
-                // Mobile card sections
-                document.querySelectorAll('#mobile-cards .content-section').forEach(sec => {
-                    if (category === 'all' || sec.dataset.category === category) {
-                        sec.classList.remove('filtered');
-                    } else {
-                        sec.classList.add('filtered');
-                    }
-                });
-            }
-
-            // ── RENDER LESSON (extended with pills) ──
-            function renderLesson(lesson, dataRows) {
-                // Header
-                document.getElementById('header-visual').textContent = lesson.meta_visual || '💬';
-                document.getElementById('header-title').textContent = lesson.title;
-                document.getElementById('header-subtitle').textContent = lesson.description || '';
-                const metaDiv = document.getElementById('header-meta');
-                metaDiv.innerHTML = '';
-                if (lesson.meta_badges) {
-                    lesson.meta_badges.split(',').forEach(b => {
-                        const span = document.createElement('span');
-                        span.className = 'meta-badge';
-                        span.textContent = b.trim();
-                        metaDiv.appendChild(span);
-                    });
-                }
-
-                document.getElementById('topic-section').style.display = 'block';
-
-                // Group rows by category
-                const groups = [];
-                let currentGroup = null;
-                for (const row of dataRows) {
-                    if (row.length < 4) continue;
-                    const category = row[0].trim();
-                    const phrase = row[1].trim();
-                    const meaning = row[2].trim();
-                    const example = row[3].trim();
-                    if (!category || !phrase || !meaning) continue;
-
-                    if (!currentGroup || currentGroup.name !== category) {
-                        currentGroup = { name: category, items: [] };
-                        groups.push(currentGroup);
-                    }
-                    currentGroup.items.push({ phrase, meaning, example });
-                }
-                allGroups = groups;
-
-                // ── BUILD STATS & PILLS ──
-                const totalIdioms = groups.reduce((sum, g) => sum + g.items.length, 0);
-                const totalCats = groups.length;
-                document.getElementById('stats-bar').innerHTML = `<span>📊 Total Idioms: <strong>${totalIdioms}</strong></span> <span>📂 Categories: <strong>${totalCats}</strong></span>`;
-
-                // Helper to create a pill button quickly
-                function createPill(text, category, isActive = false) {
-                    const pill = document.createElement('button');
-                    pill.className = 'pill-btn' + (isActive ? ' active' : '');
-                    pill.textContent = text;
-                    pill.dataset.category = category;
-                    pill.addEventListener('click', () => setActiveFilter(category));
-                    return pill;
-                }
-
-                // ── Top pills ──
-                const pillContainer = document.getElementById('filter-pills');
-                pillContainer.innerHTML = '';
-                pillContainer.appendChild(createPill('All', 'all', true));
-                groups.forEach(g => {
-                    pillContainer.appendChild(createPill(g.name, g.name));
-                });
-
-                // ── Bottom pills (identical) ──
-                const pillContainerBottom = document.getElementById('filter-pills-bottom');
-                if (pillContainerBottom) {
-                    pillContainerBottom.innerHTML = '';
-                    pillContainerBottom.appendChild(createPill('All', 'all', true));
-                    groups.forEach(g => {
-                        pillContainerBottom.appendChild(createPill(g.name, g.name));
-                    });
-                }
-
-                // Desktop table with data-category
-                const tableDiv = document.getElementById('desktop-table');
-                tableDiv.innerHTML = '';
-                if (groups.length > 0) {
-                    const table = document.createElement('table');
-                    table.className = 'desktop-table';
-                    table.innerHTML = `
-                        <thead><tr>
-                            <th>Phrase</th><th>Meaning</th><th>Example</th>
-                        </tr></thead><tbody></tbody>`;
-                    const tbody = table.querySelector('tbody');
-                    groups.forEach(group => {
-                        group.items.forEach(item => {
-                            const tr = document.createElement('tr');
-                            tr.dataset.category = group.name;
-                            const tdPhrase = document.createElement('td');
-                            tdPhrase.className = 'phrase-cell';
-                            tdPhrase.textContent = item.phrase;
-                            const tdMeaning = document.createElement('td');
-                            tdMeaning.innerHTML = formatMeaning(item.meaning);
-                            const tdExample = document.createElement('td');
-                            tdExample.textContent = item.example;
-                            tdExample.style.fontStyle = 'italic';
-                            tdExample.style.color = 'var(--ex-usage)';
-                            tr.appendChild(tdPhrase);
-                            tr.appendChild(tdMeaning);
-                            tr.appendChild(tdExample);
-                            tbody.appendChild(tr);
-                        });
-                    });
-                    tableDiv.appendChild(table);
-                }
-
-                // Mobile cards with data-category on sections
-                const mobileDiv = document.getElementById('mobile-cards');
-                mobileDiv.innerHTML = '';
-                groups.forEach(group => {
-                    const section = document.createElement('section');
-                    section.className = 'content-section';
-                    section.dataset.category = group.name;
-                    const slug = group.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                    section.innerHTML = `
-                        <h2 class="section-heading" id="${slug}">
-                            <span class="section-icon">📌</span> ${group.name}
-                        </h2>`;
-                    group.items.forEach(item => {
-                        const card = document.createElement('div');
-                        card.className = 'example-card';
-                        card.innerHTML = `
-                            <div class="example-phrase">${item.phrase}</div>
-                            <div class="example-meaning">${formatMeaning(item.meaning)}</div>
-                            <div class="example-usage">"${item.example}"</div>`;
-                        section.appendChild(card);
-                    });
-                    mobileDiv.appendChild(section);
-                });
-
-                // apply initial 'all' filter
-                applyFilter('all');
-
-                // scroll to section if param present
-                const sectionParam = getSectionParam();
-                if (sectionParam) {
-                    setTimeout(() => scrollToSection(sectionParam), 300);
+                    current = '';
+                } else {
+                    current += char;
                 }
             }
+            cols.push(current.trim());
+            rows.push(cols);
+        }
+        return rows;
+    }
 
-            function updateNavButtons() {
-                const prevBtn = document.getElementById('btn-prev');
-                const nextBtn = document.getElementById('btn-next');
-                prevBtn.disabled = currentIndex <= 0;
-                nextBtn.disabled = currentIndex >= allLessons.length - 1;
-            }
+    async function fetchCSV(url) {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Failed to fetch ' + url);
+        const text = await res.text();
+        return parseCSV(text);
+    }
 
-            function populatePhraseosphereAccordion() {
-                const container = document.getElementById('accordion-phraseosphere');
-                if (!container) return;
-                container.innerHTML = '';
-                if (allLessons.length === 0) {
-                    container.innerHTML = '<p style="font-size:0.7rem;opacity:0.6;padding:8px 0;">Loading…</p>';
-                    return;
-                }
-                allLessons.forEach(lesson => {
-                    const btn = document.createElement('button');
-                    btn.className = 'sub-lesson-btn';
-                    if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) {
-                        btn.classList.add('current');
-                    }
-                    btn.innerHTML = `<span class="sub-icon">${lesson.icon || '📄'}</span> ${lesson.title}`;
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        closeModal();
-                        if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) return;
-                        goToLesson(lesson.sheet_name);
-                    });
-                    container.appendChild(btn);
-                });
-            }
+    const INDEX_CACHE_KEY = 'phraseosphere_index_v1';
+    const INDEX_CACHE_TIME = 30 * 60 * 1000;
 
-            function openModal() {
-                document.getElementById('topic-modal').classList.add('active');
-                populatePhraseosphereAccordion();
-                document.getElementById('modal-card-phraseosphere').classList.add('expanded');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeModal() {
-                document.getElementById('topic-modal').classList.remove('active');
-                document.body.style.overflow = '';
-            }
-
-            function toggleModalCard(cardId) {
-                const card = document.getElementById(cardId);
-                if (!card) return;
-                const isOpen = card.classList.contains('expanded');
-                document.querySelectorAll('.modal-topic-card.expanded').forEach(c => c.classList.remove('expanded'));
-                if (!isOpen) card.classList.add('expanded');
-            }
-
-            function showComingSoon(topicName) {
-                showToast(topicName + ' is coming soon! 🌟');
-            }
-
-            async function init() {
-                try {
-                    const sheetName = getSheetParam();
-                    await loadIndex();
-
-                    if (!sheetName && allLessons.length > 0) {
-                        goToLesson(allLessons[0].sheet_name);
+    async function loadIndex(forceRefresh = false) {
+        if (!forceRefresh) {
+            try {
+                const cached = localStorage.getItem(INDEX_CACHE_KEY);
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    if (data.timestamp && Date.now() - data.timestamp < INDEX_CACHE_TIME) {
+                        allLessons = data.lessons;
                         return;
                     }
-
-                    currentLesson = allLessons.find(l => l.sheet_name === sheetName);
-                    if (!currentLesson) {
-                        document.getElementById('header-title').textContent = 'Lesson not found';
-                        return;
-                    }
-                    currentIndex = allLessons.indexOf(currentLesson);
-                    updateNavButtons();
-
-                    const dataRows = await fetchLessonSheet(sheetName);
-                    if (dataRows) {
-                        renderLesson(currentLesson, dataRows);
-                    } else {
-                        document.getElementById('header-title').textContent = 'No data found for this lesson';
-                    }
-
-                    populatePhraseosphereAccordion();
-                } catch (err) {
-                    console.error(err);
-                    document.getElementById('header-title').textContent = 'Error loading lesson';
                 }
+            } catch (e) {}
+        }
+
+        const rows = await fetchCSV(BASE_CSV);
+        let headerIdx = -1;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].length >= 7 &&
+                rows[i][0].toLowerCase().includes('order') &&
+                rows[i][1].toLowerCase().includes('sheet')) {
+                headerIdx = i;
+                break;
+            }
+        }
+        if (headerIdx === -1) throw new Error('_index header not found');
+
+        allLessons = [];
+        for (let i = headerIdx + 1; i < rows.length; i++) {
+            const r = rows[i];
+            if (!r[0] || r[0].trim() === '') continue;
+            if (r.length < 7) continue;
+            allLessons.push({
+                order: parseInt(r[0].trim(), 10),
+                sheet_name: r[1].trim(),
+                gid: r[2].trim(),
+                title: r[3].trim(),
+                format: r[4].trim(),
+                icon: r[5].trim(),
+                meta_visual: r[6].trim(),
+                meta_badges: r[7] ? r[7].trim() : '',
+                description: r[8] ? r[8].trim() : ''
+            });
+        }
+        allLessons.sort((a, b) => a.order - b.order);
+
+        try {
+            localStorage.setItem(INDEX_CACHE_KEY, JSON.stringify({
+                timestamp: Date.now(),
+                lessons: allLessons
+            }));
+        } catch (e) {}
+    }
+
+    async function fetchLessonSheet(sheetName) {
+        const lesson = allLessons.find(l => l.sheet_name === sheetName);
+        if (!lesson) return null;
+        const csvUrl = `https://docs.google.com/spreadsheets/d/e/2PACX-1vRf3J6Gr15efJH6zt_mEJcFf-gfjOmSYYXSAsFGJXoKZp89w3lRz72wnvRo6pwN6E_h2hdhlZb6swPc/pub?gid=${lesson.gid}&single=true&output=csv`;
+        return await fetchCSV(csvUrl);
+    }
+
+    // ── PAGINATION LOGIC ──
+    function goToPage(page) {
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        renderFilteredView(currentFilter, currentPage);
+        // scroll to top of content
+        document.getElementById('content-body').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function updatePaginationControls() {
+        const ctr = document.getElementById('pagination-controls');
+        if (!ctr) return;
+        const info = document.getElementById('page-info');
+        const prevBtn = document.getElementById('btn-prev-page');
+        const nextBtn = document.getElementById('btn-next-page');
+
+        if (totalPages <= 1) {
+            ctr.style.display = 'none';
+        } else {
+            ctr.style.display = 'block';
+            info.textContent = `Page ${currentPage} of ${totalPages}`;
+            prevBtn.disabled = currentPage <= 1;
+            nextBtn.disabled = currentPage >= totalPages;
+        }
+    }
+
+    function setActiveFilter(category) {
+        currentFilter = category;
+        currentPage = 1;  // reset to first page on filter change
+        document.querySelectorAll('#filter-pills .pill-btn, #filter-pills-bottom .pill-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.category === category);
+        });
+        renderFilteredView(category, 1);
+    }
+
+    function renderFilteredView(filterCat, page) {
+        // Filter items
+        let filteredItems = filterCat === 'all' 
+            ? allItemsFlat 
+            : allItemsFlat.filter(item => item.category === filterCat);
+
+        totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+        if (totalPages < 1) totalPages = 1;
+        if (page > totalPages) page = totalPages;
+        currentPage = page;
+
+        // Slice for current page
+        const start = (page - 1) * ITEMS_PER_PAGE;
+        const pageItems = filteredItems.slice(start, start + ITEMS_PER_PAGE);
+
+        // Rebuild desktop table
+        const tableDiv = document.getElementById('desktop-table');
+        tableDiv.innerHTML = '';
+        if (pageItems.length > 0) {
+            const table = document.createElement('table');
+            table.className = 'desktop-table';
+            table.innerHTML = `
+                <thead><tr>
+                    <th>Phrase</th><th>Meaning</th><th>Example</th>
+                </tr></thead><tbody></tbody>`;
+            const tbody = table.querySelector('tbody');
+            pageItems.forEach(item => {
+                const tr = document.createElement('tr');
+                const tdPhrase = document.createElement('td');
+                tdPhrase.className = 'phrase-cell';
+                tdPhrase.textContent = item.phrase;
+                const tdMeaning = document.createElement('td');
+                tdMeaning.innerHTML = formatMeaning(item.meaning);
+                const tdExample = document.createElement('td');
+                tdExample.textContent = item.example;
+                tdExample.style.fontStyle = 'italic';
+                tdExample.style.color = 'var(--ex-usage)';
+                tr.appendChild(tdPhrase);
+                tr.appendChild(tdMeaning);
+                tr.appendChild(tdExample);
+                tbody.appendChild(tr);
+            });
+            tableDiv.appendChild(table);
+        }
+
+        // Rebuild mobile cards
+        const mobileDiv = document.getElementById('mobile-cards');
+        mobileDiv.innerHTML = '';
+        // Group pageItems by category (only the ones present)
+        const pageGroups = {};
+        pageItems.forEach(item => {
+            if (!pageGroups[item.category]) pageGroups[item.category] = [];
+            pageGroups[item.category].push(item);
+        });
+        for (const [cat, items] of Object.entries(pageGroups)) {
+            const section = document.createElement('section');
+            section.className = 'content-section';
+            const slug = cat.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            section.innerHTML = `
+                <h2 class="section-heading" id="${slug}">
+                    <span class="section-icon">📌</span> ${cat}
+                </h2>`;
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'example-card';
+                card.innerHTML = `
+                    <div class="example-phrase">${item.phrase}</div>
+                    <div class="example-meaning">${formatMeaning(item.meaning)}</div>
+                    <div class="example-usage">"${item.example}"</div>`;
+                section.appendChild(card);
+            });
+            mobileDiv.appendChild(section);
+        }
+
+        updatePaginationControls();
+    }
+
+    // ── RENDER LESSON (builds pills, stores data, populates inline accordion) ──
+    function renderLesson(lesson, dataRows) {
+        // Header
+        document.getElementById('header-visual').textContent = lesson.meta_visual || '💬';
+        document.getElementById('header-title').textContent = lesson.title;
+        document.getElementById('header-subtitle').textContent = lesson.description || '';
+        const metaDiv = document.getElementById('header-meta');
+        metaDiv.innerHTML = '';
+        if (lesson.meta_badges) {
+            lesson.meta_badges.split(',').forEach(b => {
+                const span = document.createElement('span');
+                span.className = 'meta-badge';
+                span.textContent = b.trim();
+                metaDiv.appendChild(span);
+            });
+        }
+        document.getElementById('topic-section').style.display = 'block';
+
+        // Build flat item list
+        allItemsFlat = [];
+        const groups = [];
+        let currentGroup = null;
+        for (const row of dataRows) {
+            if (row.length < 4) continue;
+            const category = row[0].trim();
+            const phrase = row[1].trim();
+            const meaning = row[2].trim();
+            const example = row[3].trim();
+            if (!category || !phrase || !meaning) continue;
+
+            allItemsFlat.push({ category, phrase, meaning, example });
+
+            if (!currentGroup || currentGroup.name !== category) {
+                currentGroup = { name: category, items: [] };
+                groups.push(currentGroup);
+            }
+            currentGroup.items.push({ phrase, meaning, example });
+        }
+
+        // Stats bar
+        const totalIdioms = allItemsFlat.length;
+        const totalCats = groups.length;
+        document.getElementById('stats-bar').innerHTML = `<span>📊 Total Idioms: <strong>${totalIdioms}</strong></span> <span>📂 Categories: <strong>${totalCats}</strong></span>`;
+
+        // Helper to create pill buttons
+        function createPill(text, category, isActive = false) {
+            const pill = document.createElement('button');
+            pill.className = 'pill-btn' + (isActive ? ' active' : '');
+            pill.textContent = text;
+            pill.dataset.category = category;
+            pill.addEventListener('click', () => setActiveFilter(category));
+            return pill;
+        }
+
+        // Top pills
+        const pillContainer = document.getElementById('filter-pills');
+        pillContainer.innerHTML = '';
+        pillContainer.appendChild(createPill('All', 'all', true));
+        groups.forEach(g => pillContainer.appendChild(createPill(g.name, g.name)));
+
+        // Bottom pills
+        const pillContainerBottom = document.getElementById('filter-pills-bottom');
+        if (pillContainerBottom) {
+            pillContainerBottom.innerHTML = '';
+            pillContainerBottom.appendChild(createPill('All', 'all', true));
+            groups.forEach(g => pillContainerBottom.appendChild(createPill(g.name, g.name)));
+        }
+
+        // Populate inline accordion (all subtopics)
+        const accBody = document.getElementById('inline-accordion-body');
+        accBody.innerHTML = '';
+        allLessons.forEach(lsn => {
+            const btn = document.createElement('button');
+            btn.className = 'inline-topic-btn';
+            if (currentLesson && lsn.sheet_name === currentLesson.sheet_name) {
+                btn.classList.add('current');
+            }
+            btn.innerHTML = `<span class="sub-icon">${lsn.icon || '📄'}</span> ${lsn.title}`;
+            btn.addEventListener('click', () => {
+                if (currentLesson && lsn.sheet_name === currentLesson.sheet_name) return;
+                goToLesson(lsn.sheet_name);
+            });
+            accBody.appendChild(btn);
+        });
+
+        // Initially open the inline accordion
+        document.getElementById('inline-accordion').classList.add('open');
+
+        // Initial render
+        setActiveFilter('all');
+    }
+
+    // Inline accordion toggle
+    function toggleInlineAccordion() {
+        document.getElementById('inline-accordion').classList.toggle('open');
+    }
+
+    function updateNavButtons() {
+        const prevBtn = document.getElementById('btn-prev');
+        const nextBtn = document.getElementById('btn-next');
+        prevBtn.disabled = currentIndex <= 0;
+        nextBtn.disabled = currentIndex >= allLessons.length - 1;
+    }
+
+    function populatePhraseosphereAccordion() {
+        const container = document.getElementById('accordion-phraseosphere');
+        if (!container) return;
+        container.innerHTML = '';
+        if (allLessons.length === 0) {
+            container.innerHTML = '<p style="font-size:0.7rem;opacity:0.6;padding:8px 0;">Loading…</p>';
+            return;
+        }
+        allLessons.forEach(lesson => {
+            const btn = document.createElement('button');
+            btn.className = 'sub-lesson-btn';
+            if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) btn.classList.add('current');
+            btn.innerHTML = `<span class="sub-icon">${lesson.icon || '📄'}</span> ${lesson.title}`;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeModal();
+                if (currentLesson && lesson.sheet_name === currentLesson.sheet_name) return;
+                goToLesson(lesson.sheet_name);
+            });
+            container.appendChild(btn);
+        });
+    }
+
+    function openModal() {
+        document.getElementById('topic-modal').classList.add('active');
+        populatePhraseosphereAccordion();
+        document.getElementById('modal-card-phraseosphere').classList.add('expanded');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        document.getElementById('topic-modal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function toggleModalCard(cardId) {
+        const card = document.getElementById(cardId);
+        if (!card) return;
+        const isOpen = card.classList.contains('expanded');
+        document.querySelectorAll('.modal-topic-card.expanded').forEach(c => c.classList.remove('expanded'));
+        if (!isOpen) card.classList.add('expanded');
+    }
+
+    function showComingSoon(topicName) {
+        showToast(topicName + ' is coming soon! 🌟');
+    }
+
+    async function init() {
+        try {
+            const sheetName = getSheetParam();
+            await loadIndex();
+
+            if (!sheetName && allLessons.length > 0) {
+                goToLesson(allLessons[0].sheet_name);
+                return;
             }
 
-            window.goToHub = goToHub;
-            window.goToNext = goToNext;
-            window.goToPrev = goToPrev;
-            window.openModal = openModal;
-            window.closeModal = closeModal;
-            window.toggleModalCard = toggleModalCard;
-            window.showComingSoon = showComingSoon;
+            currentLesson = allLessons.find(l => l.sheet_name === sheetName);
+            if (!currentLesson) {
+                document.getElementById('header-title').textContent = 'Lesson not found';
+                return;
+            }
+            currentIndex = allLessons.indexOf(currentLesson);
+            updateNavButtons();
 
-            init();
-        })();
+            const dataRows = await fetchLessonSheet(sheetName);
+            if (dataRows) {
+                renderLesson(currentLesson, dataRows);
+            } else {
+                document.getElementById('header-title').textContent = 'No data found for this lesson';
+            }
+
+            populatePhraseosphereAccordion();
+        } catch (err) {
+            console.error(err);
+            document.getElementById('header-title').textContent = 'Error loading lesson';
+        }
+    }
+
+    // Expose needed functions globally
+    window.goToHub = goToHub;
+    window.goToNext = goToNext;
+    window.goToPrev = goToPrev;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.toggleModalCard = toggleModalCard;
+    window.showComingSoon = showComingSoon;
+    window.goToPage = goToPage;
+    window.toggleInlineAccordion = toggleInlineAccordion;
+
+    init();
+})();
+        
     </script>
 </body>
 </html>
