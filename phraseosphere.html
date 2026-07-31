@@ -718,37 +718,6 @@
     transform: rotate(90deg);
 }
 
-/* Inline accordion topic buttons – same as sub-lesson-btn but dark */
-.inline-topic-btn {
-    width: 100%;
-    background: var(--sur);
-    border: 1px solid var(--brd);
-    color: var(--txt);
-    border-radius: 10px;
-    padding: 10px 16px;
-    margin-bottom: 6px;
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    cursor: pointer;
-    text-align: left;
-    transition: all .2s;
-    font-family: inherit;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.inline-topic-btn:hover {
-    border-color: var(--acc);
-    background: #ff890612;
-}
-
-.inline-topic-btn.current {
-    border-color: var(--acc);
-    background: rgba(255,137,6,0.1);
-    font-weight: 900;
-}
-
 /* ── PAGINATION ── */
 #pagination-controls .pill-btn {
     /* same as filter pills, just slightly smaller */
@@ -920,18 +889,8 @@
             <div id="header-meta"></div>
         </header>
 
-                <!-- INLINE TOPIC ACCORDION (visible from start) -->
-        <section id="inline-accordion" style="margin-bottom: var(--gap-md);">
-            <div class="section-heading" onclick="toggleInlineAccordion()" style="cursor:pointer;">
-                <span class="section-icon">🌐</span> Phraseosphere Topics
-                <span id="inline-accordion-arrow" style="margin-left:auto;transition:transform .2s;">▶</span>
-            </div>
-            <div id="inline-accordion-body">
-                <!-- populated dynamically -->
-            </div>
-        </section>
 
-                <main id="content-body">
+            <main id="content-body">
             <!-- ── TOP FILTER PILLS & STATS ── -->
             <div id="stats-bar"></div>
             <div id="filter-pills"></div>
@@ -1415,35 +1374,10 @@ if (jumpSelect) {
             pillContainerBottom.appendChild(createPill('All', 'all', true));
             groups.forEach(g => pillContainerBottom.appendChild(createPill(g.name, g.name)));
         }
-
-        // Populate inline accordion (all subtopics)
-        const accBody = document.getElementById('inline-accordion-body');
-        accBody.innerHTML = '';
-        allLessons.forEach(lsn => {
-            const btn = document.createElement('button');
-            btn.className = 'inline-topic-btn';
-            if (currentLesson && lsn.sheet_name === currentLesson.sheet_name) {
-                btn.classList.add('current');
-            }
-            btn.innerHTML = `<span class="sub-icon">${lsn.icon || '📄'}</span> ${lsn.title}`;
-            btn.addEventListener('click', () => {
-                if (currentLesson && lsn.sheet_name === currentLesson.sheet_name) return;
-                goToLesson(lsn.sheet_name);
-            });
-            accBody.appendChild(btn);
-        });
-
-        // Initially open the inline accordion
-        document.getElementById('inline-accordion').classList.add('open');
-
         // Initial render
         setActiveFilter('all');
     }
 
-    // Inline accordion toggle
-    function toggleInlineAccordion() {
-        document.getElementById('inline-accordion').classList.toggle('open');
-    }
 
     function updateNavButtons() {
         const prevBtn = document.getElementById('btn-prev');
@@ -1543,7 +1477,6 @@ if (jumpSelect) {
     window.goToPrevPage = goToPrevPage;
     window.goToNextPage = goToNextPage;
      window.jumpToPage = jumpToPage;
-    window.toggleInlineAccordion = toggleInlineAccordion;
 
     init();
 })();
