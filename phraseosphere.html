@@ -649,7 +649,33 @@
         }
 
 
+#jump-page-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: var(--sur2);
+    border: 1.5px solid var(--brd);
+    color: var(--mut);
+    border-radius: 50px;
+    padding: 6px 12px;
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    cursor: pointer;
+    outline: none;
+    text-align: center;
+    font-family: inherit;
+}
 
+#jump-page-select:hover {
+    border-color: var(--acc);
+    color: var(--acc);
+}
+
+#jump-page-select option {
+    background: var(--sur2);
+    color: var(--txt);
+    font-weight: 700;
+}
 
 /* ── INLINE ACCORDION ── */
 #inline-accordion .section-heading {
@@ -901,7 +927,9 @@
                 <button id="btn-prev-page" class="pill-btn" onclick="goToPrevPage()">← Prev</button>
                 <span id="page-info" style="margin:0 12px; color:var(--mut); font-weight:700;">Page 1 of 1</span>
                 <button id="btn-next-page" class="pill-btn" onclick="goToNextPage()">Next →</button>
-             </div>
+                <label for="jump-page-select" style="color:var(--mut); font-size:var(--fs-xs); margin-left:12px;">Jump to</label>
+                <select id="jump-page-select" onchange="jumpToPage(this.value)" style="padding:6px 10px; cursor:pointer;"></select>
+            </div>
 
             <section id="topic-section" style="display: none;">
                 <button class="btn-topic-choose" onclick="openModal()">
@@ -1181,6 +1209,10 @@
         if (currentPage < totalPages) goToPage(currentPage + 1);
     }
 
+     function jumpToPage(page) {
+ goToPage(parseInt(page, 10));
+    }
+
     function updatePaginationControls() {
         const ctr = document.getElementById('pagination-controls');
         if (!ctr) return;
@@ -1195,6 +1227,17 @@
             info.textContent = `Page ${currentPage} of ${totalPages}`;
             prevBtn.disabled = currentPage <= 1;
             nextBtn.disabled = currentPage >= totalPages;
+            const jumpSelect = document.getElementById('jump-page-select');
+if (jumpSelect) {
+    jumpSelect.innerHTML = '';
+    for (let p = 1; p <= totalPages; p++) {
+        const option = document.createElement('option');
+        option.value = p;
+        option.textContent = p;
+        if (p === currentPage) option.selected = true;
+        jumpSelect.appendChild(option);
+    }
+}
         }
     }
 
@@ -1478,6 +1521,7 @@
     window.goToPage = goToPage;
     window.goToPrevPage = goToPrevPage;
     window.goToNextPage = goToNextPage;
+     window.jumpToPage = jumpToPage;
     window.toggleInlineAccordion = toggleInlineAccordion;
 
     init();
