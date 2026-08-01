@@ -234,6 +234,126 @@
             font-size: 0.85rem; font-weight: 500; text-align: center;
             max-width: 300px; margin: 0 auto;
         }
+
+ /*---------------------------------------------------------------------------------- The green goblin---------------------------------------------------------------------------*/
+
+
+/* Full‑app green flash */
+.idiom-app.correct-flash {
+    animation: appFlashGreen 0.6s ease-out;
+}
+.idiom-hint-text {
+    color: var(--error);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+    min-height: 20px;
+    margin-top: 4px;
+}
+        /* Quiz – wider options */
+@media (min-width: 768px) {
+    .idiom-quiz-card { max-width: 600px; }
+    .idiom-options-list { max-width: 600px; }
+    .idiom-option-btn { padding: 16px 20px; font-size: 1rem; }
+}
+
+@media (min-width: 1200px) {
+    .idiom-quiz-card { max-width: 750px; }
+    .idiom-options-list { max-width: 750px; }
+    .idiom-option-btn { padding: 18px 24px; font-size: 1.1rem; }
+}
+
+@media (min-width: 1200px) {
+    .idiom-header-item { font-size: 0.85rem; }
+    .idiom-header-item .value { font-size: 0.9rem; }
+    .idiom-btn { padding: 16px 28px; font-size: 1.05rem; }
+}
+
+@keyframes appFlashGreen {
+    0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.6), inset 0 0 0 0 rgba(16,185,129,0.4); }
+    40%  { box-shadow: 0 0 30px 10px rgba(16,185,129,0.5), inset 0 0 40px 10px rgba(16,185,129,0.25); }
+    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0), inset 0 0 0 0 rgba(16,185,129,0); }
+}
+
+        
+/* ── Overlay — full screen, sits above everything ── */
+#correct-overlay {
+  position: fixed;
+  inset: 0;                        /* covers top, right, bottom, left */
+  z-index: 99999;                  /* above all game UI */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;            /* never blocks taps/clicks */
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Active state — JS adds this class to show it */
+#correct-overlay.active {
+  opacity: 1;
+  pointer-events: none;            /* still never blocks interaction */
+}
+
+/* ── Green card in the centre ── */
+#correct-card {
+  background: linear-gradient(145deg, #06d6a0 0%, #04b887 100%);
+  border-radius: 28px;
+  padding: 48px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow:
+    0 0 0 9999px rgba(6, 214, 160, 0.22),   /* full-screen green tint */
+    0 24px 64px rgba(6, 214, 160, 0.55),     /* card glow */
+    0 8px 24px rgba(0, 0, 0, 0.4);           /* card shadow */
+  transform: scale(0.75);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  min-width: 260px;
+  max-width: 88vw;
+  text-align: center;
+}
+
+/* Card pops into position when overlay is active */
+#correct-overlay.active #correct-card {
+  transform: scale(1);
+}
+
+/* ── Tick icon ── */
+#correct-icon {
+  font-size: clamp(2.8rem, 10vw, 4.5rem);
+  font-weight: 900;
+  color: #0d0d1a;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25));
+}
+
+/* ── CORRECT text ── */
+#correct-word {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: clamp(1.6rem, 6vw, 3rem);
+  font-weight: 900;
+  color: #0d0d1a;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+/* ── Responsive tweaks ── */
+@media (max-width: 380px) {
+  #correct-card { padding: 36px 32px; border-radius: 22px; }
+}
+@media (min-width: 1024px) {
+  #correct-card { padding: 56px 72px; border-radius: 32px; }
+}
+        
+        
+/*--------------------------------------------------------------- The green goblin end-----------------------------------------------------------------------------*/
+
+        
     </style>
 </head>
 <body>
@@ -262,7 +382,14 @@
         </div>
     </div>
 </div>
-
+<!-- ----------------------------------------Celebration ----------------------------------------------->
+<div id="correct-overlay" aria-live="assertive" aria-label="Correct!">
+  <div id="correct-card">
+    <div id="correct-icon">✓</div>
+    <div id="correct-word">CORRECT</div>
+  </div>
+</div>
+<!-- ----------------------------------------Celebration End ----------------------------------------------->
 <script>
 (function() {
     // ---------- CONFIG ----------
@@ -357,6 +484,25 @@
         setTimeout(() => overlay.classList.remove('active'), 900);
     }
 
+
+    /* ── showCorrect() ──
+   Call this function the moment a correct
+   answer is confirmed. It runs entirely by
+   itself — no arguments, no cleanup needed. */
+function showCorrect(){
+  const overlay = document.getElementById('correct-overlay');
+
+  // Show
+  overlay.classList.add('active');
+
+  // Hide after 900ms — fades out over 150ms
+  setTimeout(() => {
+    overlay.classList.remove('active');
+  }, 900);
+}
+
+
+    
     // ---------- DATA LOADING ----------
     function parseCSV(txt) {
         const rows = [];
@@ -690,5 +836,52 @@
     initApp();
 })();
 </script>
+     <!-- ═══ BACK TO HUB — paste this in any game page ═══ -->
+<script>
+  // Reads the player name from the URL when the game loaded
+  // Works whether the name came in as ?name=Amrit or was set locally
+  function getPlayerName(){
+    // First try a local variable called playerName if the game has one
+    if(typeof playerName !== 'undefined' && playerName) return playerName;
+    // Otherwise read from the URL param
+    return decodeURIComponent(new URLSearchParams(window.location.search).get('name') || '');
+  }
+
+  function goToHub(){
+    const name = getPlayerName();
+    window.location.href = 'hub.html' + (name ? '?name=' + encodeURIComponent(name) : '');
+  }
+</script>
+
+<button
+  id="backToHubBtn"
+  onclick="goToHub()"
+  style="
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#1e1e38;
+    border:2px solid #2e2e52;
+    color:#7070a0;
+    border-radius:12px;
+    padding:10px 18px;
+    font-size:0.75rem;
+    font-weight:800;
+    cursor:pointer;
+    font-family:'Segoe UI',system-ui,sans-serif;
+    transition:all .2s;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    letter-spacing:.3px;
+    z-index:9999;
+    box-shadow:0 4px 16px #00000044;
+  "
+  onmouseover="this.style.borderColor='#ff8906';this.style.color='#ff8906';"
+  onmouseout="this.style.borderColor='#2e2e52';this.style.color='#7070a0';"
+>
+  ⬡ Hub
+</button>
+<!-- ═══ END BACK TO HUB ═══ -->
 </body>
 </html>
