@@ -1040,16 +1040,6 @@ function setupMegaStoryUI(story) {
     // Update navigation buttons (Prev/Next/Finish)
     updateMegaButtons();
 }
-    const partSelectTop = document.getElementById('partSelectTop');
-    const partSelectBottom = document.getElementById('partSelectBottom');
-    partSelectTop.innerHTML = '';
-    partSelectBottom.innerHTML = '';
-
-    if (megaParts.length === 0) {
-        // Fallback: no parts loaded
-        document.getElementById('content-body').innerHTML = '<p>Error loading story parts.</p>';
-        return;
-    }
 
     // Populate dropdowns with part numbers / titles
     megaParts.forEach((part, idx) => {
