@@ -1026,13 +1026,20 @@ async function loadMegaStoryParts(gid) {
 
 //-_-_-_-----------------------Mega Story Design------------------------_-_______//
 
-        function setupMegaStoryUI(story) {
-    // Show mega controls
+function setupMegaStoryUI(story) {
+    // Show the mega story controls (where the accordions live)
     document.getElementById('megaStoryControls').style.display = 'block';
     document.getElementById('megaStoryControlsBottom').style.display = 'block';
+
+    // Build both accordions (top and bottom)
     buildAccordion();
+
+    // Load the first part (currentPartIndex is already 0 from startStory)
     loadCurrentPart();
+
+    // Update navigation buttons (Prev/Next/Finish)
     updateMegaButtons();
+}
     const partSelectTop = document.getElementById('partSelectTop');
     const partSelectBottom = document.getElementById('partSelectBottom');
     partSelectTop.innerHTML = '';
