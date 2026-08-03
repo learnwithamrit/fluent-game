@@ -1846,6 +1846,7 @@ document.getElementById('finishStory').addEventListener('click', () => {
 
 // Next story
 document.getElementById('nextStory').addEventListener('click', () => {
+    if (isMegaStory) return;
     if (currentStories.length === 0) return;
     const nextIndex = currentStoryIndex + 1;
     if (nextIndex < currentStories.length) {
