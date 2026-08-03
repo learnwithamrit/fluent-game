@@ -150,7 +150,7 @@
     flex-direction: column;
     gap: 1px;
     margin-bottom: 30px;
-    max-width: 70%;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
     cursor: pointer;
@@ -165,7 +165,27 @@
         margin-right: auto;
     }
 }
-
+@media (min-width: 900px) {
+    .story-wrapper {
+        max-width: 85%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+@media (min-width: 1200px) {
+    .story-wrapper {
+        max-width: 75%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+@media (min-width: 1400px) {
+    .story-wrapper {
+        max-width: 70%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
 /* Top info card */
 .story-info-card {
     border-radius: 32px;
