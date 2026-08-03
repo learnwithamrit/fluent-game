@@ -1074,8 +1074,10 @@ async function loadMegaStoryParts(gid) {
 
 function loadCurrentPart() {
     const part = megaParts[currentPartIndex];
+
     // Update part title display
-    document.getElementById('currentPartTitle').textContent = part.title || `Part ${part.part}`;
+    document.getElementById('currentPartTitle').textContent = 
+        part.title ? `${part.chapter || ''} – Part ${part.part}: ${part.title}` : `Part ${part.part}`;
 
     // Insert story text with vocabulary pills
     const content = document.getElementById('content-body');
@@ -1094,13 +1096,8 @@ function loadCurrentPart() {
     const audioCapsule = document.getElementById('heroAudioCapsule');
     if (part.audioURL && part.audioURL.trim() !== '') {
         audioCapsule.style.display = 'flex';
-        // Remove any existing player by clearing the canvas and re-creating? 
-        // We'll reuse the same createAudioPlayer but need to destroy the old one.
-        // For simplicity, we'll re-create the audio player each time.
-        // So we must make sure the old player is stopped and removed. 
-        // A cleaner approach: store the current player object and call its stop method.
         if (window.currentMegaAudioPlayer) {
-            window.currentMegaAudioPlayer.stop(); // we need a stop method
+            window.currentMegaAudioPlayer.stop();
         }
         window.currentMegaAudioPlayer = createAudioPlayer({
             audioUrl: part.audioURL,
@@ -1113,14 +1110,11 @@ function loadCurrentPart() {
         audioCapsule.style.display = 'none';
     }
 
-    // Update dropdowns to reflect current part
-    document.getElementById('partSelectTop').value = currentPartIndex;
-    document.getElementById('partSelectBottom').value = currentPartIndex;
-
-    // Update navigation buttons
+    // Refresh both accordions to update the active part highlight
     buildAccordion();
+
+    // Update the Previous/Next buttons
     updateMegaButtons();
-    
 }
 
 function updateMegaButtons() {
