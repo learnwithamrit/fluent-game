@@ -150,10 +150,21 @@
     flex-direction: column;
     gap: 1px;
     margin-bottom: 30px;
+    max-width: 70%;
+    margin-left: auto;
+    margin-right: auto;
     cursor: pointer;
     transition: transform 0.2s;
 }
 .story-wrapper:active { transform: scale(0.98); }
+
+@media (min-width: 600px) {
+    .story-wrapper {
+        max-width: 70%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
 
 /* Top info card */
 .story-info-card {
