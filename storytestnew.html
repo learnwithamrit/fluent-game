@@ -1693,7 +1693,12 @@ document.querySelectorAll('.level-btn').forEach(btn => {
 });
 
 document.getElementById('megaStoriesBtn').addEventListener('click', () => {
-    showScreen(document.getElementById('megaScreen'));
+    currentLevel = 'Mega';
+    document.getElementById('levelTitle').textContent = 'Mega Stories';
+    currentStories = sortStories(allStories.filter(s => s.Level === 'Mega'));
+    buildCards(currentStories);
+    showScreen(listScreen);
+});
 });
 document.getElementById('megaBackToLevels').addEventListener('click', () => showScreen(levelScreen));
 document.getElementById('backToLevels').addEventListener('click', () => showScreen(levelScreen));
