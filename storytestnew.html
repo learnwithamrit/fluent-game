@@ -735,7 +735,6 @@
     <p id="currentPartTitle" style="color:var(--acc); font-weight:700; text-align:center; margin-bottom:10px;"></p>
   <!-- Top part selector -->
   <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin:20px 0;">
-    <label for="partSelectTop" style="color:var(--mut); font-weight:600;">Part:</label>
    
   </div>
   <!-- Current part title (shown above the story text) -->
@@ -751,7 +750,7 @@
                     <!-- Bottom part selector (inside story-buttons area for convenience) -->
             <div id="megaStoryControlsBottom" style="display:none; width:100%; text-align:center; margin-bottom:15px;">
                 <div class="accordion" id="accordionBottom"></div>
-              <label for="partSelectBottom" style="color:var(--mut); font-weight:600;">Part:</label>
+             
              
             </div>
             <div class="story-buttons">
@@ -1177,12 +1176,6 @@ function buildAccordion() {
                 header.classList.toggle('open');
                 list.classList.toggle('open');
             });
-
-            // If this chapter contains the current part, open it by default
-            if (parts.some(p => p.globalIndex === currentPartIndex)) {
-                header.classList.add('open');
-                list.classList.add('open');
-            }
 
             container.appendChild(header);
             container.appendChild(list);
