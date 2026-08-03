@@ -1041,34 +1041,6 @@ function setupMegaStoryUI(story) {
     updateMegaButtons();
 }
 
-    // Populate dropdowns with part numbers / titles
-    megaParts.forEach((part, idx) => {
-        const optionText = part.title ? `${part.part}: ${part.title}` : `Part ${part.part}`;
-        const option = new Option(optionText, idx);
-        partSelectTop.add(option);
-        partSelectBottom.add(option.cloneNode(true));
-    });
-
-    // Set current part to 0 (first part)
-    currentPartIndex = 0;
-    loadCurrentPart();
-
-    // Sync dropdowns and load part on change
-    partSelectTop.addEventListener('change', () => {
-        currentPartIndex = parseInt(partSelectTop.value);
-        partSelectBottom.value = currentPartIndex;
-        loadCurrentPart();
-    });
-    partSelectBottom.addEventListener('change', () => {
-        currentPartIndex = parseInt(partSelectBottom.value);
-        partSelectTop.value = currentPartIndex;
-        loadCurrentPart();
-    });
-
-    // Update button labels
-    updateMegaButtons();
-}
-
 function loadCurrentPart() {
     const part = megaParts[currentPartIndex];
 
