@@ -472,7 +472,7 @@
             </p>
             <div id="header-meta">
                 <span class="meta-badge" id="timerBadge">⏱️ 00:00</span>
-                <span class="meta-badge">🎯 Multi‑select</span>
+                <span class="meta-badge" id="correctCountBadge">🎯 Multi‑select</span>
                 <span class="meta-badge" id="batchBadge">📦 Batch: 10</span>
             </div>
         </header>
@@ -544,6 +544,7 @@
         const gameContainer = document.getElementById('game-container');
         const headerBatchBadge = document.getElementById('batchBadge');
         const headerTimerBadge = document.getElementById('timerBadge');
+        const headerCorrectBadge = document.getElementById('correctCountBadge');
 
         // ── Helpers ──
         function escapeHTML(str) {
@@ -667,6 +668,7 @@
             state.phase = 'batch';
             stopTimer();
             headerBatchBadge.textContent = `📦 Batch: ${state.batchSize}`;
+            headerCorrectBadge.textContent = '🎯 Multi‑select';
             let refillMsg = '';
             if (state.showRefillMessage) {
                 refillMsg = '<div class="toast-msg">🔄 You’ve seen all idioms! Starting a fresh set.</div>';
@@ -734,7 +736,8 @@
                 if (opt.isCorrect) acc.push(idx);
                 return acc;
             }, []));
-
+            const correctCount = state.correctIndices.size;
+            headerCorrectBadge.textContent = `🎯 Select ${correctCount}`;
             gameContainer.innerHTML = `
                 <div class="quiz-card">
                     <div class="quiz-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
