@@ -4,404 +4,655 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocab Story Game</title>
+    <meta name="description" content="Master English idioms with clear meanings and real‑life examples.">
+    <meta property="og:title" content="The Phraseosphere — Fluent by Amrit">
+    <meta property="og:description" content="Master English idioms with clear meanings and real‑life examples.">
+    <meta property="og:type" content="article">
+
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png">
+    <meta name="theme-color" content="#ff8906">
     <style>
-        /* ==========================================
-           DARK THEME (default) – "Popular Books" style
-           ========================================== */
+        /* ═══════════════════════════════════════
+           DESIGN TOKENS (Fluent template)
+        ════════════════════════════════════════ */
         :root {
-            --bg-color: #1a1625;
-            --card-bg: #221c33;
-            --text-main: #ffffff;
-            --text-muted: #a096b5;
-            --accent-yellow: #ffd23f;
-            --accent-pink: #ff4d8d;
-            --progress-bg: #362e4c;
-            --btn-primary: #64b5f6;
-            --btn-secondary: #ffb74d;
-            --reading-bg-start: #3c167d;
-            --reading-bg-mid: #170732;
-            --reading-bg-end: #0d041e;
-            --reading-card-bg: linear-gradient(180deg, rgba(31, 14, 70, 0.8) 0%, rgba(13, 4, 30, 0.95) 100%);
+            --bg: #0d0d1a;
+            --sur: #161628;
+            --sur2: #1e1e38;
+            --brd: #2e2e52;
+            --txt: #e8e8f0;
+            --mut: #ededff;
+            --acc: #ff8906;
+            --ac2: #f9c74f;
+            --grn: #06d6a0;
+            --blu: #3da9fc;
+            --red: #ef4565;
+            --fs-xs: 0.62rem;
+            --fs-sm: 0.78rem;
+            --fs-base: 1.3rem;
+            --fs-md: 1.1rem;
+            --fs-lg: 1.4rem;
+            --fs-xl: 1.9rem;
+            --fs-2xl: 2.4rem;
+            --gap-sm: 12px;
+            --gap-md: 24px;
+            --gap-lg: 48px;
+            --max-w: clamp(680px, 80vw, 960px);
         }
 
-        * {
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
-            margin: 0;
+            
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            background: var(--bg-color);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            max-width: 700px;
-            margin: 0 auto;
-            padding: 0;
-            transition: background 0.4s, color 0.4s;
+            background: var(--bg);
+            color: var(--txt);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-size: var(--fs-base);
+            line-height: 1.7;
             min-height: 100vh;
-        }
-
-        /* ========== HEADER BAR ========== */
-        #topBar {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 10px 20px;
-            background: rgba(34, 28, 51, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 0 0 24px 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            margin-bottom: 20px;
         }
 
-        .counter {
-            display: none;
-            background: var(--accent-yellow);
-            color: #1a1625;
-            font-weight: 700;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-        }
-
-        /* Theme toggle – small icon + label top right */
-        #themeToggle {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.85em;
-            color: var(--text-muted);
-            user-select: none;
-            padding: 4px 0;
-        }
-        #themeToggle span:first-child { font-size: 1.3em; }
-
-        /* ========== FLOATING HUB BUTTON ========== */
+        /* ═══════════════════════════════════════
+           FLOATING HUB BUTTON (icon + label)
+        ════════════════════════════════════════ */
         #floatingHubBtn {
-            display: none;
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--accent-yellow);
-            color: #1a1625;
-            border: none;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
-            font-size: 1.4em;
-            cursor: pointer;
-            z-index: 200;
-            transition: transform 0.2s, background 0.3s;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* ========== SCREENS ========== */
-        .screen {
-            display: none;
-            padding: 0 20px 30px;
-        }
-        .screen.active {
-            display: block;
-        }
-
-        /* ========== LEVEL SELECTION ========== */
-        .level-btn {
-            display: block;
-            width: 100%;
-            margin: 15px auto;
-            padding: 20px;
-            font-size: 1.5em;
-            border: none;
-            border-radius: 20px;
-            background: var(--card-bg);
-            color: var(--text-main);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-            transition: transform 0.1s, background 0.3s;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .level-btn:hover { transform: scale(1.02); background: #2e2642; }
-
-        .mega-btn {
-            background: linear-gradient(135deg, #ffd54f, #ffb300);
-            color: #1e1e1e;
-            font-weight: bold;
-            font-size: 1.8em;
-            border: none;
-        }
-        .mega-btn:hover { background: linear-gradient(135deg, #ffca28, #ff8f00); }
-
-        /* ========== STORY LIST (book cards) ========== */
-        #listScreen h2 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .info-section {
-            position: relative;
-            margin-bottom: 25px;
-        }
-        .info-section p.subtitle {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .stats-container {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-        .stat-box { display: flex; flex-direction: column; }
-        .stat-value { font-size: 28px; font-weight: 700; }
-        .stat-label { font-size: 14px; color: var(--text-muted); }
-
-        .mascot-art {
-            position: absolute;
-            right: 10px;
-            bottom: 0;
-            width: 100px;
-            height: 100px;
-            opacity: 0.7;
-        }
-
-        .book-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .book-card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            display: flex;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            height: 150px;
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
-        .book-card:active { transform: scale(0.98); }
-
-        .book-cover {
-            width: 100px;
-            height: 100%;
-            background: #2e2642;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2em;
-            font-weight: bold;
-            color: rgba(255, 255, 255, 0.4);
-            flex-shrink: 0;
-        }
-
-        .book-details {
-            flex: 1;
-            padding: 15px 15px 15px 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-        }
-
-        .book-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            color: #fff;
-        }
-
-        .book-tags {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-
-        .progress-container {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-top: auto;
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            height: 48px;
+            padding: 0 20px;
+            border-radius: 40px;
+            background: var(--acc);
+            color: #0d0d1a;
+            border: none;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+            font-size: 1em;
+            font-weight: 800;
+            cursor: pointer;
+            z-index: 200;
+            transition: transform 0.2s;
         }
-        .progress-bar {
-            flex: 1;
-            height: 6px;
-            background: var(--progress-bg);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: var(--accent-pink);
-            border-radius: 3px;
-            width: 0%;
-            transition: width 0.3s;
-        }
-        .progress-text {
-            font-size: 11px;
-            color: var(--text-muted);
-            white-space: nowrap;
-        }
+        #floatingHubBtn:hover { transform: scale(1.05); }
 
-
-
-        /* ========== ACTIVE STORY SCREEN (purple reading design) ========== */
-        #storyScreen {
-            min-height: 100vh;
-            background: linear-gradient(180deg, var(--reading-bg-start) 0%, var(--reading-bg-mid) 60%, var(--reading-bg-end) 100%);
-            color: #ffffff;
+        /* ═══════════════════════════════════════
+           SCREENS
+        ════════════════════════════════════════ */
+        .screen {
             display: none;
             flex-direction: column;
             align-items: center;
-            padding: 0;
-            margin: 0;
-            position: relative;
-            overflow-x: hidden;
+            width: 100%;
         }
-        #storyScreen.active {
-            display: flex;
+        .screen.active { display: flex; }
+
+        /* ═══════════════════════════════════════
+           LEVEL SELECTION
+        ════════════════════════════════════════ */
+        #levelScreen {
+            padding: 60px 20px 40px;
+            text-align: center;
+        }
+        #levelScreen h1 {
+            font-size: var(--fs-2xl);
+            font-weight: 900;
+            margin-bottom: var(--gap-lg);
+            color: var(--txt);
+        }
+        .level-btn {
+            display: block;
+            width: 100%;
+            max-width: 360px;
+            margin: 12px auto;
+            padding: 16px;
+            font-size: var(--fs-md);
+            font-weight: 800;
+            border: none;
+            border-radius: 16px;
+            background: var(--sur2);
+            color: var(--txt);
+            border: 1.5px solid var(--brd);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-family: inherit;
+        }
+        .level-btn:hover {
+            border-color: var(--acc);
+            color: var(--acc);
+        }
+        .mega-btn {
+            background: linear-gradient(135deg, #ffd54f, #ffb300);
+            color: #1e1e1e;
+            font-weight: 900;
+            border: none;
+            font-size: var(--fs-lg);
+        }
+        .mega-btn:hover {
+            background: linear-gradient(135deg, #ffca28, #ff8f00);
         }
 
-        .illustration-container {
-            position: relative;
-            height: 200px;
-            width: 100%;
+        /* ═══════════════════════════════════════
+           STORY LIST (cards)
+        ════════════════════════════════════════ */
+/* Story card wrapper (gap between the two cards) */
+.story-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-bottom: 30px;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.story-wrapper:active { transform: scale(0.98); }
+
+@media (min-width: 600px) {
+    .story-wrapper {
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+@media (min-width: 900px) {
+    .story-wrapper {
+        max-width: 85%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+@media (min-width: 1200px) {
+    .story-wrapper {
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+@media (min-width: 1400px) {
+    .story-wrapper {
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+/* Top info card */
+.story-info-card {
+    border-radius: 32px;
+    padding: 28px 24px 40px 24px;
+    color: #000;
+    background: linear-gradient(115deg, #60be3e 0%, #89d35a 40%, #ffffff 90%);
+    /* gradient will be overridden inline by JS */
+}
+
+/* Badges row */
+.card-badge-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.9);
+    color: #000;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+}
+.badge.new-badge {
+    background: var(--acc);
+    color: #0d0d1a;
+    font-weight: 900;
+}
+
+/* Story title */
+.card-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    color: #000;
+}
+
+/* Story description */
+.card-description {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    line-height: 1.5;
+    color: #1a1a1a;
+}
+
+/* Bottom audio card */
+.audio-card {
+    border-radius: 50px;
+    padding: 20px 50px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: linear-gradient(115deg, #60be3e 0%, #89d35a 40%, #ffffff 90%);
+    /* gradient will be overridden inline by JS */
+}
+
+/* Play button (triangle) */
+.play-btn {
+    width: 0;
+    height: 0;
+    border-top: 14px solid transparent;
+    border-bottom: 14px solid transparent;
+    border-left: 22px solid #fff;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+.play-btn.pause {
+    border: none;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 3px;
+}
+
+/* Wave container */
+.wave-container {
+    flex: 1;
+    height: 50px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+}
+.wave-container canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+        /* Audio player inside card */
+        .audio-player-mini {
             display: flex;
-            justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            gap: 15px;
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        .play-btn {
+            width: 0;
+            height: 0;
+            border-top: 14px solid transparent;
+            border-bottom: 14px solid transparent;
+            border-left: 22px solid #fff;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: opacity 0.2s;
+        }
+        .play-btn.pause {
+            border-left: none;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 2px;
+            position: relative;
+        }
+        .wave-container {
+            flex: 1;
+            height: 50px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .wave-container canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
         }
 
-        .mascot-squirrel { width: 150px; height: auto; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3)); }
-        .item-apple { position: absolute; top: 10px; right: 30px; width: 60px; height: auto; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25)); }
-        .item-acorn { position: absolute; bottom: 20px; right: 40px; width: 45px; height: auto; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25)); }
-
-        .story-content-card {
-            flex: 1;
+        /* ═══════════════════════════════════════
+           STORY READING SCREEN
+        ════════════════════════════════════════ */
+        #storyScreen {
             width: 100%;
-            background: var(--reading-card-bg);
-            border-radius: 40px 40px 0 0;
-            padding: 35px 30px 40px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        #storyScreen.active { display: flex; }
+
+        #top-nav {
+            width: 100%;
+            background: var(--sur);
+            border-bottom: 1px solid var(--brd);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        #top-nav .nav-brand {
+            font-size: var(--fs-sm);
+            font-weight: 900;
+            color: var(--acc);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+        #top-nav .nav-back {
+            background: var(--sur2);
+            border: 1.5px solid var(--brd);
+            color: var(--mut);
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: var(--fs-xs);
+            font-weight: 800;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+        #top-nav .nav-back:hover {
+            border-color: var(--acc);
+            color: var(--acc);
+        }
+
+        .hero-banner {
+            width: 100%;
+            padding: 50px 20px 70px;
+            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
-            margin-top: -10px;
+            color: #000;
+            border-radius: 0 0 32px 32px;
+        }
+        .hero-banner .badge { margin-bottom: 20px; }
+        .hero-title {
+            font-size: var(--fs-2xl);
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+        .hero-description {
+            font-size: var(--fs-sm);
+            opacity: 0.8;
+            max-width: 400px;
+        }
+
+        .audio-capsule {
+            background: #fff;
+            width: 90%;
+            max-width: 500px;
+            height: 70px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: -35px;
             z-index: 2;
+            position: relative;
+        }
+        .audio-capsule .play-btn {
+            border-left-color: var(--acc);
+        }
+        .audio-capsule .play-btn.pause {
+            background: var(--acc);
         }
 
-        .story-title {
-            font-family: 'Georgia', serif;
-            font-size: 32px;
-            font-weight: 400;
-            margin-bottom: 25px;
-            text-align: center;
-            letter-spacing: 0.5px;
-            color: #fff;
-        }
-
-        .story-text {
-            font-size: 15px;
-            line-height: 1.75;
-            color: #ded9eb;
-            text-align: justify;
-            margin-bottom: 30px;
-            font-weight: 400;
+        #content-body {
             width: 100%;
+            max-width: var(--max-w);
+            padding: 40px 20px 20px;
+            color: var(--mut);
+            font-size: var(--fs-base);
+            line-height: 1.8;
         }
-
         .pill {
             display: inline-block;
-            background: var(--accent-yellow);
-            color: #1a1625;
-            padding: 1px 12px;
-            border-radius: 20px;
-            margin: 2px 3px;
-            font-weight: bold;
+            background: var(--acc);
+            color: #0d0d1a;
+            padding: 1px 10px;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
             transition: transform 0.1s;
         }
         .pill:active { transform: scale(0.95); }
 
-        .reading-actions {
+        .story-buttons {
             display: flex;
-            gap: 20px;
-            align-items: center;
             flex-wrap: wrap;
+            gap: 12px;
             justify-content: center;
+            padding: 20px;
+            width: 100%;
+            max-width: var(--max-w);
         }
-
-        .next-circle {
-            width: 56px;
-            height: 56px;
-            background: #6225e6;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(98, 37, 230, 0.5);
+        .cta-btn {
+            background: var(--acc);
+            color: #0d0d1a;
             border: none;
-            transition: transform 0.2s, background 0.2s;
-        }
-        .next-circle:hover { transform: scale(1.05); background: #733bf3; }
-        .next-circle svg {
-            width: 24px;
-            height: 24px;
-            stroke: #fff;
-            stroke-width: 2.5;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .finish-reading-btn {
-            background: transparent;
-            border: 2px solid rgba(255,255,255,0.3);
-            color: #fff;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: background 0.2s;
-        }
-        .finish-reading-btn:hover { background: rgba(255,255,255,0.15); }
-
-        /* ========== SUMMARY SCREEN ========== */
-        .summary-list li {
-            background: var(--card-bg);
-            margin: 8px 0;
-            padding: 12px 16px;
             border-radius: 12px;
-            color: var(--text-main);
-        }
-        .menu-btn {
-            background: var(--card-bg);
-            color: var(--text-main);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 12px 25px;
-            font-size: 1em;
-            border-radius: 30px;
+            padding: 10px 20px;
+            font-weight: 800;
+            font-size: var(--fs-sm);
             cursor: pointer;
-            margin-top: 15px;
-            transition: background 0.2s;
+            transition: all .2s;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
-        .menu-btn:hover { background: #2e2642; }
+        .cta-btn.secondary {
+            background: var(--sur2);
+            color: var(--txt);
+            border: 1.5px solid var(--brd);
+        }
+        .cta-btn.secondary:hover {
+            border-color: var(--acc);
+            color: var(--acc);
+        }
+        .cta-btn:hover { background: #ffaa30; }
 
-        /* ========== MODALS ========== */
+
+/* Part selector styling (matches Fluent theme) */
+.part-select {
+  background: var(--sur2);
+  color: var(--txt);
+  border: 1.5px solid var(--brd);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9em;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.part-select:hover { border-color: var(--acc); }
+.part-select option {
+  background: var(--sur);
+  color: var(--txt);
+}
+
+        
+
+.playhead {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    background: #ff8906;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    pointer-events: auto;
+    cursor: pointer;
+    z-index: 10;
+}
+.story-word.highlight {
+    background: rgba(255, 137, 6, 0.5);
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+
+        
+#floatingBackBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: fixed;
+    bottom: 85px;          /* 85px from bottom, above the hub (25px + 48px height + 12px gap) */
+    right: 25px;
+    height: 48px;
+    padding: 0 20px;
+    border-radius: 40px;
+    background: var(--sur2);
+    color: var(--txt);
+    border: 1.5px solid var(--brd);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    font-size: 0.9em;
+    font-weight: 800;
+    cursor: pointer;
+    z-index: 199;          /* just below the hub button's 200 */
+    transition: transform 0.2s;
+}
+#floatingBackBtn:hover {
+    transform: scale(1.05);
+    border-color: var(--acc);
+    color: var(--acc);
+}
+
+
+
+/* Accordion Container */
+/* Accordion container */
+.accordion {
+    margin: 15px 0;
+}
+
+/* Chapter header */
+.chapter-header {
+    background: var(--sur);
+    border: 1px solid var(--brd);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--txt);
+    transition: background 0.2s;
+    user-select: none;
+}
+.chapter-header:hover { background: var(--sur2); }
+.chapter-header .arrow {
+    font-size: 0.8em;
+    transition: transform 0.2s;
+}
+.chapter-header.open .arrow {
+    transform: rotate(90deg);
+}
+
+/* Parts list (hidden by default) */
+.parts-list {
+    display: none;
+    margin-left: 16px;
+    margin-bottom: 10px;
+}
+.parts-list.open {
+    display: block;
+}
+
+/* Individual part row */
+.part-row {
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    color: var(--mut);
+    transition: background 0.2s;
+}
+.part-row:hover { background: var(--sur2); }
+.part-row.active {
+    background: var(--acc);
+    color: #0d0d1a;
+    font-weight: 700;
+}
+/* Accordion End */
+
+        
+        #page-footer {
+            width: 100%;
+            background: var(--sur);
+            border-top: 1px solid var(--brd);
+            padding: var(--gap-lg) 20px var(--gap-md);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: auto;
+        }
+        #footer-brand-name {
+            font-size: var(--fs-lg);
+            font-weight: 900;
+            color: var(--acc);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        #footer-brand-by {
+            font-size: var(--fs-xs);
+            color: var(--mut);
+            font-weight: 700;
+        }
+        #footer-tagline {
+            font-size: var(--fs-xs);
+            color: var(--mut);
+            max-width: 280px;
+            line-height: 1.6;
+        }
+        #footer-mail {
+            font-size: var(--fs-xs);
+            color: var(--mut);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #footer-copy {
+            font-size: var(--fs-xs);
+            color: var(--brd);
+        }
+
+        /* ═══════════════════════════════════════
+           MODALS
+        ════════════════════════════════════════ */
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -417,7 +668,8 @@
         .modal.show { pointer-events: auto; opacity: 1; }
 
         .modal-content {
-            background: var(--card-bg);
+            background: var(--sur);
+            border: 1.5px solid var(--brd);
             border-radius: 28px;
             padding: 30px;
             max-width: 380px;
@@ -426,117 +678,32 @@
             transform: translate(0, 0) scale(1);
             opacity: 1;
             transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s;
-            will-change: transform, opacity;
-            color: #fff;
         }
         .got-it-btn {
             margin-top: 20px;
             padding: 12px 30px;
-            background: var(--accent-yellow);
-            color: #1a1625;
-            font-weight: 700;
+            background: var(--acc);
+            color: #0d0d1a;
+            font-weight: 800;
             border: none;
             border-radius: 40px;
-            font-size: 1.1em;
+            font-size: 1em;
             cursor: pointer;
         }
 
-        /* ========== LIGHT MODE OVERRIDES ========== */
-        body:not(.dark) {
-            --bg-color: #f5f0e8;
-            --card-bg: #ffffff;
-            --text-main: #333;
-            --text-muted: #7a6e6e;
-            --accent-yellow: #ffb300;
-            --accent-pink: #ff8a65;
-            --progress-bg: #e0d7c6;
-            --reading-bg-start: #f5f0e8;
-            --reading-bg-mid: #ede4d8;
-            --reading-bg-end: #e2d4c0;
-            --reading-card-bg: #ffffff;
-        }
-        body:not(.dark) #topBar {
-            background: rgba(255,255,255,0.85);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        body:not(.dark) .counter {
-            background: #ffecb3;
-            color: #333;
-        }
-        body:not(.dark) #themeToggle {
-            color: #666;
-        }
-        body:not(.dark) .level-btn {
-            background: #a5d6a7;
-            color: #1e3d1e;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        body:not(.dark) .mega-btn {
-            background: linear-gradient(135deg, #ffd54f, #ffb300);
-            color: #3e2723;
-        }
-        body:not(.dark) .book-cover { background: #e0d7c6; }
-        body:not(.dark) .read-btn {
-            background: #ffb300;
-            color: #1a1625;
-        }
-        body:not(.dark) .pill {
-            background: #ff8a65;
-            color: #fff;
-        }
-        body:not(.dark) .story-text {
-            color: #333;
-        }
-        body:not(.dark) .story-content-card {
-            background: #ffffff;
-            color: #333;
-        }
-        body:not(.dark) .story-title { color: #333; }
-        body:not(.dark) .next-circle {
-            background: #ff8a65;
-            box-shadow: 0 8px 20px rgba(255,138,101,0.4);
-        }
-        body:not(.dark) .finish-reading-btn {
-            border-color: #aaa;
-            color: #333;
-        }
-        body:not(.dark) .summary-list li {
-            background: #f1f8e9;
-            color: #333;
-        }
-        body:not(.dark) .menu-btn {
-            background: #64b5f6;
-            color: #fff;
-            border: none;
-        }
-        body:not(.dark) .modal-content {
-            background: #fff;
-            color: #333;
-        }
-        body:not(.dark) .got-it-btn {
-            background: #81c784;
-            color: #fff;
-        }
-        body:not(.dark) #floatingHubBtn {
-            background: var(--accent-yellow);
-            color: #1a1625;
+        /* Responsive */
+        @media (max-width: 600px) {
+            .story-card { padding: 24px 16px 20px; }
+            .hero-banner { padding: 40px 16px 60px; }
+            .audio-capsule { height: 60px; padding: 0 20px; }
         }
     </style>
 </head>
 <body>
-
-    <!-- Top Bar (counter + theme toggle) -->
-    <div id="topBar">
-        <div class="counter" id="counter">Words Learnt: <span id="counterNum">0</span></div>
-        <div id="themeToggle">
-            <span id="themeIcon">🌙</span>
-            <span id="themeLabel">Dark</span>
-        </div>
-    </div>
-
+    <!-- Floating Back to Level button (above Hub) -->
+<button id="floatingBackBtn" style="display:none;">← Levels</button>
     <!-- Floating Hub Button -->
-    <button id="floatingHubBtn">🏠</button>
+    <button id="floatingHubBtn">🏠 Hub</button>
 
     <!-- Screen: Level Selection -->
     <div id="levelScreen" class="screen active">
@@ -544,90 +711,91 @@
         <button class="level-btn" data-level="Beginner">Beginner 🐣</button>
         <button class="level-btn" data-level="Intermediate">Intermediate 🐥</button>
         <button class="level-btn" data-level="Advanced">Advanced 🦉</button>
-        <button class="level-btn mega-btn" id="megaStoriesBtn">🚀 The Mega Stories</button>
-    </div>
+        <button class="level-btn mega-btn" id="megaStoriesBtn" data-level="Mega" >🚀 The Mega Stories</button>
+    </div> 
 
     <!-- Screen: Story List -->
     <div id="listScreen" class="screen">
-        <section class="info-section">
-            <h2 id="levelTitle"></h2>
-            <p class="subtitle">Carefully selected for you – read, tap words, learn!</p>
-            <div class="stats-container">
-                <div class="stat-box">
-                    <span class="stat-value" id="totalStoriesStat">0</span>
-                    <span class="stat-label">Stories</span>
-                </div>
-                <div class="stat-box">
-                    <span class="stat-value" id="wordsLearnedStat">0</span>
-                    <span class="stat-label">Words learned</span>
-                </div>
-            </div>
-            <svg class="mascot-art" viewBox="0 0 100 100">
-                <path fill="#ffd23f" d="M15 70 l30-20 l5 5 l-30 20 z" />
-                <path fill="#ff4d8d" d="M50 30 c15 0 25 10 25 25 c0 15-5 20-15 20 c-15 0-25-10-25-25 c0-15 5-25 15-25 z" />
-                <circle cx="45" cy="45" r="3" fill="#fff"/>
-                <circle cx="58" cy="45" r="3" fill="#fff"/>
-                <path d="M 46 55 Q 51 60 56 55" stroke="#fff" stroke-width="2" fill="none"/>
-                <path fill="#ff4d8d" d="M70 50 q15-5 20 10 q-5 10-20-10 M30 55 q-15 5-20-10 q 5-10 20 10" />
-                <polygon points="65,15 70,25 80,25 72,32 75,42 65,35 55,42 58,32 50,25 60,25" fill="#ffd23f"/>
-            </svg>
-        </section>
-        <div id="storyButtons" class="book-list"></div>
-        <button class="menu-btn" id="backToLevels" style="margin-top: 30px;">⬅ Back to Levels</button>
+        <h2 id="levelTitle"></h2>
+        <p class="list-subtitle">Carefully selected stories — tap to read, listen anywhere.</p>
+        <div id="storyCards" class="cards-container"></div>
     </div>
 
-    <!-- Screen: Active Story (purple reading screen) -->
+    <!-- Screen: Story Reading (Fluent template) -->
     <div id="storyScreen" class="screen">
-        <div class="illustration-container">
-            <svg class="mascot-squirrel" viewBox="0 0 200 200" fill="none">
-                <path d="M40 160 C20 130 20 60 60 45 C90 35 105 70 95 95 C115 85 140 75 155 90 C170 105 135 140 115 140 C105 150 115 165 95 165 C65 165 55 170 40 160 Z" fill="#fca311"/>
-                <circle cx="130" cy="100" r="4" fill="#170732"/>
-                <path d="M140 115 Q130 120 125 112" stroke="#170732" stroke-width="2" fill="none"/>
-            </svg>
-            <svg class="item-apple" viewBox="0 0 100 100" fill="none">
-                <circle cx="50" cy="55" r="35" fill="#e63946"/>
-                <path d="M50 20 C45 10 35 15 35 15" stroke="#2a9d8f" stroke-width="4" stroke-linecap="round"/>
-            </svg>
-            <svg class="item-acorn" viewBox="0 0 100 100" fill="none">
-                <path d="M20 40 C20 20 80 20 80 40 C80 70 50 90 50 90 C50 90 20 70 20 40 Z" fill="#e76f51"/>
-                <path d="M15 40 C15 30 85 30 85 40 Z" fill="#f4a261"/>
-            </svg>
-        </div>
-        <div class="story-content-card">
-            <h2 class="story-title" id="storyTitle"></h2>
-            <div class="story-text" id="storyContent"></div>
-            <div class="reading-actions">
-                <button class="finish-reading-btn" id="finishStory">📖 Finish reading</button>
-                <button class="next-circle" id="nextStory" aria-label="Next story">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M9 5l7 7-7 7" />
-                        <path d="M14 5l7 7-7 7" opacity="0.5" />
-                    </svg>
-                </button>
+        <nav id="top-nav">
+            <a class="nav-brand" href="#">Fluent</a>
+            <button class="nav-back" id="backToLevels">← Story Hub / Levels</button>
+        </nav>
+        <header class="hero-banner" id="heroBanner">
+            <div class="badge" id="heroLevelBadge">Beginner</div>
+            <h1 class="hero-title" id="heroTitle"></h1>
+            <p class="hero-description" id="heroDescription"></p>
+        </header>
+
+        <!-- Mega story part selector & info (hidden by default) -->
+<div id="megaStoryControls" style="display:none;">
+    <div class="accordion" id="accordionTop"></div>
+    <p id="currentPartTitle" style="color:var(--acc); font-weight:700; text-align:center; margin-bottom:10px;"></p>
+  <!-- Top part selector -->
+  <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin:20px 0;">
+   
+  </div>
+  <!-- Current part title (shown above the story text) -->
+  <p id="currentPartTitle" style="color:var(--acc); font-weight:700; text-align:center; margin-bottom:10px;"></p>
+</div>
+        <div class="audio-capsule" id="heroAudioCapsule">
+            <div class="play-btn" id="heroPlayBtn"></div>
+            <div class="wave-container" id="heroWaveContainer">
+                <canvas id="heroWaveCanvas"></canvas>
             </div>
         </div>
+            <main id="content-body"></main>
+                    <!-- Bottom part selector (inside story-buttons area for convenience) -->
+            <div id="megaStoryControlsBottom" style="display:none; width:100%; text-align:center; margin-bottom:15px;">
+                <div class="accordion" id="accordionBottom"></div>
+             
+             
+            </div>
+            <div class="story-buttons">
+              <button class="cta-btn secondary" id="prevPart" style="display:none;">← Previous Part</button>
+              <button class="cta-btn secondary" id="finishStory">📖 Finish Reading</button>
+              <button class="cta-btn" id="nextStory">➡ Next Story</button>
+            </div>
+            
+        </div>
+        
     </div>
 
     <!-- Screen: Summary -->
-    <div id="summaryScreen" class="screen">
-        <h1>🎉 Great Job!</h1>
-        <p>Words you learned this session:</p>
-        <ul id="summaryList" class="summary-list"></ul>
-        <button class="menu-btn" id="backToMenu">🔙 Back to Menu</button>
+    <div id="summaryScreen" class="screen" style="padding: 40px 20px; max-width: var(--max-w); margin: 0 auto; text-align: center;">
+        <h1 style="font-size:var(--fs-2xl); color:var(--acc);">🎉 Great Job!</h1>
+        <p style="color:var(--mut); margin:20px 0;">Words you learned this session:</p>
+        <ul id="summaryList" style="list-style:none; display:flex; flex-direction:column; gap:12px; text-align:left;"></ul>
+        <button class="cta-btn" id="readAnotherStory" style="margin-top:20px;">📖 Read another story</button>
+        <button class="cta-btn secondary" id="backToMenu" style="margin-top:20px;">🔙 Back to Menu</button>
     </div>
 
     <!-- Screen: Mega Stories (placeholder) -->
-    <div id="megaScreen" class="screen">
-        <h1>🚀 Mega Stories</h1>
-        <p style="font-size:1.2em; margin: 40px 0;">Novel‑length adventures are on their way!<br>We’re crafting multi‑part tales with rich vocabulary.</p>
-        <p style="font-size:1em; opacity:0.8;">✨ Check back soon for the first saga ✨</p>
-        <button class="menu-btn" id="megaBackToLevels">⬅ Back to Levels</button>
+    <div id="megaScreen" class="screen" style="padding: 40px 20px; text-align:center; max-width: var(--max-w); margin:0 auto;">
+        <h1 style="font-size:var(--fs-2xl);">🚀 Mega Stories</h1>
+        <p style="margin:40px 0; color:var(--mut);">Novel‑length adventures are on their way!<br>We’re crafting multi‑part tales with rich vocabulary.</p>
+        <p style="opacity:0.8; color:var(--mut);">✨ Check back soon for the first saga ✨</p>
+        <button class="cta-btn secondary" id="megaBackToLevels" style="margin-top:30px;">⬅ Back to Levels</button>
     </div>
 
-    <!-- Modal for word definitions -->
+        <footer id="page-footer">
+            <div id="footer-brand-name">Fluent</div>
+            <div id="footer-brand-by">by Amrit</div>
+            <p id="footer-tagline">Interactive English learning games for students of all levels.</p>
+            <a id="footer-mail" href="mailto:ilearnwithamrit@gmail.com">✉ ilearnwithamrit@gmail.com</a>
+            <p id="footer-copy">© 2026 Fluent by Amrit</p>
+        </footer>
+    
+    <!-- Modal: Word Definition -->
     <div class="modal" id="wordModal">
         <div class="modal-content">
-            <h2 id="modalWord"></h2>
+            <h2 id="modalWord" style="color:var(--acc); margin-bottom:12px;"></h2>
             <p><strong>Meaning:</strong> <span id="modalDefinition"></span></p>
             <p><em>Example:</em> <span id="modalExample"></span></p>
             <button class="got-it-btn" id="gotItBtn">Got it! 👍</button>
@@ -636,405 +804,1188 @@
 
     <!-- Modal: All stories completed -->
     <div class="modal" id="allDoneModal">
-        <div class="modal-content" style="text-align: center;">
+        <div class="modal-content">
             <h2>🎉 You’ve read them all!</h2>
-            <p id="allDoneMessage" style="margin: 20px 0; font-size: 1.1em;"></p>
-            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
-                <button class="menu-btn" id="reReadStories" style="flex: 1; min-width: 140px; background: #ffb74d; color: #333;">🔄 Re‑read</button>
-                <button class="menu-btn" id="goNextLevel" style="flex: 1; min-width: 140px;">➡ Next Level</button>
+            <p id="allDoneMessage" style="margin:20px 0; font-size:1.1em;"></p>
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                <button class="cta-btn secondary" id="reReadStories">🔄 Re‑read</button>
+                <button class="cta-btn" id="goNextLevel">➡ Next Level</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ========== CONFIGURATION ==========
-        const STORIES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47-snxzaPFRnl4_nzuPgOXiw9leZApJ5zQ7OFaER6tNPy7LKa1qJxJGECvEKyo-MKp8Xb47EsNWLd/pub?gid=0&single=true&output=tsv';
-        const VOCAB_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47-snxzaPFRnl4_nzuPgOXiw9leZApJ5zQ7OFaER6tNPy7LKa1qJxJGECvEKyo-MKp8Xb47EsNWLd/pub?gid=1607542814&single=true&output=tsv';
-        // ===================================
+      // ═══════════════════════════════════════
+//  CONFIGURATION – replace with your sheet links
+// ═══════════════════════════════════════
+const STORIES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47-snxzaPFRnl4_nzuPgOXiw9leZApJ5zQ7OFaER6tNPy7LKa1qJxJGECvEKyo-MKp8Xb47EsNWLd/pub?gid=0&single=true&output=tsv';
+const VOCAB_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47-snxzaPFRnl4_nzuPgOXiw9leZApJ5zQ7OFaER6tNPy7LKa1qJxJGECvEKyo-MKp8Xb47EsNWLd/pub?gid=1607542814&single=true&output=tsv';
+const SPREADSHEET_ID = '2PACX-1vQ47-snxzaPFRnl4_nzuPgOXiw9leZApJ5zQ7OFaER6tNPy7LKa1qJxJGECvEKyo-MKp8Xb47EsNWLd';
 
-        // Global data
-        let allStories = [];
-        let vocabMap = new Map();
-        let currentLevel = null;
-        let currentStories = [];
-        let currentStoryIndex = 0;
-        let learnedWords = {};
-        let learntCount = 0;
-        let sessionReadCount = {};   // stories finished per level this session
+// ═══════════════════════════════════════
+//  GLOBAL STATE
+// ═══════════════════════════════════════
+let allStories = [];
+let vocabMap = new Map();
+let currentLevel = null;
+let currentStories = [];
+let currentStoryIndex = 0;
+let learnedWords = {};
+let learntCount = 0;
+let activeAudio = null;          // { source, context, buffer, startTime, offset }
+let audioCtx = null;
+// Mega story state
+let isMegaStory = false;           // true if current story is a mega story
+let megaParts = [];                // array of parts { part, title, storyText, audioURL }
+let currentPartIndex = 0;          // index within megaParts
+let megaStoryGID = null;           // the GID of the mega story sheet
+const allPlayers = [];   // every active player instance will be stored here
 
-        // UI elements
-        const counterDiv = document.getElementById('counter');
-        const counterNum = document.getElementById('counterNum');
-        const levelScreen = document.getElementById('levelScreen');
-        const listScreen = document.getElementById('listScreen');
-        const storyScreen = document.getElementById('storyScreen');
-        const summaryScreen = document.getElementById('summaryScreen');
-        const wordModal = document.getElementById('wordModal');
-        const modalWord = document.getElementById('modalWord');
-        const modalDefinition = document.getElementById('modalDefinition');
-        const modalExample = document.getElementById('modalExample');
+// UI elements
+const levelScreen = document.getElementById('levelScreen');
+const listScreen = document.getElementById('listScreen');
+const storyScreen = document.getElementById('storyScreen');
+const summaryScreen = document.getElementById('summaryScreen');
+const wordModal = document.getElementById('wordModal');
+const modalWord = document.getElementById('modalWord');
+const modalDefinition = document.getElementById('modalDefinition');
+const modalExample = document.getElementById('modalExample');
+const floatingHubBtn = document.getElementById('floatingHubBtn');
+// Read the player name from the URL or sessionStorage
+const urlParams = new URLSearchParams(window.location.search);
+const playerName = urlParams.get('name') || sessionStorage.getItem('playerName') || 'Player';
+sessionStorage.setItem('playerName', playerName);
+// ═══════════════════════════════════════
+//  MODAL ANIMATION (pill definition)
+// ═══════════════════════════════════════
+let currentPillRect = null;
 
-        // ========== ANIMATED MODAL LOGIC ==========
-        let currentPillRect = null;
+function showModal(pillElement, word, vocab) {
+    currentPillRect = pillElement.getBoundingClientRect();
+    const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
+    const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
 
-        function showModal(pillElement, word, vocab) {
-            currentPillRect = pillElement.getBoundingClientRect();
-            const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
-            const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
-            const viewportW = window.innerWidth;
-            const viewportH = window.innerHeight;
+    modalWord.textContent = word;
+    modalDefinition.textContent = vocab.definition;
+    modalExample.textContent = vocab.example;
+    wordModal.dataset.currentWord = word;
 
-            modalWord.textContent = word;
-            modalDefinition.textContent = vocab.definition;
-            modalExample.textContent = vocab.example;
-            wordModal.dataset.currentWord = word;
+    const content = document.querySelector('#wordModal .modal-content');
+    const offsetX = pillCenterX - viewportW / 2;
+    const offsetY = pillCenterY - viewportH / 2;
+    content.style.transition = 'none';
+    content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
+    content.style.opacity = '0';
 
-            const content = document.querySelector('.modal-content');
-            const offsetX = pillCenterX - viewportW / 2;
-            const offsetY = pillCenterY - viewportH / 2;
-            content.style.transition = 'none';
-            content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
-            content.style.opacity = '0';
+    wordModal.classList.add('show');
+    content.getBoundingClientRect();
+    content.style.transition = '';
+    content.style.transform = 'translate(0, 0) scale(1)';
+    content.style.opacity = '1';
+}
 
-            wordModal.classList.add('show');
-            content.getBoundingClientRect();
-            content.style.transition = '';
-            content.style.transform = 'translate(0, 0) scale(1)';
-            content.style.opacity = '1';
-        }
+function hideModal() {
+    if (!currentPillRect) {
+        wordModal.classList.remove('show');
+        return;
+    }
+    const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
+    const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+    const offsetX = pillCenterX - viewportW / 2;
+    const offsetY = pillCenterY - viewportH / 2;
 
-        function hideModal() {
-            if (!currentPillRect) {
-                wordModal.classList.remove('show');
-                return;
-            }
-            const pillCenterX = currentPillRect.left + currentPillRect.width / 2;
-            const pillCenterY = currentPillRect.top + currentPillRect.height / 2;
-            const viewportW = window.innerWidth;
-            const viewportH = window.innerHeight;
-            const offsetX = pillCenterX - viewportW / 2;
-            const offsetY = pillCenterY - viewportH / 2;
+    const content = document.querySelector('#wordModal .modal-content');
+    content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
+    content.style.opacity = '0';
 
-            const content = document.querySelector('.modal-content');
-            content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.15)`;
-            content.style.opacity = '0';
+    setTimeout(() => {
+        wordModal.classList.remove('show');
+        content.style.transition = 'none';
+        content.style.transform = 'translate(0, 0) scale(1)';
+        content.style.opacity = '1';
+        currentPillRect = null;
+    }, 350);
+}
 
-            setTimeout(() => {
-                wordModal.classList.remove('show');
-                content.style.transition = 'none';
-                content.style.transform = 'translate(0, 0) scale(1)';
-                content.style.opacity = '1';
-                currentPillRect = null;
-            }, 350);
-        }
+// pill click & got-it
+document.addEventListener('click', (e) => {
+    const pill = e.target.closest('.pill');
+    if (!pill) return;
+    const word = pill.dataset.word;
+    const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
+    const vocab = vocabMap.get(lookupKey);
+    if (!vocab) {
+        alert(`Definition not found for "${word}" in level ${currentLevel}.`);
+        return;
+    }
+    showModal(pill, word, vocab);
+});
 
-        // Pill click -> animated modal
-        document.getElementById('storyContent').addEventListener('click', (e) => {
-            const pill = e.target.closest('.pill');
-            if (!pill) return;
-            const word = pill.dataset.word;
-            const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
-            const vocab = vocabMap.get(lookupKey);
-            if (!vocab) {
-                alert(`Definition not found for "${word}" in level ${currentLevel}.`);
-                return;
-            }
-            showModal(pill, word, vocab);
+document.getElementById('gotItBtn').addEventListener('click', () => {
+    const word = wordModal.dataset.currentWord;
+    if (!word) return;
+    const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
+    const vocab = vocabMap.get(lookupKey);
+    if (!learnedWords[word.toLowerCase()]) {
+        learnedWords[word.toLowerCase()] = {
+            word: word,
+            definition: vocab ? vocab.definition : '',
+            example: vocab ? vocab.example : ''
+        };
+        learntCount++;
+    }
+    hideModal();
+});
+
+wordModal.addEventListener('click', (e) => {
+    if (e.target === wordModal) hideModal();
+});
+
+// ═══════════════════════════════════════
+//  DATA LOADING & SORTING
+// ═══════════════════════════════════════
+function parseTSV(tsvText) {
+    const lines = tsvText.trim().split('\n');
+    if (lines.length < 2) return [];
+    const headers = lines[0].split('\t');
+    const result = [];
+    for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split('\t');
+        const obj = {};
+        headers.forEach((header, idx) => {
+            obj[header.trim()] = (values[idx] || '').trim();
         });
+        result.push(obj);
+    }
+    return result;
+}
 
-        // "Got it" button
-        document.getElementById('gotItBtn').addEventListener('click', () => {
-            const word = wordModal.dataset.currentWord;
-            if (!word) return;
-            const lookupKey = `${word.toLowerCase()}::${currentLevel}`;
-            const vocab = vocabMap.get(lookupKey);
-            if (!learnedWords[word.toLowerCase()]) {
-                learnedWords[word.toLowerCase()] = {
-                    word: word,
-                    definition: vocab ? vocab.definition : '',
-                    example: vocab ? vocab.example : ''
-                };
-                learntCount++;
-                updateCounter();
-            }
-            hideModal();
+async function loadData() {
+    try {
+        const [storiesResp, vocabResp] = await Promise.all([
+            fetch(STORIES_URL),
+            fetch(VOCAB_URL)
+        ]);
+        const storiesTSV = await storiesResp.text();
+        const vocabTSV = await vocabResp.text();
+        allStories = parseTSV(storiesTSV);
+        const vocabRows = parseTSV(vocabTSV);
+        vocabRows.forEach(row => {
+            const key = `${row.Word.toLowerCase()}::${row.Level}`;
+            vocabMap.set(key, { definition: row.Definition, example: row.Example });
         });
+        console.log(`Loaded ${allStories.length} stories, ${vocabRows.length} vocab entries.`);
+    } catch (err) {
+        alert('Oops! Could not load story data. Check your internet and the sheet links.');
+        console.error(err);
+    }
+}
 
-        wordModal.addEventListener('click', (e) => {
-            if (e.target === wordModal) hideModal();
-        });
+function sortStories(stories) {
+    const newStories = stories.filter(s => s.New && s.New.toLowerCase() === 'new');
+    const oldStories = stories.filter(s => !s.New || s.New.toLowerCase() !== 'new');
+    newStories.sort((a, b) => (b.Date || '').localeCompare(a.Date || ''));
+    return [...newStories, ...oldStories];
+}
 
-        // ========== DATA LOADING ==========
-        function parseTSV(tsvText) {
-            const lines = tsvText.trim().split('\n');
-            if (lines.length < 2) return [];
-            const headers = lines[0].split('\t');
-            const result = [];
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split('\t');
-                const obj = {};
-                headers.forEach((header, idx) => {
-                    obj[header.trim()] = (values[idx] || '').trim();
-                });
-                result.push(obj);
-            }
-            return result;
+
+async function loadMegaStoryParts(gid) {
+    // Build the URL using the spreadsheet ID and the GID from the sheet
+    const megaSheetUrl = `https://docs.google.com/spreadsheets/d/e/${SPREADSHEET_ID}/pub?gid=${gid}&single=true&output=tsv`;
+    
+    try {
+        const response = await fetch(megaSheetUrl);
+        const tsvText = await response.text();
+        const lines = tsvText.trim().split('\n');
+        if (lines.length < 2) {
+            console.warn('Mega story sheet is empty');
+            return;
         }
-
-        async function loadData() {
-            try {
-                const [storiesResp, vocabResp] = await Promise.all([
-                    fetch(STORIES_URL),
-                    fetch(VOCAB_URL)
-                ]);
-                const storiesTSV = await storiesResp.text();
-                const vocabTSV = await vocabResp.text();
-                allStories = parseTSV(storiesTSV);
-                const vocabRows = parseTSV(vocabTSV);
-                vocabRows.forEach(row => {
-                    const key = `${row.Word.toLowerCase()}::${row.Level}`;
-                    vocabMap.set(key, { definition: row.Definition, example: row.Example });
-                });
-                console.log(`Loaded ${allStories.length} stories, ${vocabRows.length} vocabulary entries.`);
-            } catch (err) {
-                alert('Oops! Could not load story data. Check internet and links.');
-                console.error(err);
-            }
-        }
-
-        // ========== HELPERS ==========
-        function shuffleArray(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-        }
-
-        function showScreen(screen) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            screen.classList.add('active');
-            document.getElementById('floatingHubBtn').style.display = (screen === levelScreen) ? 'none' : 'flex';
-        }
-
-        function updateCounter() {
-            if (learntCount > 0) {
-                counterDiv.style.display = 'block';
-                counterNum.textContent = learntCount;
-            } else {
-                counterDiv.style.display = 'none';
-            }
-        }
-
-        function updateStoryListStats() {
-            document.getElementById('totalStoriesStat').textContent = currentStories.length;
-            document.getElementById('wordsLearnedStat').textContent = learntCount;
-        }
-
-        function buildStoryCards() {
-            const container = document.getElementById('storyButtons');
-            container.innerHTML = '';
-            updateStoryListStats();
-
-            if (currentStories.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-muted); text-align:center;">No stories yet for this level.</p>';
-                return;
-            }
-
-            currentStories.forEach((story, idx) => {
-                const card = document.createElement('div');
-                card.className = 'book-card';
-
-                const cover = document.createElement('div');
-                cover.className = 'book-cover';
-                cover.textContent = story.Title.charAt(0).toUpperCase();
-
-                const details = document.createElement('div');
-                details.className = 'book-details';
-
-                const titleEl = document.createElement('h2');
-                titleEl.className = 'book-title';
-                titleEl.textContent = story.Title;
-
-                const tags = document.createElement('p');
-                tags.className = 'book-tags';
-                tags.textContent = story.Level + ' · vocabulary builder';
-
-                const progressContainer = document.createElement('div');
-                progressContainer.className = 'progress-container';
-                const progressBar = document.createElement('div');
-                progressBar.className = 'progress-bar';
-                const progressFill = document.createElement('div');
-                progressFill.className = 'progress-fill';
-                const total = currentStories.length;
-                const readCount = sessionReadCount[story.Level] || 0;
-                const percent = total > 0 ? Math.round((readCount / total) * 100) : 0;
-                progressFill.style.width = percent + '%';
-                progressBar.appendChild(progressFill);
-                const progressText = document.createElement('span');
-                progressText.className = 'progress-text';
-                progressText.textContent = percent + '%';
-                progressContainer.appendChild(progressBar);
-                progressContainer.appendChild(progressText);
-
-                details.appendChild(titleEl);
-                details.appendChild(tags);
-                details.appendChild(progressContainer);
-                card.appendChild(cover);
-                card.appendChild(details);
-
-card.addEventListener('click', () => startStory(idx));
-                        container.appendChild(card);   
+        const headers = lines[0].split('\t');
+        megaParts = [];
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split('\t');
+            const obj = {};
+            headers.forEach((h, idx) => {
+                obj[h.trim()] = (values[idx] || '').trim();
+            });
+            megaParts.push({
+                chapter: obj.Chapter || 'Chapter ?',
+                part: obj.Part,
+                title: obj.Title,
+                storyText: obj.StoryText,
+                audioURL: obj.AudioURL
             });
         }
+        // Sort by part number numerically
+        // Sort by chapter (numeric if possible), then by part (numeric)
+megaParts.sort((a, b) => {
+    const chA = parseInt(a.chapter.match(/\d+/)?.[0] || a.chapter, 10);
+    const chB = parseInt(b.chapter.match(/\d+/)?.[0] || b.chapter, 10);
+    if (chA !== chB) return chA - chB;
+    return (parseInt(a.part) || 0) - (parseInt(b.part) || 0);
+});
+    } catch (err) {
+        console.error('Failed to load mega story parts:', err);
+        megaParts = [];
+    }
+}
 
-        // ========== LEVEL SELECTION ==========
-        document.querySelectorAll('.level-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                currentLevel = btn.dataset.level;
-                document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
-                currentStories = allStories.filter(s => s.Level === currentLevel);
-                shuffleArray(currentStories);
-                buildStoryCards();
-                showScreen(listScreen);
-            });
-        });
 
-        document.getElementById('megaStoriesBtn').addEventListener('click', () => {
-            showScreen(document.getElementById('megaScreen'));
-        });
-        document.getElementById('megaBackToLevels').addEventListener('click', () => showScreen(levelScreen));
-        document.getElementById('backToLevels').addEventListener('click', () => showScreen(levelScreen));
+//-_-_-_-----------------------Mega Story Design------------------------_-_______//
 
-        // ========== START A STORY ==========
-        function startStory(index) {
-            currentStoryIndex = index;
-            const story = currentStories[index];
-            document.getElementById('storyTitle').textContent = story.Title;
-            const storyText = story.StoryText;
-            const replaced = storyText.replace(/\[([^\]]+)\]/g, (match, word) => {
-                return `<span class="pill" data-word="${word}">${word}</span>`;
-            });
-            document.getElementById('storyContent').innerHTML = replaced;
-            showScreen(storyScreen);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+function setupMegaStoryUI(story) {
+    // Show the mega story controls (where the accordions live)
+    document.getElementById('megaStoryControls').style.display = 'block';
+    document.getElementById('megaStoryControlsBottom').style.display = 'block';
+
+    // Build both accordions (top and bottom)
+    buildAccordion();
+
+    // Load the first part (currentPartIndex is already 0 from startStory)
+    loadCurrentPart();
+
+    // Update navigation buttons (Prev/Next/Finish)
+    updateMegaButtons();
+}
+
+function loadCurrentPart() {
+    const part = megaParts[currentPartIndex];
+
+    // Update part title display
+    document.getElementById('currentPartTitle').textContent = 
+        part.title ? `${part.chapter || ''} – Part ${part.part}: ${part.title}` : `Part ${part.part}`;
+
+    // Insert story text with vocabulary pills
+    const content = document.getElementById('content-body');
+    const replaced = part.storyText.replace(/\[([^\]]+)\]/g, (match, word) => {
+        return `<span class="pill" data-word="${word}">${word}</span>`;
+    });
+    content.innerHTML = replaced;
+
+    // Handle audio
+    const heroPlayBtn = document.getElementById('heroPlayBtn');
+    const heroCanvas = document.getElementById('heroWaveCanvas');
+    heroCanvas.getContext('2d').clearRect(0, 0, heroCanvas.width, heroCanvas.height);
+    heroPlayBtn.className = 'play-btn';
+    stopActiveAudio();
+
+    const audioCapsule = document.getElementById('heroAudioCapsule');
+    if (part.audioURL && part.audioURL.trim() !== '') {
+        audioCapsule.style.display = 'flex';
+        if (window.currentMegaAudioPlayer) {
+            window.currentMegaAudioPlayer.stop();
         }
-
-        // ========== STORY SCREEN BUTTONS ==========
-        // Finish reading -> summary
-        document.getElementById('storyScreen').addEventListener('click', (e) => {
-            const finishBtn = e.target.closest('#finishStory');
-            if (!finishBtn) return;
-
-            if (!sessionReadCount[currentLevel]) sessionReadCount[currentLevel] = 0;
-            sessionReadCount[currentLevel]++;
-
-            const summaryList = document.getElementById('summaryList');
-            summaryList.innerHTML = '';
-            if (Object.keys(learnedWords).length === 0) {
-                summaryList.innerHTML = '<li>You haven’t collected any words yet. Keep reading!</li>';
-            } else {
-                for (let key in learnedWords) {
-                    const lw = learnedWords[key];
-                    const li = document.createElement('li');
-                    li.innerHTML = `<strong>${lw.word}</strong> – ${lw.definition}<br><em>${lw.example}</em>`;
-                    summaryList.appendChild(li);
-                }
-            }
-            showScreen(summaryScreen);
+        window.currentMegaAudioPlayer = createAudioPlayer({
+            audioUrl: part.audioURL,
+            playBtn: heroPlayBtn,
+            canvas: heroCanvas,
+            waveColor: '#000000',
+            sentences: []
         });
+    } else {
+        audioCapsule.style.display = 'none';
+    }
 
-        // Next story
-        document.getElementById('nextStory').addEventListener('click', () => {
-            if (currentStories.length === 0) return;
-            if (!sessionReadCount[currentLevel]) sessionReadCount[currentLevel] = 0;
-            sessionReadCount[currentLevel]++;
+    // Refresh both accordions to update the active part highlight
+    buildAccordion();
 
+    // Update the Previous/Next buttons
+    updateMegaButtons();
+}
+
+function updateMegaButtons() {
+    const prevBtn = document.getElementById('prevPart');
+    const nextBtn = document.getElementById('nextStory');
+    const finishBtn = document.getElementById('finishStory');
+
+    // If only one part, hide all part nav and keep normal next story
+    if (megaParts.length <= 1) {
+        prevBtn.style.display = 'none';
+        nextBtn.textContent = '➡ Next Story';
+        nextBtn.style.display = 'inline-flex';
+        finishBtn.style.display = 'inline-flex';
+        nextBtn.onclick = () => {
             const nextIndex = currentStoryIndex + 1;
             if (nextIndex < currentStories.length) {
                 startStory(nextIndex);
             } else {
                 showAllDoneModal();
             }
+        };
+        return;
+    }
+
+    // Show previous button only if not on first part of first chapter
+    const current = megaParts[currentPartIndex];
+    const currentChapter = current.chapter;
+    const partsInChapter = megaParts.filter(p => p.chapter === currentChapter);
+    const indexInChapter = partsInChapter.indexOf(current);
+    const isFirstPartInChapter = indexInChapter === 0;
+    const isLastPartInChapter = indexInChapter === partsInChapter.length - 1;
+
+    // Determine if there is a previous part somewhere
+    const hasPrevious = currentPartIndex > 0;
+    prevBtn.style.display = hasPrevious ? 'inline-flex' : 'none';
+
+    // Determine the next part
+    let nextPartIndex = -1;
+    if (!isLastPartInChapter) {
+        // Next part in same chapter
+        nextPartIndex = megaParts.findIndex(p =>
+            p.chapter === currentChapter &&
+            parseInt(p.part) === parseInt(partsInChapter[indexInChapter + 1].part)
+        );
+    } else {
+        // Last part in chapter → go to first part of next chapter
+        const chapters = [...new Set(megaParts.map(p => p.chapter))];
+        const currentChapterIndex = chapters.indexOf(currentChapter);
+        if (currentChapterIndex < chapters.length - 1) {
+            const nextChapter = chapters[currentChapterIndex + 1];
+            nextPartIndex = megaParts.findIndex(p => p.chapter === nextChapter && p.part === '1');
+        }
+    }
+
+    if (nextPartIndex !== -1) {
+        nextBtn.textContent = '➡ Next Part';
+        nextBtn.style.display = 'inline-flex';
+        nextBtn.onclick = () => {
+            currentPartIndex = nextPartIndex;
+            loadCurrentPart();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    } else {
+        // No next part anywhere → finish mega story
+        nextBtn.textContent = '🏁 Finish Mega Story';
+        nextBtn.style.display = 'inline-flex';
+        nextBtn.onclick = () => {
+            document.getElementById('finishStory').click();
+        };
+    }
+
+    finishBtn.style.display = 'inline-flex';
+}
+// --------------------------- New Build with Accordion-----------------------//
+function buildAccordion() {
+    // Build both top and bottom accordions (identical)
+    ['accordionTop', 'accordionBottom'].forEach(containerId => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+
+        // Group parts by chapter
+        const chapters = {};
+        megaParts.forEach((part, globalIndex) => {
+            const ch = part.chapter || 'Chapter ?';
+            if (!chapters[ch]) chapters[ch] = [];
+            chapters[ch].push({ ...part, globalIndex });
         });
 
-        // ========== ALL-DONE MODAL ==========
-        function showAllDoneModal() {
-            const levelNames = ['Beginner', 'Intermediate', 'Advanced'];
-            const currentIdx = levelNames.indexOf(currentLevel);
-            const nextLevel = (currentIdx >= 0 && currentIdx < levelNames.length - 1) ? levelNames[currentIdx + 1] : null;
+        // Create accordion DOM
+        for (const [chapterName, parts] of Object.entries(chapters)) {
+            // Chapter header
+            const header = document.createElement('div');
+            header.className = 'chapter-header';
+            header.innerHTML = `${chapterName} <span class="arrow">▶</span>`;
 
-            document.getElementById('allDoneMessage').textContent =
-                `You’ve finished every story in the ${currentLevel} level. What would you like to do next?`;
+            // Parts list
+            const list = document.createElement('div');
+            list.className = 'parts-list';
 
-            const nextBtn = document.getElementById('goNextLevel');
-            if (nextLevel) {
-                nextBtn.style.display = 'inline-block';
-                nextBtn.textContent = `➡ Go to ${nextLevel}`;
-                nextBtn.onclick = () => {
-                    document.getElementById('allDoneModal').classList.remove('show');
-                    currentLevel = nextLevel;
-                    document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
-                    currentStories = allStories.filter(s => s.Level === currentLevel);
-                    shuffleArray(currentStories);
-                    buildStoryCards();
-                    showScreen(listScreen);
-                };
-            } else {
-                nextBtn.style.display = 'none';
-            }
+            parts.forEach(p => {
+                const row = document.createElement('div');
+                row.className = 'part-row';
+                if (p.globalIndex === currentPartIndex) row.classList.add('active');
+                row.textContent = `Part ${p.part} – ${p.title}`;
+                row.addEventListener('click', () => {
+                    currentPartIndex = p.globalIndex;
+                    loadCurrentPart();
+                    // Rebuild both accordions to refresh highlights and keep them in sync
+                    buildAccordion();
+                });
+                list.appendChild(row);
+            });
 
-            document.getElementById('reReadStories').onclick = () => {
-                document.getElementById('allDoneModal').classList.remove('show');
-                shuffleArray(currentStories);
-                startStory(0);
-            };
-            document.getElementById('allDoneModal').classList.add('show');
+            // Toggle open/close on header click
+            header.addEventListener('click', () => {
+                header.classList.toggle('open');
+                list.classList.toggle('open');
+            });
+
+            container.appendChild(header);
+            container.appendChild(list);
         }
+    });
+}
+//----------------------------New Build End-----------------------------------//        
+//-_-_-_-----------------------Mega Story Design End------------------------_-_______//
 
-        document.getElementById('allDoneModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('allDoneModal')) {
-                document.getElementById('allDoneModal').classList.remove('show');
+        
+// ═══════════════════════════════════════
+//  AUDIO PLAYER FACTORY
+// ═══════════════════════════════════════
+async function getAudioContext() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+    return audioCtx;
+}
+
+function stopActiveAudio() {
+    if (activeAudio) {
+        try { activeAudio.source.stop(); } catch(e) {}
+        activeAudio = null;
+    }
+}
+
+function drawWaveform(canvas, buffer, container, color = '#ffffff') {
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    if (!width || !height) return;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext('2d');
+    const data = buffer.getChannelData(0);
+    const step = Math.ceil(data.length / width);
+    const amp = height / 2;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.beginPath();
+    ctx.moveTo(0, amp);
+    for (let i = 0; i < width; i++) {
+        let min = 1.0, max = -1.0;
+        for (let j = 0; j < step; j++) {
+            const idx = i * step + j;
+            if (idx < data.length) {
+                const val = data[idx];
+                if (val < min) min = val;
+                if (val > max) max = val;
+            }
+        }
+        ctx.lineTo(i, (1 + min) * amp);
+        ctx.lineTo(i, (1 + max) * amp);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+}
+
+
+function stopAllOtherPlayers(currentPlayerId) {
+    allPlayers.forEach(player => {
+        if (player.id !== currentPlayerId && player.stop) {
+            player.stop();
+        }
+    });
+    // Also stop any lingering global activeAudio just in case
+    stopActiveAudio();
+}
+
+        
+function createAudioPlayer({ audioUrl, playBtn, canvas, waveColor = '#ffffff', onTimeUpdate = null, sentences = [] }) {
+    // ─── Per‑player state ─────────────────────
+    let buffer = null;
+    let isPlaying = false;
+    let startTime = 0;
+    let offset = 0;
+    let sourceNode = null;
+    let animationFrame = null;
+    const waveContainer = canvas.parentElement;   // .wave-container
+
+    // ─── Register this player globally ─────────
+    const playerId = Date.now() + Math.random();
+    const thisPlayer = { id: playerId, stop: null };
+    allPlayers.push(thisPlayer);
+
+    // ─── Progress overlay (optional) ─────────
+    const progressCanvas = document.createElement('canvas');
+    progressCanvas.className = 'progress-canvas';
+    progressCanvas.style.position = 'absolute';
+    progressCanvas.style.left = '0';
+    progressCanvas.style.top = '0';
+    progressCanvas.style.pointerEvents = 'none';
+    waveContainer.appendChild(progressCanvas);
+
+    // ─── Playhead knob ────────────────────────
+    const playhead = document.createElement('div');
+    playhead.className = 'playhead';
+    waveContainer.appendChild(playhead);
+
+    function updatePlayhead(progress) {
+        const percent = Math.max(0, Math.min(1, progress)) * 100;
+        playhead.style.left = percent + '%';
+    }
+
+    // ─── Drag‑to‑scrub for the playhead ──────
+    let isDragging = false;
+    function onDrag(e) {
+        if (!isDragging || !buffer) return;
+        e.preventDefault();
+        const rect = waveContainer.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const x = clientX - rect.left;
+        const ratio = Math.max(0, Math.min(1, x / rect.width));
+        offset = ratio * buffer.duration;
+        updatePlayhead(ratio);
+    }
+    function onDragEnd(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        document.removeEventListener('mousemove', onDrag);
+        document.removeEventListener('mouseup', onDragEnd);
+        document.removeEventListener('touchmove', onDrag);
+        document.removeEventListener('touchend', onDragEnd);
+        // If it was playing, restart from new position
+        if (isPlaying) {
+        if (sourceNode) sourceNode.onended = null;
+        try { sourceNode.stop(); } catch (e) {}
+        isPlaying = false;
+        playBtn.classList.remove('pause');
+        cancelAnimationFrame(animationFrame);
+        play();
+        }
+    }
+    playhead.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        document.addEventListener('mousemove', onDrag);
+        document.addEventListener('mouseup', onDragEnd);
+    });
+    playhead.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        document.addEventListener('touchmove', onDrag, { passive: false });
+        document.addEventListener('touchend', onDragEnd);
+    });
+
+    // ─── Audio loading & waveform ─────────────
+    async function loadAudio() {
+        if (buffer) return;
+        const response = await fetch(audioUrl);
+        const arrayBuffer = await response.arrayBuffer();
+        const actx = await getAudioContext();
+        buffer = await actx.decodeAudioData(arrayBuffer);
+
+        drawWaveform(canvas, buffer, waveContainer, waveColor);
+        if (progressCanvas) {
+            progressCanvas.width = canvas.width;
+            progressCanvas.height = canvas.height;
+        }
+        // Redraw on container resize
+        const resizeObserver = new ResizeObserver(() => {
+            if (buffer) {
+                drawWaveform(canvas, buffer, waveContainer, waveColor);
+                if (progressCanvas) {
+                    progressCanvas.width = canvas.width;
+                    progressCanvas.height = canvas.height;
+                }
             }
         });
+        resizeObserver.observe(waveContainer);
+    }
 
-        document.getElementById('backToMenu').addEventListener('click', () => showScreen(levelScreen));
-        document.getElementById('floatingHubBtn').addEventListener('click', () => showScreen(levelScreen));
+    // ─── Full stop & reset (used globally) ────
+function stopAndReset() {
+    if (isPlaying) {
+        if (sourceNode) sourceNode.onended = null;
+        try { sourceNode.stop(); } catch (e) {}
+        isPlaying = false;
+        playBtn.classList.remove('pause');
+        cancelAnimationFrame(animationFrame);
+        offset = 0;
+        updatePlayhead(0);
+        if (activeAudio && activeAudio.source === sourceNode) {
+            activeAudio = null;
+        }
+    }
+    else {
+            offset = 0;
+            updatePlayhead(0);
+            playBtn.classList.remove('pause');
+        }
+    }
+    thisPlayer.stop = stopAndReset;   // so global registry can call it
 
-        // ========== DARK/LIGHT MODE TOGGLE ==========
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
-        const themeLabel = document.getElementById('themeLabel');
-        const body = document.body;
+    // ─── Play (only one audio at a time) ─────
+    async function play() {
+        // Stop every other player globally
+        stopAllOtherPlayers(playerId);
 
-        function setTheme(isDark) {
-            if (isDark) {
-                body.classList.add('dark');
-                themeIcon.textContent = '☀️';
-                themeLabel.textContent = 'Light';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                body.classList.remove('dark');
-                themeIcon.textContent = '🌙';
-                themeLabel.textContent = 'Dark';
-                localStorage.setItem('theme', 'light');
+        if (!buffer) await loadAudio();
+        const actx = await getAudioContext();
+
+        // Create a fresh source — keep a LOCAL reference for this specific node
+        const node = actx.createBufferSource();
+        node.buffer = buffer;
+        node.connect(actx.destination);
+        sourceNode = node; // still keep the outer reference for pause()/stop() to use
+
+        startTime = actx.currentTime;
+        node.start(0, offset);
+        isPlaying = true;
+        playBtn.classList.add('pause');   // show pause icon
+        activeAudio = { source: node, context: actx, buffer, startTime, offset };
+
+        updateProgress();
+
+        node.onended = () => {
+            // Ignore if this node has since been superseded by a newer one
+            if (sourceNode !== node) return;
+            if (isPlaying) {
+                isPlaying = false;
+                offset = 0;
+                playBtn.classList.remove('pause');
+                cancelAnimationFrame(animationFrame);
+                updatePlayhead(0);
+                if (activeAudio && activeAudio.source === node) {
+                    activeAudio = null;
+                }
             }
+        };
+    }
+
+    function pause() {
+        if (!isPlaying) return;
+        const actx = audioCtx;
+        offset += actx.currentTime - startTime;
+        if (sourceNode) sourceNode.onended = null;   // don't let the stop() below fire stale logic
+        try { sourceNode.stop(); } catch (e) {}
+        isPlaying = false;
+        playBtn.classList.remove('pause');
+        cancelAnimationFrame(animationFrame);
+        activeAudio = null;
+        updatePlayhead(offset / buffer.duration);
+    }
+
+    async function updateProgress() {
+        if (!isPlaying || !buffer) return;
+        const now = (await getAudioContext()).currentTime;
+        const elapsed = now - startTime + offset;
+        const progress = Math.min(elapsed / buffer.duration, 1);
+
+        // Update progress overlay
+        const pctx = progressCanvas.getContext('2d');
+        pctx.clearRect(0, 0, progressCanvas.width, progressCanvas.height);
+        pctx.fillStyle = '#ff8906';
+        pctx.fillRect(0, 0, progressCanvas.width * progress, progressCanvas.height);
+
+        // Move playhead
+        updatePlayhead(progress);
+
+        // Optional sentence highlighting
+        if (sentences.length > 0) {
+            const currentTime = elapsed;
+            const totalDuration = buffer.duration;
+            const idx = Math.min(
+                Math.floor((currentTime / totalDuration) * sentences.length),
+                sentences.length - 1
+            );
+            sentences.forEach(s => s.classList.remove('highlight'));
+            if (sentences[idx]) sentences[idx].classList.add('highlight');
         }
 
-        if (localStorage.getItem('theme') === null || localStorage.getItem('theme') === 'dark') {
-            setTheme(true);
+        animationFrame = requestAnimationFrame(updateProgress);
+    }
+
+    // ─── Canvas click → scrub & restart ─────
+    canvas.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!buffer) await loadAudio();
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const ratio = Math.max(0, Math.min(1, x / rect.width));
+        offset = ratio * buffer.duration;
+        updatePlayhead(ratio);
+
+if (isPlaying) {
+        if (sourceNode) sourceNode.onended = null;
+        try { sourceNode.stop(); } catch (err) {}
+        isPlaying = false;
+        playBtn.classList.remove('pause');
+        cancelAnimationFrame(animationFrame);
+        if (activeAudio && activeAudio.source === sourceNode) {
+            activeAudio = null;
+        }
+    }
+    // Always start fresh
+    await play();
+    });
+
+    // ─── Play/pause button ─────────────────
+    playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isPlaying) pause();
+        else play();
+    });
+
+    // ─── Auto‑load waveform ─────────────────
+    loadAudio();
+
+    // Expose minimal controls (not used externally, but kept for completeness)
+    return { loadAudio, play, pause };
+}
+        
+// ═══════════════════════════════════════
+//  BUILD STORY CARDS (two‑card layout)
+// ═══════════════════════════════════════
+function buildCards(stories) {
+    const container = document.getElementById('storyCards');
+    container.innerHTML = '';
+    if (stories.length === 0) {
+        container.innerHTML = '<p style="color:var(--mut); text-align:center;">No stories in this level yet.</p>';
+        return;
+    }
+
+    stories.forEach((story, idx) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'story-wrapper';
+        wrapper.addEventListener('click', (e) => {
+            if (e.target.closest('.audio-card')) return;
+            startStory(idx);
+        });
+
+        // info card
+        const infoCard = document.createElement('div');
+        infoCard.className = 'story-info-card';
+        infoCard.style.background = `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
+
+        const badgeRow = document.createElement('div');
+        badgeRow.className = 'card-badge-row';
+        const levelBadge = document.createElement('span');
+        levelBadge.className = 'badge';
+        levelBadge.textContent = story.Level;
+        badgeRow.appendChild(levelBadge);
+        if (story.New && story.New.toLowerCase() === 'new') {
+            const newBadge = document.createElement('span');
+            newBadge.className = 'badge new-badge';
+            newBadge.textContent = 'NEW';
+            badgeRow.appendChild(newBadge);
+        }
+        infoCard.appendChild(badgeRow);
+
+        const title = document.createElement('div');
+        title.className = 'card-title';
+        title.textContent = story.Title;
+        infoCard.appendChild(title);
+
+        if (story.Description) {
+            const desc = document.createElement('div');
+            desc.className = 'card-description';
+            desc.textContent = story.Description;
+            infoCard.appendChild(desc);
+        }
+
+        wrapper.appendChild(infoCard);
+
+        // audio card (if URL exists)
+        if (story.AudioURL) {
+            const audioCard = document.createElement('div');
+            audioCard.className = 'audio-card';
+            audioCard.style.background = `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
+
+            const playBtn = document.createElement('div');
+            playBtn.className = 'play-btn';
+            const waveContainer = document.createElement('div');
+            waveContainer.className = 'wave-container';
+            const canvas = document.createElement('canvas');
+            waveContainer.appendChild(canvas);
+            audioCard.appendChild(playBtn);
+            audioCard.appendChild(waveContainer);
+
+            createAudioPlayer({
+                audioUrl: story.AudioURL,
+                playBtn,
+                canvas,
+                waveColor: '#ffffff'
+            });
+
+            wrapper.appendChild(audioCard);
+        }
+
+        container.appendChild(wrapper);
+    });
+}
+
+// ═══════════════════════════════════════
+//  START A STORY
+// ═══════════════════════════════════════
+async function startStory(index) {
+    currentStoryIndex = index;
+    const story = currentStories[index];
+
+    // Reset mega story state
+    isMegaStory = false;
+    megaParts = [];
+    currentPartIndex = 0;
+    megaStoryGID = null;
+
+    // Check if this is a mega story
+    if (story.MegaStoryGID && story.MegaStoryGID.trim() !== '') {
+        isMegaStory = true;
+        megaStoryGID = story.MegaStoryGID.trim();
+        // Fetch parts from the dedicated sheet
+        await loadMegaStoryParts(megaStoryGID);
+    }
+
+    // Set up the hero banner (common to both types)
+    document.getElementById('heroBanner').style.background =
+        `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
+    document.getElementById('heroTitle').textContent = story.Title;
+    document.getElementById('heroDescription').textContent = story.Description || '';
+    document.getElementById('heroLevelBadge').textContent = story.Level;
+
+    // Clear previous audio in hero
+    const heroPlayBtn = document.getElementById('heroPlayBtn');
+    heroPlayBtn.className = 'play-btn';
+    const heroCanvas = document.getElementById('heroWaveCanvas');
+    heroCanvas.getContext('2d').clearRect(0, 0, heroCanvas.width, heroCanvas.height);
+    stopActiveAudio();
+
+    if (isMegaStory) {
+        // Set up mega story UI
+        setupMegaStoryUI(story);
+    } else {
+        // Normal story – hide mega controls
+        document.getElementById('megaStoryControls').style.display = 'none';
+        document.getElementById('megaStoryControlsBottom').style.display = 'none';
+        document.getElementById('prevPart').style.display = 'none';
+        document.getElementById('nextStory').textContent = '➡ Next Story';
+        document.getElementById('nextStory').style.display = 'inline-flex';
+        document.getElementById('currentPartTitle').textContent = '';
+
+        // Load story text (normal)
+        const content = document.getElementById('content-body');
+        const replaced = story.StoryText.replace(/\[([^\]]+)\]/g, (match, word) => {
+            return `<span class="pill" data-word="${word}">${word}</span>`;
+        });
+        content.innerHTML = replaced;
+
+        // Setup audio if available (normal)
+        if (story.AudioURL) {
+            createAudioPlayer({
+                audioUrl: story.AudioURL,
+                playBtn: heroPlayBtn,
+                canvas: heroCanvas,
+                waveColor: '#000000',
+                sentences: []
+            });
         } else {
-            setTheme(false);
+            document.getElementById('heroAudioCapsule').style.display = 'none';
         }
+    }
 
-        themeToggle.addEventListener('click', () => setTheme(!body.classList.contains('dark')));
+    showScreen(storyScreen);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}async function startStory(index) {
+    currentStoryIndex = index;
+    const story = currentStories[index];
 
-        // ========== INIT ==========
-        window.addEventListener('DOMContentLoaded', async () => {
-            await loadData();
-            if (allStories.length === 0) {
-                levelScreen.innerHTML = '<h1>🌟 Choose Your Level</h1><p>No stories loaded. Check Google Sheet links.</p>';
-            }
+    // Reset mega story state
+    isMegaStory = false;
+    megaParts = [];
+    currentPartIndex = 0;
+    megaStoryGID = null;
+
+    // Check if this is a mega story
+    if (story.MegaStoryGID && story.MegaStoryGID.trim() !== '') {
+        isMegaStory = true;
+        megaStoryGID = story.MegaStoryGID.trim();
+        // Fetch parts from the dedicated sheet
+        await loadMegaStoryParts(megaStoryGID);
+    }
+
+    // Set up the hero banner (common to both types)
+    document.getElementById('heroBanner').style.background =
+        `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
+    document.getElementById('heroTitle').textContent = story.Title;
+    document.getElementById('heroDescription').textContent = story.Description || '';
+    document.getElementById('heroLevelBadge').textContent = story.Level;
+
+    // Clear previous audio in hero
+    const heroPlayBtn = document.getElementById('heroPlayBtn');
+    heroPlayBtn.className = 'play-btn';
+    const heroCanvas = document.getElementById('heroWaveCanvas');
+    heroCanvas.getContext('2d').clearRect(0, 0, heroCanvas.width, heroCanvas.height);
+    stopActiveAudio();
+
+    if (isMegaStory) {
+        // Set up mega story UI
+        setupMegaStoryUI(story);
+    } else {
+        // Normal story – hide mega controls
+        document.getElementById('megaStoryControls').style.display = 'none';
+        document.getElementById('megaStoryControlsBottom').style.display = 'none';
+        document.getElementById('prevPart').style.display = 'none';
+        document.getElementById('nextStory').textContent = '➡ Next Story';
+        document.getElementById('nextStory').style.display = 'inline-flex';
+        document.getElementById('currentPartTitle').textContent = '';
+
+        // Load story text (normal)
+        const content = document.getElementById('content-body');
+        const replaced = story.StoryText.replace(/\[([^\]]+)\]/g, (match, word) => {
+            return `<span class="pill" data-word="${word}">${word}</span>`;
         });
+        content.innerHTML = replaced;
+
+        // Setup audio if available (normal)
+        if (story.AudioURL) {
+            createAudioPlayer({
+                audioUrl: story.AudioURL,
+                playBtn: heroPlayBtn,
+                canvas: heroCanvas,
+                waveColor: '#000000',
+                sentences: []
+            });
+        } else {
+            document.getElementById('heroAudioCapsule').style.display = 'none';
+        }
+    }
+
+    showScreen(storyScreen);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}async function startStory(index) {
+    currentStoryIndex = index;
+    const story = currentStories[index];
+
+    // Reset mega story state
+    isMegaStory = false;
+    megaParts = [];
+    currentPartIndex = 0;
+    megaStoryGID = null;
+
+    // Check if this is a mega story
+    if (story.MegaStoryGID && story.MegaStoryGID.trim() !== '') {
+        isMegaStory = true;
+        megaStoryGID = story.MegaStoryGID.trim();
+        // Fetch parts from the dedicated sheet
+        await loadMegaStoryParts(megaStoryGID);
+    }
+
+    // Set up the hero banner (common to both types)
+    document.getElementById('heroBanner').style.background =
+        `linear-gradient(115deg, ${story.GradientStart || '#60be3e'} 0%, ${story.GradientEnd || '#89d35a'} 40%, #ffffff 90%)`;
+    document.getElementById('heroTitle').textContent = story.Title;
+    document.getElementById('heroDescription').textContent = story.Description || '';
+    document.getElementById('heroLevelBadge').textContent = story.Level;
+
+    // Clear previous audio in hero
+    const heroPlayBtn = document.getElementById('heroPlayBtn');
+    heroPlayBtn.className = 'play-btn';
+    const heroCanvas = document.getElementById('heroWaveCanvas');
+    heroCanvas.getContext('2d').clearRect(0, 0, heroCanvas.width, heroCanvas.height);
+    stopActiveAudio();
+
+    if (isMegaStory) {
+        // Set up mega story UI
+        setupMegaStoryUI(story);
+    } else {
+        // Normal story – hide mega controls
+        document.getElementById('megaStoryControls').style.display = 'none';
+        document.getElementById('megaStoryControlsBottom').style.display = 'none';
+        document.getElementById('prevPart').style.display = 'none';
+        document.getElementById('nextStory').textContent = '➡ Next Story';
+        document.getElementById('nextStory').style.display = 'inline-flex';
+        document.getElementById('currentPartTitle').textContent = '';
+
+        // Load story text (normal)
+        const content = document.getElementById('content-body');
+        const replaced = story.StoryText.replace(/\[([^\]]+)\]/g, (match, word) => {
+            return `<span class="pill" data-word="${word}">${word}</span>`;
+        });
+        content.innerHTML = replaced;
+
+        // Setup audio if available (normal)
+        if (story.AudioURL) {
+            createAudioPlayer({
+                audioUrl: story.AudioURL,
+                playBtn: heroPlayBtn,
+                canvas: heroCanvas,
+                waveColor: '#000000',
+                sentences: []
+            });
+        } else {
+            document.getElementById('heroAudioCapsule').style.display = 'none';
+        }
+    }
+
+    showScreen(storyScreen);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════
+//  SCREENS & NAVIGATION
+// ═══════════════════════════════════════
+function showScreen(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    screen.classList.add('active');
+
+    floatingHubBtn.style.display = 'flex';
+    const backBtn = document.getElementById('floatingBackBtn');
+    if (screen === listScreen || screen === storyScreen || screen === summaryScreen) {
+        backBtn.style.display = 'flex';
+    } else {
+        backBtn.style.display = 'none';
+    }
+}
+
+// Level selection
+document.querySelectorAll('.level-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        currentLevel = btn.dataset.level;
+        document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
+        currentStories = sortStories(allStories.filter(s => s.Level === currentLevel));
+        buildCards(currentStories);
+        showScreen(listScreen);
+    });
+});
+
+document.getElementById('megaStoriesBtn').addEventListener('click', () => {
+    currentLevel = 'Mega';
+    document.getElementById('levelTitle').textContent = 'Mega Stories';
+    currentStories = sortStories(allStories.filter(s => s.Level === 'Mega'));
+    buildCards(currentStories);
+    showScreen(listScreen);
+});
+
+document.getElementById('megaBackToLevels').addEventListener('click', () => showScreen(levelScreen));
+document.getElementById('backToLevels').addEventListener('click', () => showScreen(levelScreen));
+
+// Finish reading → summary
+document.getElementById('finishStory').addEventListener('click', () => {
+    const summaryList = document.getElementById('summaryList');
+    summaryList.innerHTML = '';
+    if (Object.keys(learnedWords).length === 0) {
+        summaryList.innerHTML = '<li style="color:var(--mut);">You haven’t collected any words yet.</li>';
+    } else {
+        for (let key in learnedWords) {
+            const lw = learnedWords[key];
+            const li = document.createElement('li');
+            li.style.background = 'var(--sur)';
+            li.style.border = '1px solid var(--brd)';
+            li.style.borderRadius = '12px';
+            li.style.padding = '12px 16px';
+            li.innerHTML = `<strong style="color:var(--acc);">${lw.word}</strong> – ${lw.definition}<br><em style="color:var(--mut);">${lw.example}</em>`;
+            summaryList.appendChild(li);
+        }
+    }
+    showScreen(summaryScreen);
+});
+
+// Next story
+document.getElementById('nextStory').addEventListener('click', () => {
+    if (isMegaStory) return;
+    if (currentStories.length === 0) return;
+    const nextIndex = currentStoryIndex + 1;
+    if (nextIndex < currentStories.length) {
+        startStory(nextIndex);
+    } else {
+        showAllDoneModal();
+    }
+});
+
+// Read another story (summary screen)
+document.getElementById('readAnotherStory').addEventListener('click', () => {
+    showScreen(listScreen);
+});
+
+// All-done modal
+function showAllDoneModal() {
+    const levelNames = ['Beginner', 'Intermediate', 'Advanced'];
+    const currentIdx = levelNames.indexOf(currentLevel);
+    const nextLevel = (currentIdx >= 0 && currentIdx < levelNames.length - 1) ? levelNames[currentIdx + 1] : null;
+
+    document.getElementById('allDoneMessage').textContent = `You’ve finished every story in the ${currentLevel} level. What would you like to do next?`;
+
+    const nextBtn = document.getElementById('goNextLevel');
+    if (nextLevel) {
+        nextBtn.style.display = 'inline-flex';
+        nextBtn.textContent = `➡ Go to ${nextLevel}`;
+        nextBtn.onclick = () => {
+            document.getElementById('allDoneModal').classList.remove('show');
+            currentLevel = nextLevel;
+            document.getElementById('levelTitle').textContent = currentLevel + ' Stories';
+            currentStories = sortStories(allStories.filter(s => s.Level === currentLevel));
+            buildCards(currentStories);
+            showScreen(listScreen);
+        };
+    } else {
+        nextBtn.style.display = 'none';
+    }
+
+    document.getElementById('reReadStories').onclick = () => {
+        document.getElementById('allDoneModal').classList.remove('show');
+        currentStories = sortStories(currentStories);
+        startStory(0);
+    };
+    document.getElementById('allDoneModal').classList.add('show');
+}
+
+document.getElementById('allDoneModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('allDoneModal')) {
+        document.getElementById('allDoneModal').classList.remove('show');
+    }
+});
+
+// Floating buttons
+floatingHubBtn.addEventListener('click', () => {
+    window.location.href = 'hub.html?name=' + encodeURIComponent(playerName);
+});
+document.getElementById('floatingBackBtn').addEventListener('click', () => {
+    showScreen(levelScreen);
+});
+
+
+
+        // Previous Part (mega story)
+document.getElementById('prevPart').addEventListener('click', () => {
+    if (!isMegaStory || currentPartIndex <= 0) return;
+
+    const current = megaParts[currentPartIndex];
+    const currentChapter = current.chapter;
+    const partsInChapter = megaParts.filter(p => p.chapter === currentChapter);
+    const indexInChapter = partsInChapter.indexOf(current);
+
+    if (indexInChapter > 0) {
+        // Previous part in same chapter
+        currentPartIndex = megaParts.findIndex(p =>
+            p.chapter === currentChapter &&
+            parseInt(p.part) === parseInt(partsInChapter[indexInChapter - 1].part)
+        );
+    } else {
+        // First part in chapter → go to last part of previous chapter
+        const chapters = [...new Set(megaParts.map(p => p.chapter))];
+        const currentChapterIndex = chapters.indexOf(currentChapter);
+        if (currentChapterIndex > 0) {
+            const prevChapter = chapters[currentChapterIndex - 1];
+            const partsInPrevChapter = megaParts.filter(p => p.chapter === prevChapter);
+            if (partsInPrevChapter.length > 0) {
+                const lastPart = partsInPrevChapter[partsInPrevChapter.length - 1];
+                currentPartIndex = megaParts.findIndex(p =>
+                    p.chapter === prevChapter && parseInt(p.part) === parseInt(lastPart.part)
+                );
+            }
+        }
+    }
+
+    loadCurrentPart();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+        
+    
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+    await loadData();
+    if (allStories.length === 0) {
+        levelScreen.innerHTML = '<h1>🌟 Choose Your Level</h1><p style="color:var(--mut);">No stories loaded. Check Google Sheet links.</p>';
+    }
+});
     </script>
 </body>
 </html>
