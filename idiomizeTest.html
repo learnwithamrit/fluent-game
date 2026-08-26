@@ -25,7 +25,8 @@
             --brd: #2e2e52;
             --txt: #e8e8f0;
             --mut: #7070a0;
-            --acc: #10b981;      /* green accent for Idiomize */
+            --acc: #ff3359;
+            --brand: #ff8906;   /* new variable for brand orange */  
             --ac2: #f9c74f;
             --grn: #06d6a0;
             --blu: #3da9fc;
@@ -84,7 +85,7 @@
         #top-nav .nav-brand {
             font-size: var(--fs-sm);
             font-weight: 900;
-            color: var(--acc);
+            color: var(--brand);
             letter-spacing: 1.5px;
             text-transform: uppercase;
             text-decoration: none;
@@ -146,8 +147,8 @@
             letter-spacing: 1.8px;
             text-transform: uppercase;
             color: var(--acc);
-            background: #10b98114;
-            border: 1px solid #10b98133;
+            background: #ff335914;
+            border: 1px solid #ff335933;
             border-radius: 20px;
             padding: 4px 14px;
             display: inline-block;
@@ -229,7 +230,7 @@
             border: none;
         }
         .btn-primary { background: var(--acc); color: #0d0d1a; }
-        .btn-primary:hover { background: #0aa87c; transform: translateY(-2px); }
+        .btn-primary:hover { background: #d63851; transform: translateY(-2px); }
         .btn-secondary { background: var(--sur2); color: var(--txt); border: 1.5px solid var(--brd); }
         .btn-secondary:hover { border-color: var(--acc); color: var(--acc); }
         .btn-ghost { background: transparent; color: var(--mut); padding: 10px 20px; font-size: var(--fs-sm); }
@@ -289,7 +290,7 @@
         .option-btn:hover { border-color: var(--acc); }
         .option-btn.selected {
             border-color: var(--acc);
-            background: rgba(16, 185, 129, 0.12);
+            background: rgba(255, 51, 89, 0.12);
         }
         .option-btn .check-circle {
             width: 22px;
@@ -384,7 +385,7 @@
             align-items: center;
             gap: 10px;
         }
-        #footer-brand-name { font-size: var(--fs-lg); font-weight: 900; color: var(--acc); letter-spacing: 2px; text-transform: uppercase; }
+        #footer-brand-name { font-size: var(--fs-lg); font-weight: 900; color: var(--brand); letter-spacing: 2px; text-transform: uppercase; }
         #footer-brand-by { font-size: var(--fs-xs); color: var(--mut); font-weight: 700; letter-spacing: .5px; }
         #footer-tagline { font-size: var(--fs-xs); color: var(--mut); max-width: 280px; line-height: 1.6; }
         #footer-divider { width: 40px; border: none; border-top: 1px solid var(--brd); }
