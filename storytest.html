@@ -650,6 +650,25 @@
             color: var(--brd);
         }
 
+
+        /* Story content wrapper – centres text and gives breathing room */
+        .story-content-wrapper {
+            width: 100%;
+            max-width: 680px;           /* default for mobile/tablet */
+            margin: 0 auto;
+            padding: 30px 20px 20px;
+            box-sizing: border-box;
+        }
+        
+        /* New part title inside the wrapper */
+        #storyPartTitle {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--acc);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
         /* ═══════════════════════════════════════
            MODALS
         ════════════════════════════════════════ */
@@ -697,6 +716,17 @@
             .hero-banner { padding: 40px 16px 60px; }
             .audio-capsule { height: 60px; padding: 0 20px; }
         }
+        /* On desktop, expand the wrapper */
+        @media (min-width: 1200px) {
+            .story-content-wrapper {
+                max-width: 960px;        /* you can adjust this */
+                padding: 40px 40px 30px;
+            }
+        }
+
+        #currentPartTitle {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -734,24 +764,27 @@
         </header>
 
         <!-- Mega story part selector & info (hidden by default) -->
-<div id="megaStoryControls" style="display:none;">
-    <div class="accordion" id="accordionTop"></div>
-    <p id="currentPartTitle" style="color:var(--acc); font-weight:700; text-align:center; margin-bottom:10px;"></p>
-  <!-- Top part selector -->
-  <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin:20px 0;">
-   
-  </div>
-  <!-- Current part title (shown above the story text) -->
-  <p id="currentPartTitle" style="color:var(--acc); font-weight:700; text-align:center; margin-bottom:10px;"></p>
-</div>
+        <div id="megaStoryControls" style="display:none;">
+            <div class="accordion" id="accordionTop"></div>
+            <p id="currentPartTitle" style="color:var(--acc); font-weight:700; text-align:center; margin-bottom:10px;"></p>
+          <!-- Top part selector -->
+          <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin:20px 0;">
+           
+          </div>
+          <!-- Current part title (shown above the story text) -->
+          <p id="currentPartTitle" style="color:var(--acc); font-weight:700; text-align:center; margin-bottom:10px;"></p>
+        </div>
         <div class="audio-capsule" id="heroAudioCapsule">
             <div class="play-btn" id="heroPlayBtn"></div>
             <div class="wave-container" id="heroWaveContainer">
                 <canvas id="heroWaveCanvas"></canvas>
             </div>
         </div>
-            <main id="content-body"></main>
-                    <!-- Bottom part selector (inside story-buttons area for convenience) -->
+            <div class="story-content-wrapper">
+                <h2 id="storyPartTitle" style="display:none;"></h2>
+                <main id="content-body"></main>
+            </div>
+            <!-- Bottom part selector (inside story-buttons area for convenience) -->
             <div id="megaStoryControlsBottom" style="display:none; width:100%; text-align:center; margin-bottom:15px;">
                 <div class="accordion" id="accordionBottom"></div>
              
@@ -1059,7 +1092,14 @@ function loadCurrentPart() {
     // Update part title display
     document.getElementById('currentPartTitle').textContent = 
         part.title ? `${part.chapter || ''} – Part ${part.part}: ${part.title}` : `Part ${part.part}`;
-
+    // Set the new part title inside the wrapper
+        const newPartTitle = document.getElementById('storyPartTitle');
+        if (part.title) {
+            newPartTitle.style.display = 'block';
+            newPartTitle.textContent = `Part ${part.part} – ${part.title}`;
+        } else {
+            newPartTitle.style.display = 'none';
+        }
     // Insert story text with vocabulary pills
     const content = document.getElementById('content-body');
     const replaced = part.storyText.replace(/\[([^\]]+)\]/g, (match, word) => {
