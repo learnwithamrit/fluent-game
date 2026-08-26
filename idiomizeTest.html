@@ -2,886 +2,921 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>Idiomize — Fluent by Amrit</title>
-
-    <!-- Search Engine Optimisation -->
-    <meta name="description" content="Fluent by Amrit — quiz yourself on English idioms. Multi‑select quiz, batches of 10‑50. Play free online.">
-    <meta name="keywords" content="Fluent game by Amrit, idiom quiz, English idiom game, multi‑select quiz, learn idioms">
-    <meta name="author" content="Amrit">
-    <meta name="robots" content="index, follow">
-
-    <!-- Open Graph -->
+    <meta name="description" content="Test your knowledge of English idioms with a multi‑select quiz. Choose your batch size and start playing.">
     <meta property="og:title" content="Idiomize — Fluent by Amrit">
-    <meta property="og:description" content="Test your knowledge of English idioms with a multi‑select quiz. Part of the Fluent learning suite.">
-    <meta property="og:url" content="https://learnwithamrit.github.io/idiomize/">
+    <meta property="og:description" content="Test your knowledge of English idioms with a multi‑select quiz. Choose your batch size and start playing.">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://learnwithamrit.github.io/fluent-game/icon-512.png">
-    
-    <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
-    <link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="icon-96.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-    <meta name="msapplication-TileImage" content="icon-192.png">
-    <meta name="msapplication-TileColor" content="#0d0d1a">
+
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png">
     <meta name="theme-color" content="#10b981">
 
     <style>
+        /* ═══════════════════════════════════════
+           DESIGN TOKENS – from Fluent template
+        ════════════════════════════════════════ */
         :root {
-            --bg-deep: #121212;
-            --card-bg: #1e1e1e;
-            --accent: #10b981;
-            --success: #10b981;
-            --error: #ef4444;
-            --text-primary: #f9fafb;
-            --text-secondary: #9ca3af;
-            --card-radius: 20px;
-            --btn-radius: 14px;
-            --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
-            --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --bg: #0d0d1a;
+            --sur: #161628;
+            --sur2: #1e1e38;
+            --brd: #2e2e52;
+            --txt: #e8e8f0;
+            --mut: #7070a0;
+            --acc: #10b981;      /* green accent for Idiomize */
+            --ac2: #f9c74f;
+            --grn: #06d6a0;
+            --blu: #3da9fc;
+            --red: #ef4565;
+
+            --fs-xs: 0.62rem;
+            --fs-sm: 0.78rem;
+            --fs-base: 0.95rem;
+            --fs-md: 1.1rem;
+            --fs-lg: 1.4rem;
+            --fs-xl: 1.9rem;
+            --fs-2xl: 2.4rem;
+
+            --gap-sm: 12px;
+            --gap-md: 24px;
+            --gap-lg: 48px;
+            --max-w: 680px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        html, body {
-            height: 100%; width: 100%;
-            background: #0a0a0a;
-            font-family: var(--font-sans);
-            display: flex; justify-content: center; align-items: center;
-            padding: 0; -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none; user-select: none; touch-action: manipulation;
-            overflow: hidden;
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .idiom-app {
-            width: 100%; height: 100%;
-            background: var(--bg-deep);
-            display: flex; flex-direction: column; overflow: hidden;
-            position: relative; transition: all 0.3s ease;
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--txt);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-size: var(--fs-base);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        @media (min-width: 500px) {
-            body { padding: 16px; }
-            .idiom-app {
-                max-width: 540px; height: auto; min-height: 85vh; max-height: 95vh;
-                border-radius: 32px;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
-            }
+        /* TOP NAV */
+        #top-nav {
+            width: 100%;
+            background: var(--sur);
+            border-bottom: 1px solid var(--brd);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        @media (min-width: 768px) {
-            .idiom-app { max-width: 90%; min-height: 80vh; max-height: 92vh; border-radius: 36px; }
+        #top-nav .nav-brand {
+            font-size: var(--fs-sm);
+            font-weight: 900;
+            color: var(--acc);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-decoration: none;
         }
-        @media (min-width: 1200px) {
-            .idiom-app { max-width: 1100px; min-height: 75vh; max-height: 90vh; border-radius: 40px; }
+        #top-nav .nav-back {
+            background: var(--sur2);
+            border: 1.5px solid var(--brd);
+            color: var(--mut);
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: var(--fs-xs);
+            font-weight: 800;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: .3px;
+            font-family: inherit;
         }
-        @media (min-width: 1600px) {
-            .idiom-app { max-width: 1400px; }
-        }
-
-        /* Header */
-        .idiom-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 14px; background: #1a1a1a;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            gap: 6px; flex-shrink: 0; flex-wrap: nowrap; min-height: 54px;
-        }
-        .idiom-header-item {
-            display: flex; align-items: center; gap: 5px;
-            font-size: 0.72rem; color: var(--text-secondary);
-            white-space: nowrap; letter-spacing: 0.01em;
-        }
-        .idiom-header-item .icon { font-size: 0.9rem; }
-        .idiom-header-item .value {
-            color: var(--text-primary); font-weight: 600;
-            font-variant-numeric: tabular-nums; font-family: var(--font-mono); font-size: 0.78rem;
-        }
-        .idiom-score-item.muted { opacity: 0.35; }
-        .idiom-header-divider {
-            width: 1px; height: 18px; background: rgba(255,255,255,0.1);
-            flex-shrink: 0; border-radius: 1px;
-        }
-
-        /* Main content */
-        .idiom-main {
-            flex: 1; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; padding: 16px; overflow-y: auto; gap: 20px; min-height: 0;
+        #top-nav .nav-back:hover {
+            border-color: var(--acc);
+            color: var(--acc);
         }
 
-        /* Buttons */
-        .idiom-btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 14px 24px; border-radius: var(--btn-radius); font-size: 0.95rem;
-            font-weight: 600; cursor: pointer; border: none; transition: all 0.2s;
-            font-family: var(--font-sans); letter-spacing: 0.01em; white-space: nowrap;
-        }
-        .idiom-btn:active { transform: scale(0.96); }
-        .idiom-btn-primary { background: var(--accent); color: #fff; box-shadow: 0 6px 24px rgba(16,185,129,0.35); }
-        .idiom-btn-outline { background: transparent; color: var(--text-primary); border: 2px solid rgba(255,255,255,0.2); }
-        .idiom-btn-ghost { background: transparent; color: var(--text-secondary); padding: 12px 20px; font-size: 0.9rem; }
-        .idiom-btn-full { width: 100%; max-width: 360px; }
-        .idiom-btn-lg { padding: 16px 32px; font-size: 1.1rem; border-radius: 18px; }
-
-        /* Batch selection */
-        .idiom-batch-screen { display: flex; flex-direction: column; align-items: center; gap: 24px; width: 100%; }
-        .idiom-title { font-size: 1.8rem; font-weight: 700; color: var(--text-primary); }
-        .idiom-title .accent { color: var(--accent); }
-        .idiom-select {
-            background: var(--card-bg); border: 2px solid rgba(255,255,255,0.1);
-            border-radius: var(--btn-radius); padding: 12px 16px; color: var(--text-primary);
-            font-size: 1rem; font-family: var(--font-sans); outline: none; width: 200px;
-            text-align: center; cursor: pointer;
-        }
-        .idiom-select:focus { border-color: var(--accent); }
-
-        /* Quiz */
-        .idiom-quiz-card {
-            background: var(--card-bg); border-radius: var(--card-radius); padding: 18px 22px;
-            text-align: center; border: 1px solid rgba(255,255,255,0.08); width: 100%; max-width: 420px;
-        }
-        .idiom-quiz-bengali { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); line-height: 1.5; }
-
-        .idiom-options-list { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 420px; }
-        .idiom-option-btn {
-            display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px;
-            background: var(--card-bg); border: 2px solid rgba(255,255,255,0.1);
-            border-radius: var(--btn-radius); color: var(--text-primary); font-size: 0.9rem;
-            cursor: pointer; text-align: left; transition: all 0.2s; font-family: var(--font-sans);
-            min-height: 54px; position: relative;
-        }
-        .idiom-option-btn.selected {
-            border-color: var(--accent); background: rgba(16,185,129,0.12);
-        }
-        .idiom-option-btn .check-circle {
-            width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3);
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-            transition: all 0.2s; font-size: 0.8rem; color: transparent;
-        }
-        .idiom-option-btn.selected .check-circle {
-            background: var(--accent); border-color: var(--accent); color: #fff;
-        }
-        .idiom-option-btn .check-circle::after { content: '✓'; font-weight: bold; }
-
-        .idiom-hint-text {
-            color: var(--error); font-size: 0.85rem; font-weight: 500; text-align: center;
-            min-height: 20px; margin-top: 8px;
+        /* PAGE WRAPPER */
+        #page-wrapper {
+            width: 100%;
+            max-width: var(--max-w);
+            padding: 0 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
-        .idiom-option-btn.correct-flash {
-            border-color: var(--success) !important;
-            background: rgba(16,185,129,0.15) !important;
+        /* HEADER */
+        #page-header {
+            padding: var(--gap-lg) 0 var(--gap-md);
+            text-align: center;
+            border-bottom: 1px solid var(--brd);
+            margin-bottom: var(--gap-lg);
+        }
+        #header-visual {
+            width: 88px;
+            height: 88px;
+            border-radius: 22px;
+            background: var(--sur);
+            border: 2px solid var(--brd);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            margin: 0 auto var(--gap-md);
+            box-shadow: 0 8px 32px #00000044;
+        }
+        #header-category {
+            font-size: var(--fs-xs);
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--acc);
+            background: #10b98114;
+            border: 1px solid #10b98133;
+            border-radius: 20px;
+            padding: 4px 14px;
+            display: inline-block;
+            margin-bottom: var(--gap-sm);
+        }
+        #header-title {
+            font-size: var(--fs-xl);
+            font-weight: 900;
+            color: var(--txt);
+            line-height: 1.2;
+            letter-spacing: -.5px;
+            margin-bottom: 10px;
+        }
+        #header-subtitle {
+            font-size: var(--fs-sm);
+            color: var(--mut);
+            max-width: 480px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        #header-meta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: var(--gap-md);
+            flex-wrap: wrap;
+        }
+        .meta-badge {
+            font-size: var(--fs-xs);
+            color: var(--mut);
+            background: var(--sur);
+            border: 1px solid var(--brd);
+            border-radius: 20px;
+            padding: 4px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* GAME SPECIFIC */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: var(--gap-md);
+            padding: var(--gap-sm) 0;
+            width: 100%;
+        }
+        .batch-select {
+            background: var(--sur2);
+            border: 1.5px solid var(--brd);
+            color: var(--txt);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: var(--fs-base);
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            min-width: 200px;
+            text-align: center;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: var(--fs-base);
+            font-weight: 900;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            font-family: inherit;
+            letter-spacing: .3px;
+            border: none;
+        }
+        .btn-primary { background: var(--acc); color: #0d0d1a; }
+        .btn-primary:hover { background: #0aa87c; transform: translateY(-2px); }
+        .btn-secondary { background: var(--sur2); color: var(--txt); border: 1.5px solid var(--brd); }
+        .btn-secondary:hover { border-color: var(--acc); color: var(--acc); }
+        .btn-ghost { background: transparent; color: var(--mut); padding: 10px 20px; font-size: var(--fs-sm); }
+        .btn-ghost:hover { color: var(--txt); }
+        .btn-full { width: 100%; max-width: 300px; }
+        .btn-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 0 auto;
+            align-items: center;
+            width: fit-content;
+            max-width: 300px;
+        }
+
+        .quiz-card {
+            background: var(--sur);
+            border: 1.5px solid var(--brd);
+            border-radius: 16px;
+            padding: 24px 22px;
+            text-align: center;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 8px 32px #00000044;
+        }
+        .quiz-bengali {
+            font-size: var(--fs-lg);
+            font-weight: 900;
+            color: var(--txt);
+            line-height: 1.5;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 480px;
+        }
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--sur);
+            border: 2px solid var(--brd);
+            border-radius: 12px;
+            color: var(--txt);
+            font-size: var(--fs-base);
+            cursor: pointer;
+            text-align: left;
+            transition: all .2s;
+            font-family: inherit;
+            min-height: 54px;
+        }
+        .option-btn:hover { border-color: var(--acc); }
+        .option-btn.selected {
+            border-color: var(--acc);
+            background: rgba(16, 185, 129, 0.12);
+        }
+        .option-btn .check-circle {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all .2s;
+            font-size: 0.8rem;
+            color: transparent;
+        }
+        .option-btn.selected .check-circle {
+            background: var(--acc);
+            border-color: var(--acc);
+            color: #fff;
+        }
+        .option-btn .check-circle::after {
+            content: '✓';
+            font-weight: bold;
+        }
+        .option-btn.correct-flash {
+            border-color: var(--grn) !important;
+            background: rgba(6, 214, 160, 0.15) !important;
             animation: pulse-green 0.5s ease-out;
         }
         @keyframes pulse-green {
-            0%,100% { box-shadow: 0 0 8px rgba(16,185,129,0.3); }
-            50% { box-shadow: 0 0 28px rgba(16,185,129,0.7); }
+            0%,100% { box-shadow: 0 0 8px rgba(6,214,160,0.3); }
+            50% { box-shadow: 0 0 28px rgba(6,214,160,0.7); }
         }
 
-        /* Full‑app correct flash */
-        .idiom-app.correct-flash {
-            animation: appFlashGreen 0.6s ease-out;
-        }
-        @keyframes appFlashGreen {
-            0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.6), inset 0 0 0 0 rgba(16,185,129,0.4); }
-            40%  { box-shadow: 0 0 30px 10px rgba(16,185,129,0.5), inset 0 0 40px 10px rgba(16,185,129,0.25); }
-            100% { box-shadow: 0 0 0 0 rgba(16,185,129,0), inset 0 0 0 0 rgba(16,185,129,0); }
+        .hint-text {
+            color: var(--red);
+            font-size: var(--fs-sm);
+            font-weight: 500;
+            text-align: center;
+            min-height: 20px;
         }
 
-        /* Modal */
-        .idiom-modal-overlay {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.85);
-            display: flex; align-items: center; justify-content: center; z-index: 50;
-            animation: fadeIn 0.25s ease; border-radius: inherit;
+        .results-card {
+            background: var(--sur);
+            border: 1.5px solid var(--brd);
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
         }
-        .idiom-modal-panel {
-            background: var(--card-bg); border-radius: 24px; padding: 28px 24px;
-            text-align: center; max-width: 340px; width: 90%;
-            border: 1px solid rgba(239,68,68,0.4);
-            box-shadow: 0 20px 48px rgba(0,0,0,0.8);
+        .results-score {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--txt);
+            letter-spacing: -1px;
         }
-        .idiom-modal-bengali { font-size: 1.1rem; color: var(--text-primary); font-weight: 600; margin-bottom: 4px; }
-        .idiom-modal-correct { font-size: 1rem; color: var(--success); font-weight: 700; margin-bottom: 20px; }
-        .idiom-modal-label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; }
-
-        /* Results */
-        .idiom-results { display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; padding: 12px; }
-        .idiom-results-score { font-size: 3.2rem; font-weight: 800; color: var(--text-primary); }
-        .idiom-results-badge { padding: 8px 22px; border-radius: 30px; font-weight: 700; font-size: 0.85rem; }
+        .results-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: var(--fs-sm);
+            margin-top: 8px;
+        }
         .badge-gold { background: rgba(251,191,36,0.2); color:#fbbf24; border:1px solid rgba(251,191,36,0.4); }
         .badge-silver { background: rgba(156,163,175,0.2); color:#d1d5db; border:1px solid rgba(156,163,175,0.4); }
         .badge-bronze { background: rgba(180,130,90,0.2); color:#d4a574; border:1px solid rgba(180,130,90,0.4); }
 
-        .idiom-bottom-nav {
-            padding: 10px 16px calc(12px + var(--safe-bottom));
-            flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 8px;
-            border-top: 1px solid rgba(255,255,255,0.04); background: rgba(0,0,0,0.2);
+        .toast-msg {
+            background: rgba(251,191,36,0.15);
+            border: 1px solid rgba(251,191,36,0.5);
+            color: #fbbf24;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: var(--fs-sm);
+            font-weight: 500;
+            text-align: center;
+            max-width: 300px;
+            margin: 0 auto;
         }
 
-        .hidden { display: none !important; }
-        .text-muted { color: var(--text-secondary); }
+        /* FOOTER */
+        #page-footer {
+            width: 100%;
+            background: var(--sur);
+            border-top: 1px solid var(--brd);
+            padding: var(--gap-lg) 20px var(--gap-md);
+            margin-top: auto;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        #footer-brand-name { font-size: var(--fs-lg); font-weight: 900; color: var(--acc); letter-spacing: 2px; text-transform: uppercase; }
+        #footer-brand-by { font-size: var(--fs-xs); color: var(--mut); font-weight: 700; letter-spacing: .5px; }
+        #footer-tagline { font-size: var(--fs-xs); color: var(--mut); max-width: 280px; line-height: 1.6; }
+        #footer-divider { width: 40px; border: none; border-top: 1px solid var(--brd); }
+        #footer-mail { font-size: var(--fs-xs); color: var(--mut); text-decoration: none; transition: color .2s; display: flex; align-items: center; gap: 6px; }
+        #footer-mail:hover { color: var(--acc); }
+        #footer-copy { font-size: var(--fs-xs); color: var(--brd); }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Refill toast */
-        .idiom-refill-toast {
-            background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.5);
-            color: #fbbf24; padding: 10px 18px; border-radius: 30px;
-            font-size: 0.85rem; font-weight: 500; text-align: center;
-            max-width: 300px; margin: 0 auto;
+        /* Celebration overlay */
+        #correct-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+        #correct-overlay.active { opacity: 1; }
+        #correct-card {
+            background: linear-gradient(145deg, #06d6a0 0%, #04b887 100%);
+            border-radius: 28px;
+            padding: 48px 56px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow:
+                0 0 0 9999px rgba(6, 214, 160, 0.22),
+                0 24px 64px rgba(6, 214, 160, 0.55),
+                0 8px 24px rgba(0, 0, 0, 0.4);
+            transform: scale(0.75);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #correct-overlay.active #correct-card { transform: scale(1); }
+        #correct-icon {
+            font-size: clamp(2.8rem, 10vw, 4.5rem);
+            font-weight: 900;
+            color: #0d0d1a;
+            line-height: 1;
+        }
+        #correct-word {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-size: clamp(1.6rem, 6vw, 3rem);
+            font-weight: 900;
+            color: #0d0d1a;
+            letter-spacing: 4px;
+            text-transform: uppercase;
         }
 
- /*---------------------------------------------------------------------------------- The green goblin---------------------------------------------------------------------------*/
-
-
-/* Full‑app green flash */
-.idiom-app.correct-flash {
-    animation: appFlashGreen 0.6s ease-out;
-}
-.idiom-hint-text {
-    color: var(--error);
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-align: center;
-    min-height: 20px;
-    margin-top: 4px;
-}
-        /* Quiz – wider options */
-@media (min-width: 768px) {
-    .idiom-quiz-card { max-width: 600px; }
-    .idiom-options-list { max-width: 600px; }
-    .idiom-option-btn { padding: 16px 20px; font-size: 1rem; }
-}
-
-@media (min-width: 1200px) {
-    .idiom-quiz-card { max-width: 750px; }
-    .idiom-options-list { max-width: 750px; }
-    .idiom-option-btn { padding: 18px 24px; font-size: 1.1rem; }
-}
-
-@media (min-width: 1200px) {
-    .idiom-header-item { font-size: 0.85rem; }
-    .idiom-header-item .value { font-size: 0.9rem; }
-    .idiom-btn { padding: 16px 28px; font-size: 1.05rem; }
-}
-
-@keyframes appFlashGreen {
-    0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.6), inset 0 0 0 0 rgba(16,185,129,0.4); }
-    40%  { box-shadow: 0 0 30px 10px rgba(16,185,129,0.5), inset 0 0 40px 10px rgba(16,185,129,0.25); }
-    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0), inset 0 0 0 0 rgba(16,185,129,0); }
-}
-
-        
-/* ── Overlay — full screen, sits above everything ── */
-#correct-overlay {
-  position: fixed;
-  inset: 0;                        /* covers top, right, bottom, left */
-  z-index: 99999;                  /* above all game UI */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;            /* never blocks taps/clicks */
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-
-/* Active state — JS adds this class to show it */
-#correct-overlay.active {
-  opacity: 1;
-  pointer-events: none;            /* still never blocks interaction */
-}
-
-/* ── Green card in the centre ── */
-#correct-card {
-  background: linear-gradient(145deg, #06d6a0 0%, #04b887 100%);
-  border-radius: 28px;
-  padding: 48px 56px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  box-shadow:
-    0 0 0 9999px rgba(6, 214, 160, 0.22),   /* full-screen green tint */
-    0 24px 64px rgba(6, 214, 160, 0.55),     /* card glow */
-    0 8px 24px rgba(0, 0, 0, 0.4);           /* card shadow */
-  transform: scale(0.75);
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  min-width: 260px;
-  max-width: 88vw;
-  text-align: center;
-}
-
-/* Card pops into position when overlay is active */
-#correct-overlay.active #correct-card {
-  transform: scale(1);
-}
-
-/* ── Tick icon ── */
-#correct-icon {
-  font-size: clamp(2.8rem, 10vw, 4.5rem);
-  font-weight: 900;
-  color: #0d0d1a;
-  line-height: 1;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25));
-}
-
-/* ── CORRECT text ── */
-#correct-word {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  font-size: clamp(1.6rem, 6vw, 3rem);
-  font-weight: 900;
-  color: #0d0d1a;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-}
-
-/* ── Responsive tweaks ── */
-@media (max-width: 380px) {
-  #correct-card { padding: 36px 32px; border-radius: 22px; }
-}
-@media (min-width: 1024px) {
-  #correct-card { padding: 56px 72px; border-radius: 32px; }
-}
-        
-        
-/*--------------------------------------------------------------- The green goblin end-----------------------------------------------------------------------------*/
-
-        
+        /* Responsive large screens */
+        @media (min-width: 768px) {
+            :root { --max-w: 900px; }
+            .quiz-card, .options-list, .results-card { max-width: 700px; }
+            .option-btn { font-size: var(--fs-md); padding: 16px 20px; }
+            .quiz-bengali { font-size: var(--fs-xl); }
+            .results-score { font-size: 4rem; }
+        }
+        @media (min-width: 1024px) {
+            :root { --max-w: 1100px; }
+            .quiz-card, .options-list, .results-card { max-width: 800px; }
+            .option-btn { font-size: var(--fs-lg); }
+        }
+        @media (min-width: 1440px) {
+            :root { --max-w: 1300px; }
+            .quiz-card, .options-list, .results-card { max-width: 900px; }
+        }
     </style>
 </head>
 <body>
-<div class="idiom-app" id="idiomApp">
-    <header class="idiom-header" id="idiomHeader">
-        <div class="idiom-header-item"><span class="icon">👤</span><span class="value" id="headerPlayerName">Player</span></div>
-        <div class="idiom-header-divider"></div>
-        <div class="idiom-header-item"><span class="icon">📄</span><span class="value" id="headerCardIndex">Ques: 0/0</span></div>
-        <div class="idiom-header-divider"></div>
-        <div class="idiom-header-item idiom-score-item muted" id="headerScoreItem"><span class="icon">🏆</span><span class="value" id="headerScore">--/--</span></div>
-        <div class="idiom-header-divider"></div>
-        <div class="idiom-header-item"><span class="icon">⏱️</span><span class="value" id="headerTimer">00:00</span></div>
-    </header>
+    <nav id="top-nav">
+        <a class="nav-brand" href="hub.html">Fluent</a>
+        <button class="nav-back" onclick="goToHub()">← Hub</button>
+    </nav>
 
-    <div class="idiom-main" id="idiomMain"></div>
+    <div id="page-wrapper">
+        <header id="page-header">
+            <div id="header-visual">🧠</div>
+            <div id="header-category">Idiomize Quiz</div>
+            <h1 id="header-title">Idiomize Challenge</h1>
+            <p id="header-subtitle">
+                Test your knowledge of English idioms. Select all correct translations before submitting.
+            </p>
+            <div id="header-meta">
+                <span class="meta-badge" id="timerBadge">⏱️ 00:00</span>
+                <span class="meta-badge">🎯 Multi‑select</span>
+                <span class="meta-badge" id="batchBadge">📦 Batch: 10</span>
+            </div>
+        </header>
 
-    <div class="idiom-bottom-nav" id="idiomBottomNav"></div>
+        <main id="game-container" class="game-container">
+            <!-- Dynamic content rendered here -->
+        </main>
+    </div>
 
-    <div class="idiom-modal-overlay hidden" id="idiomModal"></div>
+    <footer id="page-footer">
+        <div id="footer-brand-name">Fluent</div>
+        <div id="footer-brand-by">by Amrit</div>
+        <p id="footer-tagline">Interactive English learning games for students of all levels.</p>
+        <hr id="footer-divider">
+        <a id="footer-mail" href="mailto:ilearnwithamrit@gmail.com">✉ ilearnwithamrit@gmail.com</a>
+        <p id="footer-copy">© 2026 Fluent by Amrit</p>
+    </footer>
 
-    <!-- Celebration overlay (same as Proverb Game) -->
+    <!-- Celebration overlay -->
     <div id="correct-overlay" aria-live="assertive" aria-label="Correct!">
         <div id="correct-card">
             <div id="correct-icon">✓</div>
             <div id="correct-word">CORRECT</div>
         </div>
     </div>
-</div>
-<!-- ----------------------------------------Celebration ----------------------------------------------->
-<div id="correct-overlay" aria-live="assertive" aria-label="Correct!">
-  <div id="correct-card">
-    <div id="correct-icon">✓</div>
-    <div id="correct-word">CORRECT</div>
-  </div>
-</div>
-<!-- ----------------------------------------Celebration End ----------------------------------------------->
-<script>
-(function() {
-    // ---------- CONFIG ----------
-    const CONFIG = {
-        googleSheetCSVUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSW-l6YsWCVD5POIG-6dbxu8JXthe67i4o4WjyBTBgviAoONp3LnnnVp526u9Vj0zxoIsynmYk1hIMH/pub?output=csv',   // ← published CSV URL
-        fallbackData: [
-            { bengali: ['বিরক্ত / ক্লান্ত'], english: ['Sick and tired', 'Fed up'], distractors: ['Tired and sick', 'Bored and tired', 'Angry and fed up', 'Exhausted and annoyed'] },
-            { bengali: ['অল্প বিদ্যা ভয়ংকরী'], english: ['A little learning is a dangerous thing'], distractors: ['Little knowledge is safe', 'A little wisdom is enough', 'Learning a little is great', 'Small knowledge is power'] },
-            { bengali: ['চোখের বালি'], english: ['Eyesore', 'A thorn in the flesh'], distractors: ['Eye candy', 'A pain in the neck', 'A sight for sore eyes', 'A beautiful view'] },
-            { bengali: ['মাথা খাটানো'], english: ['Rack one’s brain'], distractors: ['Use one’s head', 'Brainstorm hard', 'Think hardly', 'Ponder deeply'] },
-            { bengali: ['গোড়ায় গলদ'], english: ['Something wrong at the root'], distractors: ['Root cause is fine', 'Problem at the top', 'No issue at base', 'A faulty foundation'] },
-            { bengali: ['হাতির পাঁচ পা দেখা'], english: ['To see the impossible'], distractors: ['To see an elephant with five legs', 'To witness a miracle', 'To spot a rare animal', 'To dream big'] },
-            { bengali: ['নাড়িতে রক্ত থাকা'], english: ['To have blood in one’s veins'], distractors: ['To be cold-blooded', 'To have red blood cells', 'To bleed easily', 'To be brave'] },
-            { bengali: ['বাঘের চামড়ায় ঢাকা'], english: ['A wolf in sheep’s clothing'], distractors: ['A tiger in a sheep skin', 'A fox in a hen house', 'A dog in a blanket', 'A cat in a hat'] },
-            { bengali: ['আকাশ থেকে পড়া'], english: ['Out of the blue'], distractors: ['Falling from the sky', 'A bolt from the heavens', 'Suddenly from above', 'A surprise'] },
-            { bengali: ['কান কাটা'], english: ['Shameless'], distractors: ['Earless', 'Bold', 'Outspoken', 'Brazen'] }
-        ],
-        HUB_URL: '../index.html'   // change to your hub page
-    };
 
-    // ---------- STATE ----------
-    const state = {
-        playerName: 'Player',
-        phase: 'batch',   // 'batch' | 'quiz' | 'results'
-        allProverbs: [],
-        remainingPool: [],
-        sessionProverbs: [],
-        quizOrder: [],
-        currentQuizIndex: 0,
-        score: 0,
-        timerSeconds: 0,
-        timerIntervalId: null,
-        batchSize: 10,   // default
-        totalInSession: 10,
-        currentOptions: [],
-        correctIndices: new Set(),
-        selectedOptions: new Set(),
-        showRefillMessage: false,
-    };
+    <script>
+        // ═══════════════════════════════════════
+        //  CONFIGURATION
+        // ═══════════════════════════════════════
+        const CONFIG = {
+            googleSheetCSVUrl: 'YOUR_GOOGLE_SHEET_CSV_URL_HERE',
+            HUB_URL: 'hub.html',
+            fallbackData: [
+                { bengali: ['বিরক্ত / ক্লান্ত'], english: ['Sick and tired', 'Fed up'], distractors: ['Tired and sick', 'Bored and tired', 'Angry and fed up', 'Exhausted and annoyed'] },
+                { bengali: ['অল্প বিদ্যা ভয়ংকরী'], english: ['A little learning is a dangerous thing'], distractors: ['Little knowledge is safe', 'A little wisdom is enough', 'Learning a little is great', 'Small knowledge is power'] },
+                { bengali: ['চোখের বালি'], english: ['Eyesore', 'A thorn in the flesh'], distractors: ['Eye candy', 'A pain in the neck', 'A sight for sore eyes', 'A beautiful view'] },
+                { bengali: ['মাথা খাটানো'], english: ['Rack one’s brain'], distractors: ['Use one’s head', 'Brainstorm hard', 'Think hardly', 'Ponder deeply'] },
+                { bengali: ['গোড়ায় গলদ'], english: ['Something wrong at the root'], distractors: ['Root cause is fine', 'Problem at the top', 'No issue at base', 'A faulty foundation'] },
+                { bengali: ['হাতির পাঁচ পা দেখা'], english: ['To see the impossible'], distractors: ['To see an elephant with five legs', 'To witness a miracle', 'To spot a rare animal', 'To dream big'] },
+                { bengali: ['নাড়িতে রক্ত থাকা'], english: ['To have blood in one’s veins'], distractors: ['To be cold-blooded', 'To have red blood cells', 'To bleed easily', 'To be brave'] },
+                { bengali: ['বাঘের চামড়ায় ঢাকা'], english: ['A wolf in sheep’s clothing'], distractors: ['A tiger in a sheep skin', 'A fox in a hen house', 'A dog in a blanket', 'A cat in a hat'] },
+                { bengali: ['আকাশ থেকে পড়া'], english: ['Out of the blue'], distractors: ['Falling from the sky', 'A bolt from the heavens', 'Suddenly from above', 'A surprise'] },
+                { bengali: ['কান কাটা'], english: ['Shameless'], distractors: ['Earless', 'Bold', 'Outspoken', 'Brazen'] }
+            ]
+        };
 
-    // ---------- DOM REFS ----------
-    const appContainer = document.getElementById('idiomApp');
-    const mainContent = document.getElementById('idiomMain');
-    const bottomNav = document.getElementById('idiomBottomNav');
-    const modalOverlay = document.getElementById('idiomModal');
-    const headerPlayerName = document.getElementById('headerPlayerName');
-    const headerCardIndex = document.getElementById('headerCardIndex');
-    const headerScore = document.getElementById('headerScore');
-    const headerScoreItem = document.getElementById('headerScoreItem');
-    const headerTimer = document.getElementById('headerTimer');
+        // ── State ──
+        const state = {
+            playerName: '',
+            allProverbs: [],
+            remainingPool: [],
+            sessionProverbs: [],
+            quizOrder: [],
+            currentQuizIndex: 0,
+            score: 0,
+            timerSeconds: 0,
+            timerIntervalId: null,
+            batchSize: 10,
+            phase: 'batch',   // 'batch' | 'quiz' | 'results'
+            totalInSession: 0,
+            currentOptions: [],
+            correctIndices: new Set(),
+            selectedOptions: new Set(),
+            showRefillMessage: false,
+        };
 
-    // ---------- UTILS ----------
-    function escapeHTML(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-    function formatVariantList(variants) { return variants.map(v => '• ' + escapeHTML(v)).join('<br>'); }
+        // ── DOM refs ──
+        const gameContainer = document.getElementById('game-container');
+        const headerBatchBadge = document.getElementById('batchBadge');
+        const headerTimerBadge = document.getElementById('timerBadge');
 
-    function startTimer() {
-        stopTimer();
-        state.timerSeconds = 0;
-        updateTimerDisplay();
-        state.timerIntervalId = setInterval(() => { state.timerSeconds++; updateTimerDisplay(); }, 1000);
-    }
-    function stopTimer() { if (state.timerIntervalId) { clearInterval(state.timerIntervalId); state.timerIntervalId = null; } }
-    function updateTimerDisplay() {
-        const m = Math.floor(state.timerSeconds/60), s = state.timerSeconds%60;
-        headerTimer.textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-    }
-    function formatTime(sec) { const m=Math.floor(sec/60), s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
-
-    function updateHeaderPlayerName() { headerPlayerName.textContent = state.playerName; }
-    function updateHeaderCardIndex() {
-        if (state.phase === 'quiz') {
-            headerCardIndex.textContent = `Ques: ${state.currentQuizIndex+1}/${state.totalInSession}`;
-        } else {
-            headerCardIndex.textContent = `--/${state.totalInSession}`;
+        // ── Helpers ──
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
         }
-    }
-    function updateHeaderScore() {
-        if (state.phase === 'quiz' || state.phase === 'results') {
-            headerScoreItem.classList.remove('muted');
-            headerScore.textContent = `${String(state.score).padStart(2,'0')}/${state.totalInSession}`;
-        } else {
-            headerScoreItem.classList.add('muted');
-            headerScore.textContent = `--/${state.totalInSession}`;
+
+        function getPlayerName() {
+            return decodeURIComponent(new URLSearchParams(window.location.search).get('name') || '');
         }
-    }
 
-    // Celebration
-    function showCorrect() {
-        const overlay = document.getElementById('correct-overlay');
-        if (!overlay) return;
-        overlay.classList.add('active');
-        setTimeout(() => overlay.classList.remove('active'), 900);
-    }
+        function goToHub() {
+            const name = getPlayerName();
+            window.location.href = CONFIG.HUB_URL + (name ? '?name=' + encodeURIComponent(name) : '');
+        }
 
+        function startTimer() {
+            stopTimer();
+            state.timerSeconds = 0;
+            updateTimerDisplay();
+            state.timerIntervalId = setInterval(() => { state.timerSeconds++; updateTimerDisplay(); }, 1000);
+        }
+        function stopTimer() {
+            if (state.timerIntervalId) { clearInterval(state.timerIntervalId); state.timerIntervalId = null; }
+        }
+        function updateTimerDisplay() {
+            const mins = Math.floor(state.timerSeconds / 60);
+            const secs = state.timerSeconds % 60;
+            const timeString = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+            if (headerTimerBadge) headerTimerBadge.textContent = `⏱️ ${timeString}`;
+        }
 
-    /* ── showCorrect() ──
-   Call this function the moment a correct
-   answer is confirmed. It runs entirely by
-   itself — no arguments, no cleanup needed. */
-function showCorrect(){
-  const overlay = document.getElementById('correct-overlay');
-
-  // Show
-  overlay.classList.add('active');
-
-  // Hide after 900ms — fades out over 150ms
-  setTimeout(() => {
-    overlay.classList.remove('active');
-  }, 900);
-}
-
-
-    
-    // ---------- DATA LOADING ----------
-    function parseCSV(txt) {
-        const rows = [];
-        txt.trim().split(/\r?\n/).forEach(line => {
-            if (!line.trim()) return;
-            const cols = [];
-            let cur = '', inQ = false;
-            for (let i = 0; i < line.length; i++) {
-                const ch = line[i];
-                if (ch === '"') {
-                    if (inQ && i+1 < line.length && line[i+1] === '"') { cur += '"'; i++; }
-                    else inQ = !inQ;
-                } else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-                else cur += ch;
-            }
-            cols.push(cur.trim());
-            if (cols.length >= 6) {
-                const bengali = cols[0].split(';').map(s => s.trim()).filter(Boolean);
-                const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
-                const distractors = [cols[2], cols[3], cols[4], cols[5]];
-                rows.push({
-                    bengali: bengali.length ? bengali : [cols[0]],
-                    english: english.length ? english : [cols[1]],
-                    distractors: distractors
-                });
-            }
-        });
-        return rows;
-    }
-
-    async function loadData() {
-        if (CONFIG.googleSheetCSVUrl && CONFIG.googleSheetCSVUrl.trim() !== '') {
-            try {
-                const res = await fetch(CONFIG.googleSheetCSVUrl);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const csv = await res.text();
-                const parsed = parseCSV(csv);
-                if (parsed.length > 0) {
-                    const firstCell = parsed[0].bengali?.[0]?.toLowerCase();
-                    if (firstCell === 'bengali' || firstCell === 'bengali expression') parsed.shift();
+        // ── Data loading ──
+        function parseCSV(txt) {
+            const rows = [];
+            txt.trim().split(/\r?\n/).forEach(line => {
+                if (!line.trim()) return;
+                const cols = [];
+                let cur = '', inQ = false;
+                for (let i = 0; i < line.length; i++) {
+                    const ch = line[i];
+                    if (ch === '"') {
+                        if (inQ && i+1 < line.length && line[i+1] === '"') { cur += '"'; i++; }
+                        else inQ = !inQ;
+                    } else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+                    else cur += ch;
                 }
-                if (parsed.length >= 10) {
-                    state.allProverbs = parsed;
-                    state.remainingPool = [...parsed];
-                    return;
+                cols.push(cur.trim());
+                if (cols.length >= 6) {
+                    const bengali = cols[0].split(';').map(s => s.trim()).filter(Boolean);
+                    const english = cols[1].split(';').map(s => s.trim()).filter(Boolean);
+                    const distractors = [cols[2], cols[3], cols[4], cols[5]];
+                    rows.push({
+                        bengali: bengali.length ? bengali : [cols[0]],
+                        english: english.length ? english : [cols[1]],
+                        distractors: distractors
+                    });
                 }
-            } catch (e) {
-                console.warn('Sheet fetch failed, using fallback.');
-            }
+            });
+            return rows;
         }
-        state.allProverbs = CONFIG.fallbackData.map(item => ({
-            bengali: [...item.bengali],
-            english: [...item.english],
-            distractors: [...item.distractors]
-        }));
-        state.remainingPool = [...state.allProverbs];
-    }
 
-    // ---------- POOL MANAGEMENT ----------
-    function refillPoolIfNeeded() {
-        if (state.remainingPool.length < state.batchSize) {
+        async function loadData() {
+            if (CONFIG.googleSheetCSVUrl && CONFIG.googleSheetCSVUrl.trim() !== '') {
+                try {
+                    const res = await fetch(CONFIG.googleSheetCSVUrl);
+                    if (!res.ok) throw new Error('Network error');
+                    const csv = await res.text();
+                    const parsed = parseCSV(csv);
+                    if (parsed.length > 0 && parsed[0].bengali[0].toLowerCase() === 'bengali') parsed.shift();
+                    if (parsed.length >= 10) {
+                        state.allProverbs = parsed;
+                        state.remainingPool = [...parsed];
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Sheet fetch failed, using fallback.');
+                }
+            }
+            // Fallback
+            state.allProverbs = CONFIG.fallbackData.map(item => ({
+                bengali: [...item.bengali],
+                english: [...item.english],
+                distractors: [...item.distractors]
+            }));
             state.remainingPool = [...state.allProverbs];
-            state.showRefillMessage = true;
-        } else {
-            state.showRefillMessage = false;
-        }
-    }
-
-    function selectSessionProverbs() {
-        refillPoolIfNeeded();
-        const shuffled = [...state.remainingPool];
-        for (let i = shuffled.length-1; i>0; i--) {
-            const j = Math.floor(Math.random()*(i+1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        state.sessionProverbs = shuffled.slice(0, state.batchSize);
-        state.remainingPool = shuffled.slice(state.batchSize);
-        state.quizOrder = [...Array(state.batchSize).keys()];
-        for (let i = state.quizOrder.length-1; i>0; i--) {
-            const j = Math.floor(Math.random()*(i+1));
-            [state.quizOrder[i], state.quizOrder[j]] = [state.quizOrder[j], state.quizOrder[i]];
-        }
-        state.currentQuizIndex = 0;
-        state.score = 0;
-        state.totalInSession = state.batchSize;
-        state.selectedOptions.clear();
-        updateHeaderScore();
-        updateHeaderCardIndex();
-    }
-
-    // ---------- RENDER: BATCH SELECTION ----------
-    function renderBatchSelection() {
-        state.phase = 'batch';
-        stopTimer();
-        updateHeaderScore();
-        updateHeaderCardIndex();
-        headerCardIndex.textContent = `--/${state.totalInSession}`;
-        headerScoreItem.classList.add('muted');
-        headerScore.textContent = `--/${state.totalInSession}`;
-
-        let refillMsgHTML = '';
-        if (state.showRefillMessage) {
-            refillMsgHTML = '<div class="idiom-refill-toast">🔄 You’ve seen all idioms! Starting a fresh set.</div>';
-            state.showRefillMessage = false;
         }
 
-        mainContent.innerHTML = `
-            <div class="idiom-batch-screen">
-                <div class="idiom-title">Idio<span class="accent">mize</span></div>
-                <div class="text-muted" style="font-size:0.9rem;">Select your quiz size</div>
-                ${refillMsgHTML}
-                <select id="batchSizeSelect" class="idiom-select">
-                    <option value="10" ${state.batchSize===10?'selected':''}>10 questions</option>
-                    <option value="20" ${state.batchSize===20?'selected':''}>20 questions</option>
-                    <option value="30" ${state.batchSize===30?'selected':''}>30 questions</option>
-                    <option value="50" ${state.batchSize===50?'selected':''}>50 questions</option>
-                </select>
-                <button class="idiom-btn idiom-btn-primary idiom-btn-full idiom-btn-lg" id="btnStartQuiz">🎮 Start Quiz</button>
-                <a href="${CONFIG.HUB_URL}" class="idiom-btn idiom-btn-ghost idiom-btn-full" style="text-decoration:none;">← Back to Hub</a>
-            </div>`;
-        bottomNav.innerHTML = '';
+        function refillPoolIfNeeded() {
+            if (state.remainingPool.length < state.batchSize) {
+                state.remainingPool = [...state.allProverbs];
+                state.showRefillMessage = true;
+            } else {
+                state.showRefillMessage = false;
+            }
+        }
 
-        document.getElementById('btnStartQuiz').addEventListener('click', () => {
-            const select = document.getElementById('batchSizeSelect');
-            state.batchSize = parseInt(select.value);
-            selectSessionProverbs();
+        function selectSessionProverbs() {
+            refillPoolIfNeeded();
+            const shuffled = [...state.remainingPool];
+            for (let i = shuffled.length-1; i>0; i--) {
+                const j = Math.floor(Math.random()*(i+1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            state.sessionProverbs = shuffled.slice(0, state.batchSize);
+            state.remainingPool = shuffled.slice(state.batchSize);
+            state.quizOrder = [...Array(state.batchSize).keys()];
+            for (let i = state.quizOrder.length-1; i>0; i--) {
+                const j = Math.floor(Math.random()*(i+1));
+                [state.quizOrder[i], state.quizOrder[j]] = [state.quizOrder[j], state.quizOrder[i]];
+            }
+            state.currentQuizIndex = 0;
+            state.score = 0;
+            state.totalInSession = state.batchSize;
+            state.selectedOptions.clear();
+        }
+
+        // ── Render batch selection ──
+        function renderBatchSelection() {
+            state.phase = 'batch';
+            stopTimer();
+            headerBatchBadge.textContent = `📦 Batch: ${state.batchSize}`;
+            let refillMsg = '';
+            if (state.showRefillMessage) {
+                refillMsg = '<div class="toast-msg">🔄 You’ve seen all idioms! Starting a fresh set.</div>';
+                state.showRefillMessage = false;
+            }
+            gameContainer.innerHTML = `
+                <div class="quiz-card" style="text-align:center;">
+                    <h2 style="margin-bottom:16px;">Choose Quiz Size</h2>
+                    ${refillMsg}
+                    <select id="batchSelect" class="batch-select">
+                        <option value="10" ${state.batchSize===10?'selected':''}>10 Questions</option>
+                        <option value="20" ${state.batchSize===20?'selected':''}>20 Questions</option>
+                        <option value="30" ${state.batchSize===30?'selected':''}>30 Questions</option>
+                        <option value="50" ${state.batchSize===50?'selected':''}>50 Questions</option>
+                    </select>
+                    <div class="btn-row" style="margin-top:20px;">
+                        <button class="btn btn-primary" id="btnStartQuiz">Start Quiz</button>
+                        <button class="btn btn-secondary" onclick="goToHub()">← Back to Hub</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('btnStartQuiz').addEventListener('click', () => {
+                state.batchSize = parseInt(document.getElementById('batchSelect').value);
+                headerBatchBadge.textContent = `📦 Batch: ${state.batchSize}`;
+                selectSessionProverbs();
+                state.phase = 'quiz';
+                startTimer();
+                renderQuizQuestion();
+            });
+            document.getElementById('batchSelect').addEventListener('change', (e) => {
+                state.batchSize = parseInt(e.target.value);
+                headerBatchBadge.textContent = `📦 Batch: ${state.batchSize}`;
+            });
+        }
+
+        // ── Render quiz question (multi-select) ──
+        function renderQuizQuestion() {
+            if (state.currentQuizIndex >= state.totalInSession) { finishQuiz(); return; }
             state.phase = 'quiz';
-            startTimer();
-            renderQuizQuestion();
-        });
-    }
+            state.selectedOptions.clear();
 
-    // ---------- MULTI‑SELECT QUIZ ----------
-    function renderQuizQuestion() {
-        if (state.currentQuizIndex >= state.totalInSession) { finishQuiz(); return; }
-        state.phase = 'quiz';
-        updateHeaderScore();
-        updateHeaderCardIndex();
-        state.selectedOptions.clear();
+            const sessionIdx = state.quizOrder[state.currentQuizIndex];
+            const proverb = state.sessionProverbs[sessionIdx];
 
-        const sessionIdx = state.quizOrder[state.currentQuizIndex];
-        const proverb = state.sessionProverbs[sessionIdx];
+            const corrects = proverb.english.slice(0, 5);
+            const allDistractors = [...proverb.distractors];
+            for (let i = allDistractors.length-1; i>0; i--) {
+                const j = Math.floor(Math.random()*(i+1));
+                [allDistractors[i], allDistractors[j]] = [allDistractors[j], allDistractors[i]];
+            }
+            const needed = 5 - corrects.length;
+            const chosenDistractors = allDistractors.slice(0, needed);
 
-        const corrects = proverb.english.slice(0, 5);
-        const allDistractors = [...proverb.distractors];
-        for (let i = allDistractors.length-1; i>0; i--) {
-            const j = Math.floor(Math.random()*(i+1));
-            [allDistractors[i], allDistractors[j]] = [allDistractors[j], allDistractors[i]];
+            const options = [
+                ...corrects.map(text => ({ text, isCorrect: true })),
+                ...chosenDistractors.map(text => ({ text, isCorrect: false }))
+            ];
+            for (let i = options.length-1; i>0; i--) {
+                const j = Math.floor(Math.random()*(i+1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+
+            state.currentOptions = options;
+            state.correctIndices = new Set(options.reduce((acc, opt, idx) => {
+                if (opt.isCorrect) acc.push(idx);
+                return acc;
+            }, []));
+
+            gameContainer.innerHTML = `
+                <div class="quiz-card">
+                    <div class="quiz-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
+                </div>
+                <div class="options-list" id="optionsList">
+                    ${options.map((opt, idx) => `
+                        <button class="option-btn" data-index="${idx}">
+                            <span class="check-circle"></span>
+                            <span>${escapeHTML(opt.text)}</span>
+                        </button>
+                    `).join('')}
+                </div>
+                <div class="hint-text" id="hintText"></div>
+                <div class="btn-row" style="margin-top:16px;">
+                    <button class="btn btn-primary btn-full" id="btnSubmit">Submit</button>
+                    <button class="btn btn-secondary btn-full" id="btnFinishGame">🏁 Finish Game</button>
+                    <button class="btn btn-secondary btn-full" onclick="goToHub()">← Back to Hub</button>
+                </div>
+                <div style="margin-top:10px; font-size:var(--fs-sm); color:var(--mut);">
+                    Question ${state.currentQuizIndex+1}/${state.totalInSession} &nbsp;|&nbsp; Score: ${state.score}
+                </div>
+            `;
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index);
+                    if (state.selectedOptions.has(idx)) {
+                        state.selectedOptions.delete(idx);
+                        this.classList.remove('selected');
+                    } else {
+                        state.selectedOptions.add(idx);
+                        this.classList.add('selected');
+                    }
+                    document.getElementById('hintText').textContent = '';
+                });
+            });
+
+            document.getElementById('btnSubmit').addEventListener('click', checkQuizAnswer);
+            document.getElementById('btnFinishGame').addEventListener('click', finishQuiz);
         }
-        const needed = 5 - corrects.length;
-        const chosenDistractors = allDistractors.slice(0, needed);
 
-        const options = [
-            ...corrects.map(text => ({ text, isCorrect: true })),
-            ...chosenDistractors.map(text => ({ text, isCorrect: false }))
-        ];
-        for (let i = options.length-1; i>0; i--) {
-            const j = Math.floor(Math.random()*(i+1));
-            [options[i], options[j]] = [options[j], options[i]];
-        }
+        function checkQuizAnswer() {
+            const selected = state.selectedOptions;
+            const correct = state.correctIndices;
+            const allBtns = document.querySelectorAll('.option-btn');
+            const submitBtn = document.getElementById('btnSubmit');
+            const hintEl = document.getElementById('hintText');
+            if (!submitBtn) return;
 
-        state.currentOptions = options;
-        state.correctIndices = new Set(options.reduce((acc, opt, idx) => {
-            if (opt.isCorrect) acc.push(idx);
-            return acc;
-        }, []));
+            if (selected.size === 0) {
+                hintEl.textContent = 'Please select an option.';
+                return;
+            }
+            hintEl.textContent = '';
 
-        mainContent.innerHTML = `
-            <div class="idiom-quiz-card">
-                <div class="idiom-quiz-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
-            </div>
-            <div class="idiom-options-list" id="idiomOptionsList">
-                ${options.map((opt, idx) => `
-                    <button class="idiom-option-btn" data-index="${idx}">
-                        <span class="check-circle"></span>
-                        <span>${escapeHTML(opt.text)}</span>
-                    </button>
-                `).join('')}
-            </div>
-            <div class="idiom-hint-text" id="idiomHintText"></div>
-            <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnSubmitAnswer">Submit</button>
-        `;
-        bottomNav.innerHTML = '';
+            submitBtn.disabled = true;
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
 
-        document.querySelectorAll('.idiom-option-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const idx = parseInt(this.dataset.index);
-                if (state.selectedOptions.has(idx)) {
-                    state.selectedOptions.delete(idx);
-                    this.classList.remove('selected');
+            let anyWrong = false;
+            for (const idx of selected) {
+                if (!correct.has(idx)) { anyWrong = true; break; }
+            }
+            const isComplete = selected.size === correct.size && !anyWrong;
+
+            if (isComplete) {
+                state.score++;
+                updateScoreDisplay();
+                document.body.classList.add('correct-flash'); // full screen flash alternative
+                showCorrect();
+                allBtns.forEach(btn => {
+                    const idx = parseInt(btn.dataset.index);
+                    if (correct.has(idx)) btn.classList.add('correct-flash');
+                });
+                setTimeout(() => {
+                    document.body.classList.remove('correct-flash');
+                    state.currentQuizIndex++;
+                    if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
+                    else renderQuizQuestion();
+                }, 700);
+            } else {
+                if (anyWrong) {
+                    showErrorModal('wrong');
                 } else {
-                    state.selectedOptions.add(idx);
-                    this.classList.add('selected');
+                    const missingCount = correct.size - selected.size;
+                    showErrorModal('incomplete', missingCount);
                 }
-                document.getElementById('idiomHintText').textContent = '';
-            });
-        });
-
-        document.getElementById('btnSubmitAnswer').addEventListener('click', checkQuizAnswer);
-    }
-
-    function checkQuizAnswer() {
-        const selected = state.selectedOptions;
-        const correct = state.correctIndices;
-        const allBtns = document.querySelectorAll('.idiom-option-btn');
-        const submitBtn = document.getElementById('btnSubmitAnswer');
-        const hintEl = document.getElementById('idiomHintText');
-        if (!submitBtn) return;
-
-        if (selected.size === 0) {
-            hintEl.textContent = 'Please select an option.';
-            return;
+            }
         }
-        hintEl.textContent = '';
 
-        submitBtn.disabled = true;
-        allBtns.forEach(b => b.style.pointerEvents = 'none');
-
-        let anyWrong = false;
-        for (const idx of selected) {
-            if (!correct.has(idx)) { anyWrong = true; break; }
+        function updateScoreDisplay() {
+            // Score already shown in footer of quiz; but we can update header if needed
         }
-        const isComplete = selected.size === correct.size && !anyWrong;
 
-        if (isComplete) {
-            state.score++;
-            updateHeaderScore();
-            document.getElementById('idiomApp').classList.add('correct-flash');
-            showCorrect();
-            allBtns.forEach(btn => {
-                const idx = parseInt(btn.dataset.index);
-                if (correct.has(idx)) btn.classList.add('correct-flash');
-            });
-            setTimeout(() => {
-                document.getElementById('idiomApp').classList.remove('correct-flash');
+        function showErrorModal(type, missingCount = 0) {
+            const sessionIdx = state.quizOrder[state.currentQuizIndex];
+            const proverb = state.sessionProverbs[sessionIdx];
+            let iconHtml = '', message = '', borderColor = '';
+            if (type === 'incomplete') {
+                iconHtml = `<div style="font-size:2.5rem; margin-bottom:10px;">🟡</div>`;
+                message = `Good start! You still need to select all the correct answers. You missed ${missingCount}.`;
+                borderColor = 'rgba(251,191,36,0.4)';
+            } else {
+                iconHtml = '<div style="font-size:2.5rem; margin-bottom:10px;">❌</div>';
+                message = 'That’s incorrect.';
+                borderColor = 'rgba(239,68,68,0.4)';
+            }
+
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:999;';
+            modal.innerHTML = `
+                <div style="background:var(--sur);border:1px solid ${borderColor};border-radius:16px;padding:24px;max-width:340px;width:90%;text-align:center;">
+                    ${iconHtml}
+                    <div style="color:var(--txt);font-weight:700;margin-bottom:10px;">${message}</div>
+                    <div style="color:var(--mut);margin-bottom:10px;">${escapeHTML(proverb.bengali.join(' • '))}</div>
+                    <div style="color:var(--grn);font-weight:700;margin-bottom:20px;">→ ${escapeHTML(proverb.english.join(' • '))}</div>
+                    <button class="btn btn-primary" id="btnGotIt">👍 Got It</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('btnGotIt').addEventListener('click', () => {
+                modal.remove();
                 state.currentQuizIndex++;
                 if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
                 else renderQuizQuestion();
-            }, 700);
-        } else {
-            if (anyWrong) {
-                showErrorModal('wrong');
-            } else {
-                const missingCount = correct.size - selected.size;
-                showErrorModal('incomplete', missingCount);
+            });
+        }
+
+        function showCorrect() {
+            const overlay = document.getElementById('correct-overlay');
+            overlay.classList.add('active');
+            setTimeout(() => overlay.classList.remove('active'), 900);
+        }
+
+        function finishQuiz() {
+            state.phase = 'results';
+            stopTimer();
+            const total = state.totalInSession;
+            const score = state.score;
+            const time = formatTime(state.timerSeconds);
+            const perc = Math.round((score / total) * 100);
+            let badge = 'badge-bronze', badgeText = '🥉 Keep Practicing', emoji = '📚';
+            if (perc >= 90) { badge = 'badge-gold'; badgeText = '🥇 Excellent!'; emoji = '🏆'; }
+            else if (perc >= 70) { badge = 'badge-silver'; badgeText = '🥈 Great Job!'; emoji = '🌟'; }
+
+            gameContainer.innerHTML = `
+                <div class="results-card">
+                    <div style="font-size:3rem;">${emoji}</div>
+                    <div class="results-score">${score}<span style="color:var(--mut);font-size:2rem;">/${total}</span></div>
+                    <span class="results-badge ${badge}">${badgeText}</span>
+                    <div style="margin-top:16px; color:var(--mut); font-size:var(--fs-sm);">
+                        ⏱️ Time: ${time} &nbsp;|&nbsp; 📊 Accuracy: ${perc}%
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" id="btnPlayAgain">📚 Play another batch</button>
+                        <button class="btn btn-secondary" onclick="goToHub()">← Back to Hub</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('btnPlayAgain').addEventListener('click', () => {
+                renderBatchSelection();
+            });
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60), s = sec % 60;
+            return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        // ── Init ──
+        async function init() {
+            state.playerName = getPlayerName();
+            gameContainer.innerHTML = '<div style="color:var(--mut);">⏳ Loading idioms…</div>';
+            await loadData();
+            if (state.allProverbs.length < 10) {
+                gameContainer.innerHTML = '<div style="color:var(--red);">❌ Need at least 10 idioms.</div>';
+                return;
             }
-        }
-    }
-
-    function showErrorModal(type, missingCount = 0) {
-        const proverb = state.sessionProverbs[state.quizOrder[state.currentQuizIndex]];
-        let iconHtml = '', message = '', borderColor = '';
-        if (type === 'incomplete') {
-            iconHtml = `<div style="font-size:2.5rem; margin-bottom:10px;">🟡</div>`;
-            message = `Good start! You still need to select all the correct answers. You missed ${missingCount}.`;
-            borderColor = 'rgba(251,191,36,0.4)';
-        } else {
-            iconHtml = '<div style="font-size:2.5rem; margin-bottom:10px;">❌</div>';
-            message = 'That’s incorrect.';
-            borderColor = 'rgba(239,68,68,0.4)';
-        }
-
-        modalOverlay.innerHTML = `
-            <div class="idiom-modal-panel" style="border-color:${borderColor};">
-                ${iconHtml}
-                <div class="idiom-modal-label">${message}</div>
-                <div class="idiom-modal-bengali">${escapeHTML(proverb.bengali.join(' • '))}</div>
-                <div class="idiom-modal-correct">→ ${formatVariantList(proverb.english)}</div>
-                <button class="idiom-btn idiom-btn-primary idiom-btn-full" id="btnGotIt">👍 Got It</button>
-            </div>`;
-        modalOverlay.classList.remove('hidden');
-
-        document.getElementById('btnGotIt').addEventListener('click', () => {
-            modalOverlay.classList.add('hidden');
-            modalOverlay.innerHTML = '';
-            state.currentQuizIndex++;
-            if (state.currentQuizIndex >= state.totalInSession) finishQuiz();
-            else renderQuizQuestion();
-        });
-    }
-
-    function finishQuiz() {
-        state.phase = 'results';
-        stopTimer();
-        updateHeaderScore();
-        updateHeaderCardIndex();
-        headerCardIndex.textContent = 'Complete';
-
-        const total = state.totalInSession, score = state.score, time = formatTime(state.timerSeconds), perc = Math.round((score/total)*100);
-        let badge='badge-bronze', badgeText='🥉 Keep Practicing', emoji='📚';
-        if (perc>=90){ badge='badge-gold'; badgeText='🥇 Excellent!'; emoji='🏆'; }
-        else if (perc>=70){ badge='badge-silver'; badgeText='🥈 Great Job!'; emoji='🌟'; }
-
-        mainContent.innerHTML = `
-            <div class="idiom-results">
-                <div style="font-size:3rem;">${emoji}</div>
-                <div class="idiom-results-score">${score}<span style="color:var(--text-secondary);">/</span>${total}</div>
-                <span class="idiom-results-badge ${badge}">${badgeText}</span>
-                <div class="text-muted"><p>⏱️ Time: <strong>${time}</strong></p><p>📊 Accuracy: <strong>${perc}%</strong></p></div>
-            </div>`;
-        bottomNav.innerHTML = `
-            <button class="idiom-btn idiom-btn-primary idiom-btn-full idiom-btn-lg" id="btnPlayAgain">🔄 Play Another Session</button>
-            <a href="${CONFIG.HUB_URL}" class="idiom-btn idiom-btn-ghost idiom-btn-full" style="text-decoration:none;">← Back to Hub</a>`;
-        document.getElementById('btnPlayAgain').addEventListener('click', () => {
-            state.showRefillMessage = false;   // will be set correctly by next refillIfNeeded
+            updateTimerDisplay();
             renderBatchSelection();
-        });
-    }
-
-    // ---------- INIT ----------
-    async function initApp() {
-        // Read player name from URL ?name=...
-        const params = new URLSearchParams(window.location.search);
-        const urlName = params.get('name');
-        if (urlName) state.playerName = decodeURIComponent(urlName.trim());
-        else state.playerName = 'Player';
-        updateHeaderPlayerName();
-
-        mainContent.innerHTML = '<div class="idiom-batch-screen"><p style="color:var(--text-secondary);">⏳ Loading data…</p></div>';
-        bottomNav.innerHTML = '';
-
-        await loadData();
-        if (state.allProverbs.length < 10) {
-            mainContent.innerHTML = `<div class="idiom-batch-screen"><p style="color:var(--error);">❌ Need at least 10 idioms.</p></div>`;
-            return;
         }
 
-        renderBatchSelection();
-    }
-
-    initApp();
-})();
-</script>
-     <!-- ═══ BACK TO HUB — paste this in any game page ═══ -->
-<script>
-  // Reads the player name from the URL when the game loaded
-  // Works whether the name came in as ?name=Amrit or was set locally
-  function getPlayerName(){
-    // First try a local variable called playerName if the game has one
-    if(typeof playerName !== 'undefined' && playerName) return playerName;
-    // Otherwise read from the URL param
-    return decodeURIComponent(new URLSearchParams(window.location.search).get('name') || '');
-  }
-
-  function goToHub(){
-    const name = getPlayerName();
-    window.location.href = 'hub.html' + (name ? '?name=' + encodeURIComponent(name) : '');
-  }
-</script>
-
-<button
-  id="backToHubBtn"
-  onclick="goToHub()"
-  style="
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    background:#1e1e38;
-    border:2px solid #2e2e52;
-    color:#7070a0;
-    border-radius:12px;
-    padding:10px 18px;
-    font-size:0.75rem;
-    font-weight:800;
-    cursor:pointer;
-    font-family:'Segoe UI',system-ui,sans-serif;
-    transition:all .2s;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    letter-spacing:.3px;
-    z-index:9999;
-    box-shadow:0 4px 16px #00000044;
-  "
-  onmouseover="this.style.borderColor='#ff8906';this.style.color='#ff8906';"
-  onmouseout="this.style.borderColor='#2e2e52';this.style.color='#7070a0';"
->
-  ⬡ Hub
-</button>
-<!-- ═══ END BACK TO HUB ═══ -->
+        init();
+    </script>
 </body>
 </html>
