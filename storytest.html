@@ -487,138 +487,146 @@
 
 
 /* Part selector styling (matches Fluent theme) */
-.part-select {
-  background: var(--sur2);
-  color: var(--txt);
-  border: 1.5px solid var(--brd);
-  border-radius: 12px;
-  padding: 8px 14px;
-  font-family: inherit;
-  font-weight: 600;
-  font-size: 0.9em;
-  cursor: pointer;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.part-select:hover { border-color: var(--acc); }
-.part-select option {
-  background: var(--sur);
-  color: var(--txt);
-}
+        .part-select {
+          background: var(--sur2);
+          color: var(--txt);
+          border: 1.5px solid var(--brd);
+          border-radius: 12px;
+          padding: 8px 14px;
+          font-family: inherit;
+          font-weight: 600;
+          font-size: 0.9em;
+          cursor: pointer;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+        .part-select:hover { border-color: var(--acc); }
+        .part-select option {
+          background: var(--sur);
+          color: var(--txt);
+        }
 
         
-
-.playhead {
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 14px;
-    height: 14px;
-    background: #ff8906;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    pointer-events: auto;
-    cursor: pointer;
-    z-index: 10;
-}
-.story-word.highlight {
-    background: rgba(255, 137, 6, 0.5);
-    border-radius: 4px;
-    transition: background 0.2s;
-}
-
-
         
-#floatingBackBtn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    position: fixed;
-    bottom: 85px;          /* 85px from bottom, above the hub (25px + 48px height + 12px gap) */
-    right: 25px;
-    height: 48px;
-    padding: 0 20px;
-    border-radius: 40px;
-    background: var(--sur2);
-    color: var(--txt);
-    border: 1.5px solid var(--brd);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
-    font-size: 0.9em;
-    font-weight: 800;
-    cursor: pointer;
-    z-index: 199;          /* just below the hub button's 200 */
-    transition: transform 0.2s;
-}
-#floatingBackBtn:hover {
-    transform: scale(1.05);
-    border-color: var(--acc);
-    color: var(--acc);
-}
+        .playhead {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 14px;
+            height: 14px;
+            background: #ff8906;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            pointer-events: auto;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .story-word.highlight {
+            background: rgba(255, 137, 6, 0.5);
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        
+                
+        #floatingBackBtn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: fixed;
+            bottom: 85px;          /* 85px from bottom, above the hub (25px + 48px height + 12px gap) */
+            right: 25px;
+            height: 48px;
+            padding: 0 20px;
+            border-radius: 40px;
+            background: var(--sur2);
+            color: var(--txt);
+            border: 1.5px solid var(--brd);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+            font-size: 0.9em;
+            font-weight: 800;
+            cursor: pointer;
+            z-index: 199;          /* just below the hub button's 200 */
+            transition: transform 0.2s;
+        }
+        #floatingBackBtn:hover {
+            transform: scale(1.05);
+            border-color: var(--acc);
+            color: var(--acc);
+        }
+        
+        
+        
+        
+        /* Accordion container */
+        .accordion {
+            margin: 15px 0;
+            width: 100%;
+            display: block;
+            box-sizing: border-box;
+        }
+        
+        /* Chapter header */
+        .chapter-header {
+            background: var(--sur);
+            border: 1px solid var(--brd);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            box-sizing: border-box;
+            align-items: center;
+            color: var(--txt);
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .chapter-header:hover { background: var(--sur2); }
+        .chapter-header .arrow {
+            font-size: 0.8em;
+            transition: transform 0.2s;
+            margin-left: auto;
+        }
+        .chapter-header.open .arrow {
+            transform: rotate(90deg);
+        }
+        
+        /* Parts list (hidden by default) */
+        .parts-list {
+            display: none;
+            margin-left: 16px;
+            margin-bottom: 10px;
+        }
+        .parts-list.open {
+            display: block;
+        }
+        
+        /* Individual part row */
+        .part-row {
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            color: var(--mut);
+            transition: background 0.2s;
+        }
+        .part-row:hover { background: var(--sur2); }
+        .part-row.active {
+            background: var(--acc);
+            color: #0d0d1a;
+            font-weight: 700;
+        }
 
-
-
-
-/* Accordion container */
-.accordion {
-    margin: 15px 0;
-    width: 100%;
-    display: block;
-    box-sizing: border-box;
-}
-
-/* Chapter header */
-.chapter-header {
-    background: var(--sur);
-    border: 1px solid var(--brd);
-    border-radius: 12px;
-    padding: 12px 16px;
-    margin-bottom: 6px;
-    cursor: pointer;
-    font-weight: 700;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    box-sizing: border-box;
-    align-items: center;
-    color: var(--txt);
-    transition: background 0.2s;
-    user-select: none;
-}
-.chapter-header:hover { background: var(--sur2); }
-.chapter-header .arrow {
-    font-size: 0.8em;
-    transition: transform 0.2s;
-    margin-left: auto;
-}
-.chapter-header.open .arrow {
-    transform: rotate(90deg);
-}
-
-/* Parts list (hidden by default) */
-.parts-list {
-    display: none;
-    margin-left: 16px;
-    margin-bottom: 10px;
-}
-.parts-list.open {
-    display: block;
-}
-
-/* Individual part row */
-.part-row {
-    padding: 8px 12px;
-    border-radius: 8px;
-    margin-bottom: 4px;
-    cursor: pointer;
-    color: var(--mut);
-    transition: background 0.2s;
-}
-.part-row:hover { background: var(--sur2); }
-.part-row.active {
-    background: var(--acc);
-    color: #0d0d1a;
-    font-weight: 700;
-}
+        /* Small fix for chapter button selector */
+        #megaStoryControls,
+        #megaStoryControlsBottom {
+            width: 100%;
+            align-self: stretch;
+            box-sizing: border-box;
+        }
 /* Accordion End */
 
         
