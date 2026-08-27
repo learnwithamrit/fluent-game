@@ -1274,10 +1274,23 @@ function buildAccordion() {
             });
 
             // Toggle open/close on header click
-            header.addEventListener('click', () => {
-                header.classList.toggle('open');
-                list.classList.toggle('open');
-            });
+                           header.addEventListener('click', () => {
+                    // Get the parent accordion container (either top or bottom)
+                    const accordion = header.parentElement;
+                
+                    // Close all chapter headers and their parts lists inside this accordion
+                    accordion.querySelectorAll('.chapter-header').forEach(h => {
+                        h.classList.remove('open');
+                        const siblingList = h.nextElementSibling;
+                        if (siblingList && siblingList.classList.contains('parts-list')) {
+                            siblingList.classList.remove('open');
+                        }
+                    });
+                
+                    // Now open the clicked chapter
+                    header.classList.add('open');
+                    if (list) list.classList.add('open');
+                });
 
             container.appendChild(header);
             container.appendChild(list);
