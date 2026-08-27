@@ -629,7 +629,11 @@
         }
 /* Accordion End */
 
-        
+        #storyChapterTitle,
+        #storyPartTitle {
+            text-align: center;
+        }
+            
         #page-footer {
             width: 100%;
             background: var(--sur);
@@ -803,10 +807,11 @@
                 <canvas id="heroWaveCanvas"></canvas>
             </div>
         </div>
-            <div class="story-content-wrapper">
-                <h2 id="storyPartTitle" style="display:none;"></h2>
-                <main id="content-body"></main>
-            </div>
+               <div class="story-content-wrapper">
+                    <h3 id="storyChapterTitle" style="display:none; text-align:center; font-size:1.2rem; color:var(--acc); margin-bottom:5px;"></h3>
+                    <h2 id="storyPartTitle" style="display:none; text-align:center; margin-bottom:20px;"></h2>
+                    <main id="content-body"></main>
+                </div>
             <!-- Bottom part selector (inside story-buttons area for convenience) -->
             <div id="megaStoryControlsBottom" style="display:none; width:100%; text-align:center; margin-bottom:15px;">
                 <div class="accordion" id="accordionBottom"></div>
@@ -1111,7 +1116,14 @@ function setupMegaStoryUI(story) {
 
 function loadCurrentPart() {
     const part = megaParts[currentPartIndex];
-
+    // Set chapter title inside the wrapper
+    const chapterTitleEl = document.getElementById('storyChapterTitle');
+    if (part.chapter) {
+        chapterTitleEl.style.display = 'block';
+        chapterTitleEl.textContent = part.chapter;
+    } else {
+        chapterTitleEl.style.display = 'none';
+    }
     // Update part title display
     document.getElementById('currentPartTitle').textContent = 
         part.title ? `${part.chapter || ''} – Part ${part.part}: ${part.title}` : `Part ${part.part}`;
