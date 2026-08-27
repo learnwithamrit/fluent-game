@@ -1275,22 +1275,25 @@ function buildAccordion() {
 
             // Toggle open/close on header click
                            header.addEventListener('click', () => {
-                    // Get the parent accordion container (either top or bottom)
-                    const accordion = header.parentElement;
-                
-                    // Close all chapter headers and their parts lists inside this accordion
-                    accordion.querySelectorAll('.chapter-header').forEach(h => {
-                        h.classList.remove('open');
-                        const siblingList = h.nextElementSibling;
-                        if (siblingList && siblingList.classList.contains('parts-list')) {
-                            siblingList.classList.remove('open');
-                        }
-                    });
-                
-                    // Now open the clicked chapter
-                    header.classList.add('open');
-                    if (list) list.classList.add('open');
-                });
+                            const accordion = header.parentElement;
+                            const isOpen = header.classList.contains('open');
+                        
+                            // Close all chapters in this accordion
+                            accordion.querySelectorAll('.chapter-header').forEach(h => {
+                                h.classList.remove('open');
+                                const siblingList = h.nextElementSibling;
+                                if (siblingList && siblingList.classList.contains('parts-list')) {
+                                    siblingList.classList.remove('open');
+                                }
+                            });
+                        
+                            // If the clicked chapter was not open, open it now
+                            if (!isOpen) {
+                                header.classList.add('open');
+                                if (list) list.classList.add('open');
+                            }
+                            // If it was open, it stays closed (toggle off)
+                        });
 
             container.appendChild(header);
             container.appendChild(list);
