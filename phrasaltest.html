@@ -6,7 +6,6 @@
 
 <!-- ═══════════════════════════════════════════════════════════════
      PAGE IDENTITY
-     ✏️  Change title, description and OG tags for each new page.
      ═══════════════════════════════════════════════════════════════ -->
 <title>Phrasal Verbs — Fluent by Amrit</title>
 <meta name="description" content="The most common English phrasal verbs with English and Bengali meanings, each in a full context sentence.">
@@ -14,12 +13,10 @@
 <meta property="og:description" content="The most common English phrasal verbs with English and Bengali meanings.">
 <meta property="og:type" content="article">
 
-<!-- Favicon + theme colour -->
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png">
 <meta name="theme-color" content="#ff8906">
 
-<!-- Bengali font — needed for correct conjunct rendering -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -27,24 +24,20 @@
 <style>
 /* ═══════════════════════════════════════════════════════════════
    DESIGN TOKENS
-   All colours, fonts, spacing and layout widths live here.
-   Change a value once and it updates everywhere on the page.
    ═══════════════════════════════════════════════════════════════ */
 :root {
-    /* Core palette */
-    --bg: #0d0d1a;      /* page background            */
-    --sur: #161628;     /* surface / card background  */
-    --sur2: #1e1e38;    /* secondary surface          */
-    --brd: #2e2e52;     /* borders                    */
-    --txt: #e8e8f0;     /* primary text               */
-    --mut: #7070a0;     /* muted / secondary text     */
-    --acc: #ff8906;     /* orange — primary accent    */
-    --ac2: #f9c74f;     /* yellow — secondary accent  */
-    --grn: #06d6a0;     /* green — Bengali text       */
-    --blu: #3da9fc;     /* blue                       */
-    --red: #ef4565;     /* red                        */
+    --bg: #0d0d1a;
+    --sur: #161628;
+    --sur2: #1e1e38;
+    --brd: #2e2e52;
+    --txt: #e8e8f0;
+    --mut: #7070a0;
+    --acc: #ff8906;
+    --ac2: #f9c74f;
+    --grn: #06d6a0;
+    --blu: #3da9fc;
+    --red: #ef4565;
 
-    /* Typography scale */
     --fs-xs: 0.62rem;
     --fs-sm: 0.78rem;
     --fs-base: 0.95rem;
@@ -53,15 +46,12 @@
     --fs-xl: 1.9rem;
     --fs-2xl: 2.4rem;
 
-    /* Spacing */
     --gap-sm: 12px;
     --gap-md: 24px;
     --gap-lg: 48px;
 
-    /* Layout */
     --max-w: 680px;
 
-    /* Bengali font stack */
     --font-bn: 'Noto Sans Bengali', 'Segoe UI', system-ui, sans-serif;
 }
 
@@ -90,7 +80,6 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    TOP NAV
-   Thin sticky bar at the top — brand + "Hub" button.
    ═══════════════════════════════════════════════════════════════ */
 #top-nav {
     width: 100%;
@@ -132,7 +121,6 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    PAGE WRAPPER
-   Centres and constrains the page width.
    ═══════════════════════════════════════════════════════════════ */
 #page-wrapper {
     width: 100%;
@@ -145,7 +133,6 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    HEADER
-   Icon, category label, title, subtitle, meta badges.
    ═══════════════════════════════════════════════════════════════ */
 #page-header {
     padding: var(--gap-lg) 0 var(--gap-md);
@@ -236,9 +223,58 @@ body {
 .section-heading .section-icon { font-size: 1.1rem; }
 
 /* ═══════════════════════════════════════════════════════════════
+   ★ NEW — CATEGORY PILLS
+   Horizontal row of pill buttons right below the section heading.
+   Overflows sideways on narrow screens with smooth snap scrolling.
+   The scrollbar itself is hidden.
+   ═══════════════════════════════════════════════════════════════ */
+.category-pills {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 6px;
+    margin-bottom: 16px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;   /* iOS momentum scrolling */
+    scrollbar-width: none;               /* Firefox */
+    -ms-overflow-style: none;            /* Edge / old IE */
+}
+.category-pills::-webkit-scrollbar { display: none; }  /* Chrome / Safari */
+
+.pill {
+    flex: 0 0 auto;                      /* never shrink — keep full width */
+    padding: 7px 16px;
+    font-family: inherit;
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    letter-spacing: .4px;
+    border-radius: 20px;
+    border: 1.5px solid var(--brd);
+    background: var(--sur);
+    color: var(--mut);
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+    scroll-snap-align: start;
+}
+.pill:hover {
+    border-color: var(--acc);
+    color: var(--acc);
+}
+/* Active pill — solid orange, dark text */
+.pill.is-active {
+    background: var(--acc);
+    border-color: var(--acc);
+    color: #0d0d1a;
+}
+.pill.is-active:hover {
+    background: var(--acc);
+    color: #0d0d1a;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    EXAMPLE CARD
-   One card per phrasal verb.
-   Contents: verb → meaning (English + Bengali) → usage sentence.
    ═══════════════════════════════════════════════════════════════ */
 .example-card {
     background: var(--sur);
@@ -250,7 +286,6 @@ body {
 }
 .example-card:hover { border-color: var(--acc); }
 
-/* The phrasal verb itself — orange, bold */
 .example-card .example-phrase {
     font-size: var(--fs-md);
     font-weight: 900;
@@ -258,16 +293,13 @@ body {
     margin-bottom: 6px;
 }
 
-/* Meaning box — English + Bengali combined */
 .example-card .example-meaning {
     font-size: var(--fs-sm);
     color: var(--txt);
     line-height: 1.6;
     margin-bottom: 10px;
 }
-.example-card .example-meaning .meaning-en {
-    display: block;
-}
+.example-card .example-meaning .meaning-en { display: block; }
 .example-card .example-meaning .meaning-bn {
     display: block;
     margin-top: 4px;
@@ -278,7 +310,6 @@ body {
     line-height: 1.7;
 }
 
-/* Example sentence — italic, orange left rule */
 .example-card .example-usage {
     font-size: var(--fs-sm);
     color: var(--mut);
@@ -288,9 +319,18 @@ body {
     line-height: 1.6;
 }
 
+/* Empty-category state */
+.empty-state {
+    text-align: center;
+    padding: 32px 20px;
+    font-size: var(--fs-sm);
+    color: var(--mut);
+    border: 1.5px dashed var(--brd);
+    border-radius: 16px;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    PAGINATION
-   Prev/Next row, numbered buttons row, jump-to-page row.
    ═══════════════════════════════════════════════════════════════ */
 .pagination {
     margin-top: var(--gap-md);
@@ -299,7 +339,6 @@ body {
     align-items: center;
     gap: 14px;
 }
-/* Hidden entirely when there is only one page */
 .pagination[hidden] { display: none; }
 
 .page-controls { display: flex; gap: 10px; }
@@ -323,7 +362,6 @@ body {
 }
 .page-btn:disabled { opacity: .35; cursor: not-allowed; }
 
-/* Numbered page buttons */
 .page-numbers {
     display: flex;
     flex-wrap: wrap;
@@ -348,7 +386,6 @@ body {
     border-color: var(--acc);
     color: var(--acc);
 }
-/* Currently visible page number — solid orange */
 .page-num.is-active {
     background: var(--acc);
     border-color: var(--acc);
@@ -359,7 +396,6 @@ body {
     background: var(--acc);
     color: #0d0d1a;
 }
-/* The "…" between far-apart page numbers */
 .ellipsis {
     display: inline-flex;
     align-items: center;
@@ -370,7 +406,6 @@ body {
     user-select: none;
 }
 
-/* Jump-to-page row */
 .jump {
     display: flex;
     align-items: center;
@@ -396,7 +431,6 @@ body {
 .jump input:focus { border-color: var(--acc); outline: none; }
 .jump .page-btn { padding: 8px 14px; }
 
-/* Hide the number-input spinner arrows */
 .jump input::-webkit-outer-spin-button,
 .jump input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .jump input[type=number] { -moz-appearance: textfield; appearance: textfield; }
@@ -479,37 +513,23 @@ body {
 </nav>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
-     PAGE WRAPPER
-     ═══════════════════════════════════════════════════════════════ -->
 <div id="page-wrapper">
 
     <!-- ─────────── HEADER ─────────── -->
     <header id="page-header">
-
-        <!-- ✏️ Replace the emoji, or swap in an <img> tag -->
         <div id="header-visual">🔤</div>
-
-        <!-- ✏️ Small label above the title -->
         <div id="header-category">English · Reference</div>
-
-        <!-- ✏️ Main title -->
         <h1 id="header-title">Phrasal Verbs</h1>
-
-        <!-- ✏️ One-line description -->
         <p id="header-subtitle">
             The most commonly used phrasal verbs in modern English —
             each with its English meaning, Bengali meaning, and a
             full sentence showing it in real context.
         </p>
-
-        <!-- Meta badges — the entry count is filled in by JS -->
         <div id="header-meta">
             <span class="meta-badge">📖 Reference</span>
             <span class="meta-badge">🎯 All levels</span>
             <span class="meta-badge" id="metaCount">📌 — entries</span>
         </div>
-
     </header>
 
     <!-- ─────────── CONTENT BODY ─────────── -->
@@ -522,26 +542,26 @@ body {
                 Phrasal Verb List
             </h2>
 
-            <!-- Live status: "Showing 1–10 of 240 entries" -->
+            <!-- ★ NEW — Category pills, injected by renderPills() -->
+            <div class="category-pills" id="categoryPills" role="tablist" aria-label="Filter by category"></div>
+
+            <!-- Live status: "Showing 1–10 of 47 entries" -->
             <p id="statusText"
                style="font-size:var(--fs-xs);color:var(--mut);margin-bottom:14px;"></p>
 
-            <!-- INFORMATION WRAPPER — 10 cards get injected here -->
+            <!-- INFORMATION WRAPPER — cards get injected here -->
             <div id="infoWrapper"></div>
 
             <!-- PAGINATION — directly under the information wrapper -->
             <nav class="pagination" id="pagination" aria-label="Pagination">
 
-                <!-- Row 1: Previous / Next -->
                 <div class="page-controls">
                     <button type="button" class="page-btn" id="prevBtn">← Previous</button>
                     <button type="button" class="page-btn" id="nextBtn">Next →</button>
                 </div>
 
-                <!-- Row 2: 1 2 3 … (filled in by JS) -->
                 <div class="page-numbers" id="pageNumbers"></div>
 
-                <!-- Row 3: Jump to page -->
                 <form class="jump" id="jumpForm">
                     <label for="jumpInput">Jump to</label>
                     <input type="number" id="jumpInput" min="1" step="1"
@@ -578,9 +598,6 @@ body {
 
 <!-- ═══════════════════════════════════════════════════════════════
      JAVASCRIPT
-     Everything below runs on page load.
-     Sections: CONFIG → FALLBACK DATA → CSV PARSER → DATA LOADER
-               → RENDER → NAVIGATION → BOOT
      ═══════════════════════════════════════════════════════════════ -->
 <script>
 
@@ -592,24 +609,41 @@ body {
      Format:
        https://docs.google.com/spreadsheets/d/<SHEET_ID>/gviz/tq?tqx=out:csv&sheet=<TAB_NAME>
 
-     Leave it as "" to use the 10 built-in fallback entries below.
-     If the fetch fails for any reason, the fallback is used too —
-     so the page is never blank.
+     Leave "" to use the 10 built-in fallback entries below.
 
-   ▸ ROWS_PER_PAGE — how many cards show per page.
-     Change to 5, 15, 20 — anything you like. Default is 10.
+   ▸ ROWS_PER_PAGE — how many cards show per page. Default 10.
+
+   ▸ CATEGORIES — the 8 category pills. Order matters: this is
+     the order they render left-to-right. If you add or rename a
+     category in your sheet, add it here too, otherwise cards
+     tagged with the new category won't be reachable.
+
+   ▸ DEFAULT_CATEGORY — the pill selected on first load.
+     Must exactly match one of the CATEGORIES strings.
 
    ═══════════════════════════════════════════════════════════════ */
 
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcZDeYiPpjL6g1BtORfo8XEZRS_pAB4aBi2ZTvuRW6bE3CK378rfNQpfZRJtlU8JEhL4aDZ8oOaVY_/pub?gid=0&single=true&output=csv";
+const SHEET_CSV_URL = "";
 const ROWS_PER_PAGE = 10;
+
+const CATEGORIES = [
+  "Most Common",
+  "Rarely used",
+  "Slang & Informal",
+  "Professional and Business",
+  "Literal meaning",
+  "Idiomatic",
+  "Polysemous",
+  "Action Nuanced"
+];
+
+const DEFAULT_CATEGORY = "Most Common";
 
 
 /* ═══════════════════════════════════════════════════════════════
    SECTION 2 — FALLBACK DATA
-   10 phrasal verbs used when the Google Sheet is empty,
-   unreachable, or blocked. Delete any you don't want, or add more.
-   Same field names as the sheet columns.
+   10 phrasal verbs used when the Google Sheet is empty or
+   unreachable. Same field names as the sheet columns.
    ═══════════════════════════════════════════════════════════════ */
 
 const FALLBACK_DATA = [
@@ -688,53 +722,42 @@ const FALLBACK_DATA = [
 
 /* ═══════════════════════════════════════════════════════════════
    SECTION 3 — DOM REFERENCES
-   Cached lookups so we don't query the DOM repeatedly.
    ═══════════════════════════════════════════════════════════════ */
 
-const infoWrapper = document.getElementById('infoWrapper');
-const pagination  = document.getElementById('pagination');
-const prevBtn     = document.getElementById('prevBtn');
-const nextBtn     = document.getElementById('nextBtn');
-const pageNumbers = document.getElementById('pageNumbers');
-const jumpForm    = document.getElementById('jumpForm');
-const jumpInput   = document.getElementById('jumpInput');
-const statusText  = document.getElementById('statusText');
-const metaCount   = document.getElementById('metaCount');
+const infoWrapper   = document.getElementById('infoWrapper');
+const pagination    = document.getElementById('pagination');
+const prevBtn       = document.getElementById('prevBtn');
+const nextBtn       = document.getElementById('nextBtn');
+const pageNumbers   = document.getElementById('pageNumbers');
+const jumpForm      = document.getElementById('jumpForm');
+const jumpInput     = document.getElementById('jumpInput');
+const statusText    = document.getElementById('statusText');
+const metaCount     = document.getElementById('metaCount');
+const categoryPills = document.getElementById('categoryPills');   /* ★ NEW */
 
 
 /* ═══════════════════════════════════════════════════════════════
    SECTION 4 — APPLICATION STATE
-   `items` holds the full dataset; `page` is the current page number.
+   ▸ items    — full dataset from the sheet
+   ▸ category — currently selected category (a pill value)
+   ▸ page     — current page number
    ═══════════════════════════════════════════════════════════════ */
 
 const state = {
-  items: [],
-  page:  1
+  items:    [],
+  category: DEFAULT_CATEGORY,   /* ★ NEW */
+  page:     1
 };
 
 
 /* ═══════════════════════════════════════════════════════════════
    SECTION 5 — CSV PARSER
-   Google Sheets returns CSV. These helpers turn that text into
-   an array of plain JS objects.
    ═══════════════════════════════════════════════════════════════ */
 
-/**
- * normaliseKey(str)
- * Lowercases a string and strips anything that isn't a-z or 0-9.
- * Used so that header names like "Meaning (English)", "meaning english"
- * and "MeaningEnglish" all resolve to the same internal field.
- */
 function normaliseKey(str) {
   return String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
-/**
- * FIELD_MAP
- * Maps the normalised sheet-header name → the internal field name
- * used everywhere else in the code. If you rename a column in the
- * sheet, update the key here.
- */
 const FIELD_MAP = {
   category:        'category',
   phrasalverb:     'verb',
@@ -743,32 +766,19 @@ const FIELD_MAP = {
   examplesentence: 'example'
 };
 
-/**
- * parseCSV(text)
- * A small RFC-4180–style CSV parser. Handles:
- *   • quoted fields          "hello, world"
- *   • escaped quotes         "she said ""hi"""
- *   • newlines inside quotes (common in Bengali meaning cells)
- * Returns an array of rows, each row being an array of cell strings.
- */
 function parseCSV(text) {
   const rows = [];
   let row = [], field = '', inQuotes = false;
 
-  // Normalise line endings
   text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
-
     if (inQuotes) {
       if (ch === '"') {
-        // Double quote inside a quoted field = literal "
         if (text[i + 1] === '"') { field += '"'; i++; }
-        else { inQuotes = false; }
-      } else {
-        field += ch;
-      }
+        else inQuotes = false;
+      } else field += ch;
     } else {
       if (ch === '"')       inQuotes = true;
       else if (ch === ',')  { row.push(field); field = ''; }
@@ -776,24 +786,13 @@ function parseCSV(text) {
       else                  field += ch;
     }
   }
-  // Flush the last field/row if the file didn't end with a newline
   if (field !== '' || row.length) { row.push(field); rows.push(row); }
-
-  // Drop completely blank rows
   return rows.filter(r => r.some(c => String(c).trim() !== ''));
 }
 
-/**
- * rowsToObjects(rows)
- * Takes the array-of-arrays from parseCSV and converts it into
- * an array of objects, e.g.
- *   { verb: "give up", meaningEn: "...", meaningBn: "...", example: "..." }
- * Rows without a phrasal verb are discarded.
- */
 function rowsToObjects(rows) {
   if (rows.length < 2) return [];
   const header = rows[0].map(normaliseKey);
-
   return rows.slice(1).map(cells => {
     const obj = {};
     header.forEach((key, i) => {
@@ -809,22 +808,13 @@ function rowsToObjects(rows) {
    SECTION 6 — DATA LOADER
    ═══════════════════════════════════════════════════════════════ */
 
-/**
- * loadData()
- * Attempts to fetch SHEET_CSV_URL and parse it. If the URL is
- * empty, or the fetch throws (network / CORS / bad URL), falls
- * back to FALLBACK_DATA.
- * Returns: { data: Array, source: 'sheet' | 'fallback' }
- */
 async function loadData() {
   if (SHEET_CSV_URL) {
     try {
       const res = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
-
       const data = rowsToObjects(parseCSV(await res.text()));
       if (!data.length) throw new Error('sheet returned no usable rows');
-
       console.info('[phrasal-verbs] Loaded ' + data.length + ' entries from sheet.');
       return { data, source: 'sheet' };
     } catch (err) {
@@ -836,14 +826,39 @@ async function loadData() {
 
 
 /* ═══════════════════════════════════════════════════════════════
-   SECTION 7 — RENDERING
+   SECTION 7 — CATEGORY FILTERING  (★ NEW)
    ═══════════════════════════════════════════════════════════════ */
 
 /**
- * escapeHTML(str)
- * Prevents any characters in the data (like < or &) from being
- * interpreted as HTML — a small safety net for sheet content.
+ * itemCategories(item)
+ * The sheet's Category cell can hold multiple comma-separated tags,
+ * e.g. "Idiomatic, Polysemous". This splits them into a normalised
+ * lowercase array for comparison.
+ * Returns: string[]  e.g. ["idiomatic", "polysemous"]
  */
+function itemCategories(item) {
+  return String(item.category || '')
+    .split(',')
+    .map(s => s.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+/**
+ * filteredItems()
+ * Returns the subset of state.items that belong to the currently
+ * selected category. Matching is case-insensitive and tag-aware,
+ * so a verb tagged "Idiomatic, Polysemous" shows under both pills.
+ */
+function filteredItems() {
+  const target = state.category.trim().toLowerCase();
+  return state.items.filter(item => itemCategories(item).includes(target));
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 8 — RENDERING
+   ═══════════════════════════════════════════════════════════════ */
+
 function escapeHTML(str) {
   return String(str ?? '')
     .replace(/&/g, '&amp;')
@@ -855,9 +870,7 @@ function escapeHTML(str) {
 
 /**
  * cardHTML(item)
- * Returns the HTML string for a single phrasal-verb card.
- * Uses the template's .example-card classes so the design stays
- * consistent. English and Bengali meanings sit together in one box.
+ * One phrasal-verb card. Uses the template's .example-card classes.
  */
 function cardHTML(item) {
   return `
@@ -872,17 +885,43 @@ function cardHTML(item) {
 }
 
 /**
+ * renderPills()  (★ NEW)
+ * Draws the category pill row. Called once after data loads.
+ * Marks the pill whose value equals state.category as active.
+ */
+function renderPills() {
+  categoryPills.innerHTML = CATEGORIES.map(cat => {
+    const active = cat === state.category;
+    return `<button type="button"
+                    class="pill${active ? ' is-active' : ''}"
+                    role="tab"
+                    data-category="${escapeHTML(cat)}"
+                    aria-selected="${active}">${escapeHTML(cat)}</button>`;
+  }).join('');
+}
+
+/**
+ * updatePillActiveState()  (★ NEW)
+ * Cheaply toggles the .is-active class without rebuilding the row.
+ * Used when the user switches categories.
+ */
+function updatePillActiveState() {
+  categoryPills.querySelectorAll('.pill').forEach(btn => {
+    const active = btn.dataset.category === state.category;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-selected', String(active));
+  });
+}
+
+/**
  * pageList(current, total)
- * Builds the list of page numbers to show beneath the cards.
- *   ≤ 7 pages → show all:              1 2 3 4 5 6 7
- *   > 7 pages → show ends + neighbours: 1 … 5 6 7 … 30
- * Returns an array containing numbers and the string '…'.
+ * Numbers to show beneath the cards.
+ *   ≤ 7 → all of them.  > 7 → 1 … n-1 n n+1 … last
  */
 function pageList(current, total) {
   if (total <= 7) {
     return Array.from({ length: total }, (_, i) => i + 1);
   }
-
   const pages = [1];
   const start = Math.max(2, current - 1);
   const end   = Math.min(total - 1, current + 1);
@@ -897,38 +936,40 @@ function pageList(current, total) {
 
 /**
  * totalPages()
- * How many pages exist for the current dataset at ROWS_PER_PAGE.
- * Always at least 1.
+ * How many pages exist for the FILTERED dataset.
  */
 function totalPages() {
-  return Math.max(1, Math.ceil(state.items.length / ROWS_PER_PAGE));
+  const count = filteredItems().length;
+  return Math.max(1, Math.ceil(count / ROWS_PER_PAGE));
 }
 
 /**
  * render()
- * The heart of the page. Repaints everything:
- *   1. Clamps the current page to a valid range
- *   2. Slices the dataset for the current page
- *   3. Injects the 10 card HTML strings into #infoWrapper
- *   4. Updates the "Showing X–Y of Z entries" line
- *   5. Updates prev/next disabled state + page-number buttons
- *   6. Updates the jump input's max/placeholder
- * Safe to call any time the state changes.
+ * Repaints everything. Now operates on the filtered list, so
+ * switching category changes both the cards and the pagination.
  */
 function render() {
+  const items = filteredItems();          /* ★ CHANGED — was state.items */
   const tp = totalPages();
   state.page = Math.min(Math.max(1, state.page), tp);
 
   const start = (state.page - 1) * ROWS_PER_PAGE;
-  const slice = state.items.slice(start, start + ROWS_PER_PAGE);
+  const slice = items.slice(start, start + ROWS_PER_PAGE);
 
-  // 1. Cards
-  infoWrapper.innerHTML = slice.map(cardHTML).join('');
+  // 1. Cards — or an empty state if the category has no rows yet
+  if (items.length === 0) {
+    infoWrapper.innerHTML =
+      `<div class="empty-state">No entries yet in “${escapeHTML(state.category)}”.</div>`;
+  } else {
+    infoWrapper.innerHTML = slice.map(cardHTML).join('');
+  }
 
   // 2. Status line
-  const from = state.items.length ? start + 1 : 0;
+  const from = items.length ? start + 1 : 0;
   const to   = start + slice.length;
-  statusText.textContent = `Showing ${from}–${to} of ${state.items.length} entries`;
+  statusText.textContent =
+    `Showing ${from}–${to} of ${items.length} ` +
+    `${items.length === 1 ? 'entry' : 'entries'} in “${state.category}”`;
 
   // 3. Pagination visibility
   pagination.hidden = tp <= 1;
@@ -945,22 +986,30 @@ function render() {
                     ${active ? 'aria-current="page"' : ''}>${p}</button>`;
   }).join('');
 
-  // 5. Jump-to input
+  // 5. Jump input
   jumpInput.max         = tp;
   jumpInput.placeholder = tp;
   jumpInput.value       = '';
 }
 
+/**
+ * setCategory(cat)  (★ NEW)
+ * Switch the active category. Resets to page 1, repaints pills,
+ * re-renders cards + pagination.
+ */
+function setCategory(cat) {
+  if (cat === state.category) return;
+  state.category = cat;
+  state.page = 1;
+  updatePillActiveState();
+  render();
+}
+
 
 /* ═══════════════════════════════════════════════════════════════
-   SECTION 8 — NAVIGATION
+   SECTION 9 — NAVIGATION
    ═══════════════════════════════════════════════════════════════ */
 
-/**
- * goToPage(n)
- * Jump to page n (clamped to a valid range). Re-renders and
- * smoothly scrolls the info wrapper back into view.
- */
 function goToPage(n) {
   const tp = totalPages();
   const target = Math.min(Math.max(1, n), tp);
@@ -971,17 +1020,14 @@ function goToPage(n) {
   infoWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// Previous / Next buttons
 prevBtn.addEventListener('click', () => goToPage(state.page - 1));
 nextBtn.addEventListener('click', () => goToPage(state.page + 1));
 
-// Delegated click handler for the numbered page buttons
 pageNumbers.addEventListener('click', e => {
   const btn = e.target.closest('.page-num');
   if (btn) goToPage(Number(btn.dataset.page));
 });
 
-// Jump-to-page form submit
 jumpForm.addEventListener('submit', e => {
   e.preventDefault();
   const n = parseInt(jumpInput.value, 10);
@@ -990,32 +1036,30 @@ jumpForm.addEventListener('submit', e => {
   jumpInput.blur();
 });
 
+/* ★ NEW — delegated click handler for the category pills.
+   Uses event delegation so we don't have to reattach listeners
+   when renderPills() rebuilds the row. */
+categoryPills.addEventListener('click', e => {
+  const pill = e.target.closest('.pill');
+  if (pill) setCategory(pill.dataset.category);
+});
+
 
 /* ═══════════════════════════════════════════════════════════════
-   SECTION 9 — NAV HELPERS (unchanged from the template)
-   Carry the player's name between pages when navigating.
+   SECTION 10 — NAV HELPERS (template)
    ═══════════════════════════════════════════════════════════════ */
 
-/**
- * getPlayerName()
- * Reads the player name from a global `playerName` variable if one
- * exists, otherwise from the ?name= query string.
- */
 function getPlayerName() {
   if (typeof playerName !== 'undefined' && playerName) return playerName;
   return decodeURIComponent(
     new URLSearchParams(window.location.search).get('name') || ''
   );
 }
-
-/** Send the user back to hub.html, preserving ?name=. */
 function goToHub() {
   const name = getPlayerName();
   window.location.href = 'hub.html' +
     (name ? '?name=' + encodeURIComponent(name) : '');
 }
-
-/** Navigate to any page, preserving ?name=. */
 function goTo(page) {
   const name = getPlayerName();
   window.location.href = page +
@@ -1024,25 +1068,25 @@ function goTo(page) {
 
 
 /* ═══════════════════════════════════════════════════════════════
-   SECTION 10 — BOOT
-   Runs once on page load. Loads data, updates the entry-count
-   badge, and paints the first page.
+   SECTION 11 — BOOT
    ═══════════════════════════════════════════════════════════════ */
 
 (async function init() {
   const { data, source } = await loadData();
 
-  state.items = data;
-  state.page  = 1;
+  state.items    = data;
+  state.category = DEFAULT_CATEGORY;
+  state.page     = 1;
 
   metaCount.textContent =
     `📌 ${data.length} ${data.length === 1 ? 'entry' : 'entries'}`;
 
   if (source === 'fallback' && SHEET_CSV_URL) {
-    console.warn('[phrasal-verbs] Rendering fallback data — check your sheet URL and sharing.');
+    console.warn('[phrasal-verbs] Rendering fallback — check your sheet URL and sharing.');
   }
 
-  render();
+  renderPills();   /* ★ NEW — build the pill row first */
+  render();        /* then paint the cards + pagination */
 })();
 
 </script>
