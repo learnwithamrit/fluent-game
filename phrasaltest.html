@@ -339,27 +339,35 @@ body {
     border: 1.5px dashed var(--brd);
     border-radius: 16px;
 }
-
 /* ═══════════════════════════════════════════════════════════════
-   PAGINATION
+   RESULTS TABLE — wrapper + column header
+   On mobile the header is hidden and cards stay stacked.
+   The table-row layout is applied further down in the
+   @media (min-width: 768px) block.
+   ═══════════════════════════════════════════════════════════════ */
+.results-table { display: block; }
+
+.table-header { display: none; }   /* hidden on mobile */
+/* ═══════════════════════════════════════════════════════════════
+   PAGINATION — single flex row (wraps on narrow screens)
    ═══════════════════════════════════════════════════════════════ */
 .pagination {
     margin-top: var(--gap-md);
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 14px;
+    justify-content: center;
+    gap: 12px;
 }
 .pagination[hidden] { display: none; }
-
-.page-controls { display: flex; gap: 10px; }
 
 .page-btn {
     background: var(--sur2);
     border: 1.5px solid var(--brd);
     color: var(--txt);
-    border-radius: 10px;
-    padding: 9px 18px;
+    border-radius: 20px;
+    padding: 8px 18px;
     font-size: var(--fs-sm);
     font-weight: 800;
     cursor: pointer;
@@ -373,50 +381,17 @@ body {
 }
 .page-btn:disabled { opacity: .35; cursor: not-allowed; }
 
-.page-numbers {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-}
-.page-num {
-    min-width: 38px;
-    height: 38px;
-    padding: 0 10px;
-    font: inherit;
+/* "Page 2 of 33" */
+.page-indicator {
     font-size: var(--fs-sm);
     font-weight: 800;
-    border-radius: 9px;
-    border: 1.5px solid var(--brd);
-    background: var(--sur);
-    color: var(--mut);
-    cursor: pointer;
-    transition: all .2s;
-}
-.page-num:hover {
-    border-color: var(--acc);
-    color: var(--acc);
-}
-.page-num.is-active {
-    background: var(--acc);
-    border-color: var(--acc);
-    color: #0d0d1a;
-    cursor: default;
-}
-.page-num.is-active:hover {
-    background: var(--acc);
-    color: #0d0d1a;
-}
-.ellipsis {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 24px;
-    height: 38px;
-    color: var(--mut);
-    user-select: none;
+    color: var(--txt);
+    letter-spacing: .3px;
+    white-space: nowrap;
+    padding: 0 4px;
 }
 
+/* Jump-to-page dropdown */
 .jump {
     display: flex;
     align-items: center;
@@ -426,25 +401,42 @@ body {
     font-weight: 700;
     letter-spacing: .3px;
 }
-.jump input {
-    width: 78px;
-    padding: 8px 10px;
+.jump select {
+    padding: 8px 32px 8px 14px;
     font: inherit;
     font-size: var(--fs-sm);
+    font-weight: 800;
     text-align: center;
-    border-radius: 9px;
+    border-radius: 20px;
     border: 1.5px solid var(--brd);
-    background: var(--sur);
+    background: var(--sur2);
     color: var(--txt);
     font-family: inherit;
-    font-weight: 700;
-}
-.jump input:focus { border-color: var(--acc); outline: none; }
-.jump .page-btn { padding: 8px 14px; }
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 
-.jump input::-webkit-outer-spin-button,
-.jump input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.jump input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--mut) 50%),
+        linear-gradient(135deg, var(--mut) 50%, transparent 50%);
+    background-position:
+        calc(100% - 16px) calc(50% - 2px),
+        calc(100% - 11px) calc(50% - 2px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    transition: border-color .2s, color .2s;
+}
+.jump select:hover,
+.jump select:focus {
+    border-color: var(--acc);
+    color: var(--acc);
+    outline: none;
+}
+.jump select option {
+    background: var(--sur2);
+    color: var(--txt);
+}
 
 /* ═══════════════════════════════════════════════════════════════
    FOOTER
@@ -505,6 +497,75 @@ body {
     .section-heading { font-size: var(--fs-lg); }
     .example-card { padding: 22px 24px; }
     .example-card .example-phrase { font-size: var(--fs-lg); }
+         /* ── Results table on iPad and up ── */
+    .results-table {
+        background: var(--sur);
+        border: 1.5px solid var(--brd);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        display: grid;
+        grid-template-columns: 1fr 1.3fr 1.6fr;
+        gap: 24px;
+        padding: 16px 24px;
+        background: var(--sur2);
+        border-bottom: 1.5px solid var(--brd);
+        align-items: center;
+    }
+    .table-header > div {
+        font-size: var(--fs-xs);
+        font-weight: 900;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--txt);
+    }
+
+    /* Card becomes a table row */
+    .example-card {
+        display: grid;
+        grid-template-columns: 1fr 1.3fr 1.6fr;
+        gap: 24px;
+        align-items: start;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--brd);
+        border-radius: 0;
+        padding: 20px 24px;
+        margin-bottom: 0;
+        transition: background .15s;
+    }
+    .example-card:last-child { border-bottom: none; }
+    .example-card:hover {
+        background: #ffffff04;
+        border-color: var(--brd);
+    }
+
+    /* Column 1 — the verb */
+    .example-card .example-phrase {
+        margin-bottom: 0;
+        padding-top: 2px;
+    }
+
+    /* Column 2 — meaning (English + Bengali stacked) */
+    .example-card .example-meaning {
+        margin-bottom: 0;
+        color: var(--blu);
+    }
+    .example-card .example-meaning .meaning-en {
+        color: var(--blu);
+    }
+    .example-card .example-meaning .meaning-bn {
+        margin-top: 6px;
+    }
+
+    /* Column 3 — the example sentence */
+    .example-card .example-usage {
+        border-left: none;
+        padding-left: 0;
+        margin: 0;
+    }
 }
 @media (min-width: 1024px) {
     :root { --max-w: 740px; }
@@ -561,26 +622,30 @@ body {
                style="font-size:var(--fs-xs);color:var(--mut);margin-bottom:14px;"></p>
 
             <!-- INFORMATION WRAPPER — cards get injected here -->
-            <div id="infoWrapper"></div>
-
-            <!-- PAGINATION — directly under the information wrapper -->
-            <nav class="pagination" id="pagination" aria-label="Pagination">
-
-                <div class="page-controls">
-                    <button type="button" class="page-btn" id="prevBtn">← Previous</button>
-                    <button type="button" class="page-btn" id="nextBtn">Next →</button>
-                </div>
-
-                <div class="page-numbers" id="pageNumbers"></div>
-
-                <form class="jump" id="jumpForm">
-                    <label for="jumpInput">Jump to</label>
-                    <input type="number" id="jumpInput" min="1" step="1"
-                           inputmode="numeric" placeholder="1">
-                    <button type="submit" class="page-btn">Go</button>
-                </form>
-
-            </nav>
+          <!-- RESULTS — table on iPad/desktop, stacked cards on mobile -->
+          <div class="results-table">
+          
+              <!-- Column headers — hidden on mobile, shown from 768px up -->
+              <div class="table-header" aria-hidden="true">
+                  <div>Phrase</div>
+                  <div>Meaning</div>
+                  <div>Example</div>
+              </div>
+          
+              <div id="infoWrapper"></div>
+          </div>
+          
+          <!-- PAGINATION — single row: Prev | Page X of Y | Next | Jump to -->
+          <nav class="pagination" id="pagination" aria-label="Pagination">
+              <button type="button" class="page-btn" id="prevBtn">← Prev</button>
+              <span class="page-indicator" id="pageIndicator">Page 1 of 1</span>
+              <button type="button" class="page-btn" id="nextBtn">Next →</button>
+          
+              <div class="jump">
+                  <label for="jumpSelect">Jump to</label>
+                  <select id="jumpSelect"></select>
+              </div>
+          </nav>
 
         </section>
 
@@ -739,7 +804,7 @@ const infoWrapper   = document.getElementById('infoWrapper');
 const pagination    = document.getElementById('pagination');
 const prevBtn       = document.getElementById('prevBtn');
 const nextBtn       = document.getElementById('nextBtn');
-const pageNumbers   = document.getElementById('pageNumbers');
+const pageIndicator = document.getElementById('pageIndicator');   /* ★ CHANGED */
 const jumpForm      = document.getElementById('jumpForm');
 const jumpInput     = document.getElementById('jumpInput');
 const statusText    = document.getElementById('statusText');
@@ -925,26 +990,6 @@ function updatePillActiveState() {
   });
 }
 
-/**
- * pageList(current, total)
- * Numbers to show beneath the cards.
- *   ≤ 7 → all of them.  > 7 → 1 … n-1 n n+1 … last
- */
-function pageList(current, total) {
-  if (total <= 7) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-  const pages = [1];
-  const start = Math.max(2, current - 1);
-  const end   = Math.min(total - 1, current + 1);
-
-  if (start > 2)       pages.push('…');
-  for (let p = start; p <= end; p++) pages.push(p);
-  if (end < total - 1) pages.push('…');
-
-  pages.push(total);
-  return pages;
-}
 
 /**
  * totalPages()
@@ -991,20 +1036,15 @@ metaCategoryCount.textContent =
   prevBtn.disabled  = state.page === 1;
   nextBtn.disabled  = state.page === tp;
 
-  // 4. Page-number buttons
-  pageNumbers.innerHTML = pageList(state.page, tp).map(p => {
-    if (p === '…') return `<span class="ellipsis" aria-hidden="true">…</span>`;
-    const active = p === state.page;
-    return `<button type="button"
-                    class="page-num${active ? ' is-active' : ''}"
-                    data-page="${p}"
-                    ${active ? 'aria-current="page"' : ''}>${p}</button>`;
-  }).join('');
+  // 4. "Page X of Y" indicator
+  pageIndicator.textContent = `Page ${state.page} of ${tp}`;
 
-  // 5. Jump input
-  jumpInput.max         = tp;
-  jumpInput.placeholder = tp;
-  jumpInput.value       = '';
+  // 5. Jump dropdown — rebuild options for the current page count
+  jumpSelect.innerHTML = Array.from({ length: tp }, (_, i) => {
+    const p = i + 1;
+    const selected = p === state.page ? ' selected' : '';
+    return `<option value="${p}"${selected}>${p}</option>`;
+  }).join('');
 }
 
 /**
@@ -1038,10 +1078,6 @@ function goToPage(n) {
 prevBtn.addEventListener('click', () => goToPage(state.page - 1));
 nextBtn.addEventListener('click', () => goToPage(state.page + 1));
 
-pageNumbers.addEventListener('click', e => {
-  const btn = e.target.closest('.page-num');
-  if (btn) goToPage(Number(btn.dataset.page));
-});
 
 jumpForm.addEventListener('submit', e => {
   e.preventDefault();
