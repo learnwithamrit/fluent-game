@@ -239,9 +239,20 @@ body {
     -webkit-overflow-scrolling: touch;   /* iOS momentum scrolling */
     scrollbar-width: none;               /* Firefox */
     -ms-overflow-style: none;            /* Edge / old IE */
+     cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
 }
 .category-pills::-webkit-scrollbar { display: none; }  /* Chrome / Safari */
-
+ .category-pills.is-dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;   /* snap off while dragging, feels smoother */
+}
+/* Prevent text selection / native drag while pill-dragging */
+.category-pills .pill {
+    user-select: none;
+    -webkit-user-drag: none;
+}
 .pill {
     flex: 0 0 auto;                      /* never shrink — keep full width */
     padding: 7px 16px;
@@ -623,15 +634,15 @@ body {
 
    ═══════════════════════════════════════════════════════════════ */
 
-const SHEET_CSV_URL = "";
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1tQRoMrI08JAwZVEuNnoBvz2xLGklIwnKbVQnsdS2muU/gviz/tq?tqx=out:csv&sheet=Sheet1";
 const ROWS_PER_PAGE = 10;
 
 const CATEGORIES = [
   "Most Common",
-  "Rarely used",
+  "Rarely Used",
   "Slang & Informal",
   "Professional and Business",
-  "Literal meaning",
+  "Literal Meaning",
   "Idiomatic",
   "Polysemous",
   "Action Nuanced"
@@ -669,7 +680,7 @@ const FALLBACK_DATA = [
     example:   "The cricket match was put off until next Saturday because of the heavy rain."
   },
   {
-    category:  "Literal meaning",
+    category:  "Literal Meaning",
     verb:      "come across",
     meaningEn: "to find or meet something by chance",
     meaningBn: "আকস্মিকভাবে খুঁজে পাওয়া; হঠাৎ দেখা হয়ে যাওয়া",
@@ -1039,11 +1050,90 @@ jumpForm.addEventListener('submit', e => {
 /* ★ NEW — delegated click handler for the category pills.
    Uses event delegation so we don't have to reattach listeners
    when renderPills() rebuilds the row. */
+/* Delegated click handler for the category pills.
+   The `didDrag` guard prevents a drag gesture from also firing
+   a category switch when the user releases the mouse. */
 categoryPills.addEventListener('click', e => {
+  if (didDrag) {                    /* ★ NEW */
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
   const pill = e.target.closest('.pill');
   if (pill) setCategory(pill.dataset.category);
 });
+/* ═══════════════════════════════════════════════════════════════
+   ★ NEW — Desktop scroll support for the category pills
+   Two behaviours:
+     1. Mouse drag  — click and drag the row left / right
+     2. Wheel scroll — hover and roll the mouse wheel; vertical
+                       wheel motion is translated into horizontal
+                       scrolling of the pill row.
+   Touch screens already work natively via overflow-x: auto.
+   ═══════════════════════════════════════════════════════════════ */
 
+/* --- 1. Mouse drag --------------------------------------------- */
+let isDown    = false;   // true while the mouse button is held
+let startX    = 0;       // cursor X at mousedown
+let startScroll = 0;     // pills' scrollLeft at mousedown
+let didDrag   = false;   // true if the pointer moved far enough to count as a drag
+
+categoryPills.addEventListener('mousedown', e => {
+  // Ignore right-click / middle-click
+  if (e.button !== 0) return;
+
+  isDown      = true;
+  didDrag     = false;
+  startX      = e.pageX;
+  startScroll = categoryPills.scrollLeft;
+
+  categoryPills.classList.add('is-dragging');
+});
+
+window.addEventListener('mousemove', e => {
+  if (!isDown) return;
+
+  const walk = e.pageX - startX;       // pixels moved since mousedown
+
+  // Past a 5px threshold we consider it a drag, not a click
+  if (Math.abs(walk) > 5) didDrag = true;
+
+  // Drag left → scroll right (inverse sign feels natural)
+  categoryPills.scrollLeft = startScroll - walk;
+});
+
+window.addEventListener('mouseup', () => {
+  if (!isDown) return;
+  isDown = false;
+  categoryPills.classList.remove('is-dragging');
+
+  // Let the click handler see didDrag=true on this tick, then reset
+  // on the next tick so the NEXT click works normally.
+  setTimeout(() => { didDrag = false; }, 0);
+});
+
+/* Cancel drag if the cursor leaves the window entirely */
+window.addEventListener('blur', () => {
+  isDown = false;
+  categoryPills.classList.remove('is-dragging');
+});
+
+/* --- 2. Wheel scroll ------------------------------------------ */
+/* Translate vertical wheel motion into horizontal scroll while
+   the cursor is over the pill row. Also blocks the page from
+   scrolling vertically during that gesture. */
+categoryPills.addEventListener('wheel', e => {
+  // Only act when the row actually has something to scroll
+  const canScroll = categoryPills.scrollWidth > categoryPills.clientWidth;
+  if (!canScroll) return;
+
+  // If the user is already scrolling with a trackpad horizontally,
+  // respect that (deltaX is non-zero) and don't override.
+  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+
+  e.preventDefault();
+  categoryPills.scrollLeft += e.deltaY;
+}, { passive: false });
 
 /* ═══════════════════════════════════════════════════════════════
    SECTION 10 — NAV HELPERS (template)
