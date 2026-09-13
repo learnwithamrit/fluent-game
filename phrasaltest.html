@@ -537,7 +537,7 @@ body {
             full sentence showing it in real context.
         </p>
         <div id="header-meta">
-            <span class="meta-badge">📖 Reference</span>
+            <span class="meta-badge" id="metaCategoryCount">📖 — entries</span>
             <span class="meta-badge">🎯 All levels</span>
             <span class="meta-badge" id="metaCount">📌 — entries</span>
         </div>
@@ -744,6 +744,7 @@ const jumpForm      = document.getElementById('jumpForm');
 const jumpInput     = document.getElementById('jumpInput');
 const statusText    = document.getElementById('statusText');
 const metaCount     = document.getElementById('metaCount');
+const metaCategoryCount = document.getElementById('metaCategoryCount');   /* ★ NEW */
 const categoryPills = document.getElementById('categoryPills');   /* ★ NEW */
 
 
@@ -962,6 +963,9 @@ function totalPages() {
 function render() {
   const items = filteredItems();          /* ★ CHANGED — was state.items */
   const tp = totalPages();
+// ★ NEW — update the category-count badge with the current filter's total
+metaCategoryCount.textContent =
+  `📖 ${items.length} ${items.length === 1 ? 'entry' : 'entries'}`;
   state.page = Math.min(Math.max(1, state.page), tp);
 
   const start = (state.page - 1) * ROWS_PER_PAGE;
