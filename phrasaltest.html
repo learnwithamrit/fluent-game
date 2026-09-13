@@ -805,8 +805,7 @@ const pagination    = document.getElementById('pagination');
 const prevBtn       = document.getElementById('prevBtn');
 const nextBtn       = document.getElementById('nextBtn');
 const pageIndicator = document.getElementById('pageIndicator');   /* ★ CHANGED */
-const jumpForm      = document.getElementById('jumpForm');
-const jumpInput     = document.getElementById('jumpInput');
+const jumpSelect    = document.getElementById('jumpSelect');
 const statusText    = document.getElementById('statusText');
 const metaCount     = document.getElementById('metaCount');
 const metaCategoryCount = document.getElementById('metaCategoryCount');   /* ★ NEW */
@@ -1079,12 +1078,10 @@ prevBtn.addEventListener('click', () => goToPage(state.page - 1));
 nextBtn.addEventListener('click', () => goToPage(state.page + 1));
 
 
-jumpForm.addEventListener('submit', e => {
-  e.preventDefault();
-  const n = parseInt(jumpInput.value, 10);
-  if (!Number.isFinite(n)) { jumpInput.focus(); return; }
-  goToPage(n);
-  jumpInput.blur();
+/* Jump-to-page dropdown — navigates as soon as a page is chosen */
+jumpSelect.addEventListener('change', e => {
+  const n = parseInt(e.target.value, 10);
+  if (Number.isFinite(n)) goToPage(n);
 });
 
 /* ★ NEW — delegated click handler for the category pills.
