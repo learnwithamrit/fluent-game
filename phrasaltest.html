@@ -244,6 +244,11 @@ body {
     -webkit-user-select: none;
 }
 .category-pills::-webkit-scrollbar { display: none; }  /* Chrome / Safari */
+     /* Second pill row — sits below the pagination */
+#categoryPillsBottom {
+    margin-top: 16px;
+    margin-bottom: 0;
+}
  .category-pills.is-dragging {
     cursor: grabbing;
     scroll-snap-type: none;   /* snap off while dragging, feels smoother */
@@ -507,7 +512,7 @@ body {
 
     .table-header {
         display: grid;
-        grid-template-columns: 1fr 1.3fr 1.6fr;
+        grid-template-columns: 1fr 1.4fr 1.6fr;
         gap: 24px;
         padding: 16px 24px;
         background: var(--sur2);
@@ -525,7 +530,7 @@ body {
     /* Card becomes a table row */
     .example-card {
         display: grid;
-        grid-template-columns: 1fr 1.3fr 1.6fr;
+        grid-template-columns: 1fr 1.4fr 1.6fr;
         gap: 24px;
         align-items: start;
         background: transparent;
@@ -568,9 +573,14 @@ body {
     }
 }
 @media (min-width: 1024px) {
-    :root { --max-w: 740px; }
+    :root { --max-w: 1100px; }   /* ★ CHANGED — was 740px */
     #page-header { padding: 64px 0 var(--gap-md); }
     #header-title { font-size: 2.8rem; }
+}
+/* Very large screens — use up to 80% of the viewport, capped at 1600px
+   so ultrawide monitors don't stretch content absurdly */
+@media (min-width: 1440px) {
+    :root { --max-w: min(80vw, 1600px); }
 }
 </style>
 </head>
@@ -646,7 +656,8 @@ body {
                   <select id="jumpSelect"></select>
               </div>
           </nav>
-
+     <!-- Second copy of the category pills — same behaviour as the top row -->
+          <div class="category-pills" id="categoryPillsBottom" role="tablist" aria-label="Filter by category"></div>
         </section>
 
     </main>
@@ -809,7 +820,7 @@ const jumpSelect    = document.getElementById('jumpSelect');
 const statusText    = document.getElementById('statusText');
 const metaCount     = document.getElementById('metaCount');
 const metaCategoryCount = document.getElementById('metaCategoryCount');   /* ★ NEW */
-const categoryPills = document.getElementById('categoryPills');   /* ★ NEW */
+const categoryPillsAll = document.querySelectorAll('.category-pills'); /* Both pill rows — a NodeList so every loop below applies to all rows */
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -966,7 +977,8 @@ function cardHTML(item) {
  * Marks the pill whose value equals state.category as active.
  */
 function renderPills() {
-  categoryPills.innerHTML = CATEGORIES.map(cat => {
+  // Build the pill markup once, then inject it into every pill row
+  const html = CATEGORIES.map(cat => {
     const active = cat === state.category;
     return `<button type="button"
                     class="pill${active ? ' is-active' : ''}"
@@ -974,6 +986,8 @@ function renderPills() {
                     data-category="${escapeHTML(cat)}"
                     aria-selected="${active}">${escapeHTML(cat)}</button>`;
   }).join('');
+
+  categoryPillsAll.forEach(row => { row.innerHTML = html; });
 }
 
 /**
@@ -982,10 +996,13 @@ function renderPills() {
  * Used when the user switches categories.
  */
 function updatePillActiveState() {
-  categoryPills.querySelectorAll('.pill').forEach(btn => {
-    const active = btn.dataset.category === state.category;
-    btn.classList.toggle('is-active', active);
-    btn.setAttribute('aria-selected', String(active));
+  // Loop every row, then every pill inside it, and sync the active class
+  categoryPillsAll.forEach(row => {
+    row.querySelectorAll('.pill').forEach(btn => {
+      const active = btn.dataset.category === state.category;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-selected', String(active));
+    });
   });
 }
 
@@ -1100,77 +1117,92 @@ categoryPills.addEventListener('click', e => {
   if (pill) setCategory(pill.dataset.category);
 });
 /* ═══════════════════════════════════════════════════════════════
-   ★ NEW — Desktop scroll support for the category pills
-   Two behaviours:
-     1. Mouse drag  — click and drag the row left / right
-     2. Wheel scroll — hover and roll the mouse wheel; vertical
-                       wheel motion is translated into horizontal
-                       scrolling of the pill row.
-   Touch screens already work natively via overflow-x: auto.
+   Category pills — click, mouse-drag and wheel-scroll
+   All handlers below apply to EVERY element with the
+   .category-pills class, so both the top and bottom rows behave
+   identically and stay in sync.
    ═══════════════════════════════════════════════════════════════ */
 
-/* --- 1. Mouse drag --------------------------------------------- */
-let isDown    = false;   // true while the mouse button is held
-let startX    = 0;       // cursor X at mousedown
-let startScroll = 0;     // pills' scrollLeft at mousedown
-let didDrag   = false;   // true if the pointer moved far enough to count as a drag
+/* Drag state — shared across all pill rows */
+let isDown      = false;   // mouse button currently held
+let startX      = 0;       // cursor X at mousedown
+let startScroll = 0;       // scrollLeft of the dragged row at mousedown
+let didDrag     = false;   // true once the pointer has moved > 5px
+let dragTarget  = null;    // which pill row is currently being dragged
 
-categoryPills.addEventListener('mousedown', e => {
-  // Ignore right-click / middle-click
-  if (e.button !== 0) return;
+/* --- 1. Click / tap -------------------------------------------- */
+/* Document-level delegation so we never need to re-bind after
+   renderPills() rebuilds the pill rows. */
+document.addEventListener('click', e => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
 
-  isDown      = true;
-  didDrag     = false;
-  startX      = e.pageX;
-  startScroll = categoryPills.scrollLeft;
+  // Ignore the click that ends a drag gesture
+  if (didDrag) {
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+  setCategory(pill.dataset.category);
+});
 
-  categoryPills.classList.add('is-dragging');
+/* --- 2. Mouse drag -------------------------------------------- */
+categoryPillsAll.forEach(row => {
+  row.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;           // left button only
+
+    isDown      = true;
+    didDrag     = false;
+    dragTarget  = row;
+    startX      = e.pageX;
+    startScroll = row.scrollLeft;
+
+    row.classList.add('is-dragging');
+  });
 });
 
 window.addEventListener('mousemove', e => {
-  if (!isDown) return;
+  if (!isDown || !dragTarget) return;
 
-  const walk = e.pageX - startX;       // pixels moved since mousedown
-
-  // Past a 5px threshold we consider it a drag, not a click
+  const walk = e.pageX - startX;
   if (Math.abs(walk) > 5) didDrag = true;
 
-  // Drag left → scroll right (inverse sign feels natural)
-  categoryPills.scrollLeft = startScroll - walk;
+  // Drag left → scroll right (inverse feels natural)
+  dragTarget.scrollLeft = startScroll - walk;
 });
 
 window.addEventListener('mouseup', () => {
   if (!isDown) return;
-  isDown = false;
-  categoryPills.classList.remove('is-dragging');
 
-  // Let the click handler see didDrag=true on this tick, then reset
-  // on the next tick so the NEXT click works normally.
+  isDown = false;
+  if (dragTarget) dragTarget.classList.remove('is-dragging');
+  dragTarget = null;
+
+  // Reset didDrag on the next tick, after the click event fires
   setTimeout(() => { didDrag = false; }, 0);
 });
 
-/* Cancel drag if the cursor leaves the window entirely */
+/* Cancel drag if the window loses focus */
 window.addEventListener('blur', () => {
   isDown = false;
-  categoryPills.classList.remove('is-dragging');
+  if (dragTarget) dragTarget.classList.remove('is-dragging');
+  dragTarget = null;
 });
 
-/* --- 2. Wheel scroll ------------------------------------------ */
-/* Translate vertical wheel motion into horizontal scroll while
-   the cursor is over the pill row. Also blocks the page from
-   scrolling vertically during that gesture. */
-categoryPills.addEventListener('wheel', e => {
-  // Only act when the row actually has something to scroll
-  const canScroll = categoryPills.scrollWidth > categoryPills.clientWidth;
-  if (!canScroll) return;
+/* --- 3. Wheel scroll ------------------------------------------ */
+/* Vertical wheel motion over a pill row scrolls it horizontally */
+categoryPillsAll.forEach(row => {
+  row.addEventListener('wheel', e => {
+    const canScroll = row.scrollWidth > row.clientWidth;
+    if (!canScroll) return;
 
-  // If the user is already scrolling with a trackpad horizontally,
-  // respect that (deltaX is non-zero) and don't override.
-  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    // Respect trackpad horizontal swipes as-is
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
 
-  e.preventDefault();
-  categoryPills.scrollLeft += e.deltaY;
-}, { passive: false });
+    e.preventDefault();
+    row.scrollLeft += e.deltaY;
+  }, { passive: false });
+});
 
 /* ═══════════════════════════════════════════════════════════════
    SECTION 10 — NAV HELPERS (template)
