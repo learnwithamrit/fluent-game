@@ -1132,51 +1132,65 @@
         /* ═══════════════════════════════════════════════════════
            BOOT
         ═══════════════════════════════════════════════════════ */
-        async function boot() {
-            const loadingEl = document.getElementById('loading-state');
-            const errorEl   = document.getElementById('error-state');
-            const listHead  = document.getElementById('list-header');
+async function boot() {
+    const loadingEl = document.getElementById('loading-state');
+    const errorEl   = document.getElementById('error-state');
+    const listHead  = document.getElementById('list-header');
+    const errText   = document.getElementById('error-text');
 
-            let groups = [];
+    try {
+        let groups = [];
+        const urlConfigured = SHEET_CSV_URL && SHEET_CSV_URL.indexOf('PASTE_') !== 0;
 
-            const urlConfigured =
-                SHEET_CSV_URL && SHEET_CSV_URL.indexOf('PASTE_') !== 0;
+        if (urlConfigured) {
+            try {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 8000);
+                const res = await fetch(SHEET_CSV_URL, {
+                    cache: 'no-store',
+                    signal: controller.signal
+                });
+                clearTimeout(timer);
 
-            if (urlConfigured) {
-                try {
-                    const res = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
-                    if (!res.ok) throw new Error('HTTP ' + res.status);
-
-                    const csv  = await res.text();
-                    const rows = parseCSV(csv);
-                    groups     = groupRows(rows);
-
-                    if (!groups.length) throw new Error('Sheet returned no usable rows');
-                } catch (err) {
-                    console.warn('[Fluent] Sheet fetch failed, using fallback:', err);
-                    groups = groupRows(FALLBACK_ROWS);
-                    errorEl.style.display = 'flex';
-                    document.getElementById('error-text').innerHTML =
-                        'Showing the built-in list — the live sheet couldn\'t be reached.';
-                }
-            } else {
-                console.warn('[Fluent] SHEET_CSV_URL not set — using fallback data.');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const csv  = await res.text();
+                const rows = parseCSV(csv);
+                groups     = groupRows(rows);
+                if (!groups.length) throw new Error('Sheet returned no usable rows');
+            } catch (err) {
+                console.warn('[Fluent] Sheet fetch failed, using fallback:', err);
                 groups = groupRows(FALLBACK_ROWS);
+                if (errorEl) errorEl.style.display = 'flex';
+                if (errText) errText.textContent =
+                    'Showing the built-in list — the live sheet couldn\'t be reached.';
             }
-
-            ALL_GROUPS = groups;
-            CURRENT_PAGE = 1;
-
-            // Update the header count badge
-            const altCount = groups.reduce((n, g) => n + g.alts.length, 0);
-            document.getElementById('meta-count').textContent =
-                '📌 ' + altCount + ' phrases';
-
-            loadingEl.style.display = 'none';
-            listHead.style.display  = 'grid';
-
-            renderPage();
+        } else {
+            console.warn('[Fluent] SHEET_CSV_URL not set — using fallback data.');
+            groups = groupRows(FALLBACK_ROWS);
         }
+
+        ALL_GROUPS   = groups;
+        CURRENT_PAGE = 1;
+
+        const countEl = document.getElementById('meta-count');
+        if (countEl) {
+            const altCount = groups.reduce((n, g) => n + g.alts.length, 0);
+            countEl.textContent = '📌 ' + altCount + ' phrases';
+        }
+
+        if (listHead) listHead.style.display = 'grid';
+        renderPage();
+
+    } catch (err) {
+        console.error('[Fluent] boot() failed:', err);
+        if (errorEl) errorEl.style.display = 'flex';
+        if (errText) errText.textContent = 'Something went wrong: ' + err.message;
+
+    } finally {
+        // ── Always hide the spinner, no matter what happened above ──
+        if (loadingEl) loadingEl.style.display = 'none';
+    }
+}
 
         /* ═══════════════════════════════════════════════════════
            NAVIGATION HELPERS (unchanged from template)
