@@ -959,32 +959,30 @@
            Rows sharing a "Basic" value become one card.
            Order follows first appearance.
         ═══════════════════════════════════════════════════════ */
-        function groupRows(rows) {
-            if (!rows.length) return [];
+function groupRows(rows) {
+    if (!Array.isArray(rows) || !rows.length) return [];
 
-            // Skip a header row if the first cell looks like "Basic"
-            const first = (rows[0][0] || '').trim().toLowerCase();
-            const body = (first === 'basic' || first === 'plain')
-                ? rows.slice(1)
-                : rows;
+    // Skip a header row if the first cell looks like "Basic"
+    const firstCell = Array.isArray(rows[0]) ? String(rows[0][0] || '') : '';
+    const first = firstCell.trim().toLowerCase();
+    const body  = (first === 'basic' || first === 'plain') ? rows.slice(1) : rows;
 
-            const map = new Map();
+    const map = new Map();
 
-            for (const r of body) {
-                const basic   = (r[0] || '').trim();
-                const natural = (r[1] || '').trim();
-                const note    = (r[2] || '').trim();
+    for (const r of body) {
+        if (!Array.isArray(r)) continue;              // ← skips holes / undefined
+        const basic   = String(r[0] || '').trim();
+        const natural = String(r[1] || '').trim();
+        const note    = String(r[2] || '').trim();
 
-                if (!basic || !natural) continue;
+        if (!basic || !natural) continue;
 
-                if (!map.has(basic)) {
-                    map.set(basic, { basic, alts: [] });
-                }
-                map.get(basic).alts.push({ natural, note });
-            }
+        if (!map.has(basic)) map.set(basic, { basic, alts: [] });
+        map.get(basic).alts.push({ natural, note });
+    }
 
-            return Array.from(map.values());
-        }
+    return Array.from(map.values());
+}
 
         /* ═══════════════════════════════════════════════════════
            REGISTER → COLOUR CLASS
